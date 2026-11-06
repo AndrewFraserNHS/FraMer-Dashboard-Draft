@@ -3,6 +3,37 @@ import { Link } from "react-router-dom";
 import { useDetailPanel } from "./MaternityShell";
 import { RiskBannerGroup } from "./RiskBanner";
 
+type AccordionItemProps = {
+  label: string;
+  detail: string;
+  children: ReactNode;
+  expandedContent: ReactNode;
+};
+
+function AccordionItem({ label, detail, children, expandedContent }: AccordionItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        className={`dash-list-row interactive${isExpanded ? " expanded" : ""}`}
+        onClick={() => setIsExpanded(!isExpanded)}
+        aria-label={`${isExpanded ? "Collapse" : "Expand"} ${label} detail`}
+        aria-expanded={isExpanded}
+      >
+        {children}
+        <RowChevron />
+      </button>
+      {isExpanded && (
+        <div className="accordion-details">
+          {expandedContent}
+        </div>
+      )}
+    </>
+  );
+}
+
 const risks = [
   ["high", "Gestational diabetes", "Diagnosed 5 September 2026 · Lab results"],
   ["high", "Penicillin allergy", "Reaction: rash · GP record"],
@@ -274,35 +305,39 @@ export default function App() {
 
     <div className="dash-grid dash-grid-three">
       <ExpanderCard title="Clinical risks and alerts" count="Showing 7 of 7 active">
-        {risks.map(([tone, label, detail], index) => <ListRow key={label} label={`View ${label} detail`} onOpen={() => openPanel({
-          eyebrow: "Risk and safety detail",
-          title: label,
-          content: <DetailRows rows={[
+        {risks.map(([tone, label, detail], index) => <AccordionItem
+          key={label}
+          label={label}
+          detail={detail}
+          children={<><div><strong>{label}</strong><small>{detail}</small></div><b className={`priority ${tone}${index % 2 === 1 ? " priority-filled" : ""}`}>{tone === "high" ? "High priority" : tone === "medium" ? "Medium priority" : "Low priority"}</b></>}
+          expandedContent={<DetailRows rows={[
             ["Risk or flag", label],
             ["Priority", tone === "high" ? "High priority" : tone === "medium" ? "Medium priority" : "Low priority"],
             ["Clinical detail", detail],
             ["Applies to", "Current pregnancy"],
             ["Review status", tone === "low" ? "No action required" : "Active review required"],
             ["Record source", detail.includes("·") ? detail.split("·")[1].trim() : "Maternity record"],
-          ]} />,
-        })}><div><strong>{label}</strong><small>{detail}</small></div><b className={`priority ${tone}${index % 2 === 1 ? " priority-filled" : ""}`}>{tone === "high" ? "High priority" : tone === "medium" ? "Medium priority" : "Low priority"}</b></ListRow>)}
+          ]} />}
+        />)}
       </ExpanderCard>
       <Card
         title="Pregnancy conditions"
         count="Showing 3 of 3 active"
       >
-        {conditions.map(([name, meta, source]) => <ListRow key={name} label={`View ${name} detail`} onOpen={() => openPanel({
-          eyebrow: "Condition detail",
-          title: name,
-          content: <DetailRows rows={[
+        {conditions.map(([name, meta, source]) => <AccordionItem
+          key={name}
+          label={name}
+          detail={`${meta} · ${source}`}
+          children={<div><strong>{name}</strong><small>{meta} · {source}</small></div>}
+          expandedContent={<DetailRows rows={[
             ["Condition or problem", name],
             ["Clinical status", meta],
             ["Date recorded", meta.includes("Diagnosed") ? "5 September 2026" : "15 August 2026"],
             ["Recorder", source === "GP record" ? "Dr Sarah Wilson" : "Maternity clinical team"],
             ["Service", source],
             ["Record source", source],
-          ]} />,
-        })}><div><strong>{name}</strong><small>{meta} · {source}</small></div></ListRow>)}
+          ]} />}
+        />)}
         <More to="/comorbidities">View full condition history</More>
       </Card>
       <Card title="Social and maternity context" count="Showing 14 of 14 recorded">
@@ -334,18 +369,20 @@ export default function App() {
         defaultOpen={false}
         action={<SortControl label="test results" value={resultSort} onChange={setResultSort} />}
       >
-        {sortedResults.map(([test, value, date, status, tone]) => <ListRow key={test} label={`View ${test} result`} onOpen={() => openPanel({
-          eyebrow: "Result detail",
-          title: test,
-          content: <DetailRows rows={[
+        {sortedResults.map(([test, value, date, status, tone]) => <AccordionItem
+          key={test}
+          label={test}
+          detail={`${value} · ${date}`}
+          children={<><div><strong>{test}</strong><span>{value}</span><small>{date} · Lab results</small></div><b className={`result-tag ${tone}`}>{status}</b></>}
+          expandedContent={<DetailRows rows={[
             ["Investigation", test],
             ["Result", value],
             ["Result date", date],
             ["Status", status],
             ["Requested by", "Maternity clinical team"],
             ["Record source", "Lab results"],
-          ]} />,
-        })}><div><strong>{test}</strong><span>{value}</span><small>{date} · Lab results</small></div><b className={`result-tag ${tone}`}>{status}</b></ListRow>)}
+          ]} />}
+        />)}
         <More to="/results">View all results</More>
       </Card>
       <Card title="Care plans and treatment preferences" count="Showing 2 of 2 active" defaultOpen={false}>
@@ -367,18 +404,20 @@ export default function App() {
         defaultOpen={false}
         action={<SortControl label="medicines" value={medicineSort} onChange={setMedicineSort} />}
       >
-        {sortedMedicines.map(([name, dose, direction, source]) => <ListRow key={name} label={`View ${name} detail`} onOpen={() => openPanel({
-          eyebrow: "Medication detail",
-          title: name,
-          content: <DetailRows rows={[
+        {sortedMedicines.map(([name, dose, direction, source]) => <AccordionItem
+          key={name}
+          label={name}
+          detail={`${dose} · ${direction}`}
+          children={<div><strong>{name} <em>{dose}</em></strong><small>{direction} · {source}</small></div>}
+          expandedContent={<DetailRows rows={[
             ["Medicine", name],
             ["Dose", dose],
             ["Directions or indication", direction],
             ["Status", "Current"],
             ["Prescriber or service", source],
             ["Pregnancy review", "Reviewed for current pregnancy"],
-          ]} />,
-        })}><div><strong>{name} <em>{dose}</em></strong><small>{direction} · {source}</small></div></ListRow>)}
+          ]} />}
+        />)}
         <More to="/pregnancy">View complete medicines record</More>
       </Card>
     </div>

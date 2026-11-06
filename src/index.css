@@ -1321,6 +1321,45 @@ button {
   font-weight: 400;
 }
 
+.accordion-details {
+  background: #f0f4f5;
+  border-bottom: 1px solid #e8edee;
+  padding: 12px 10px;
+}
+
+.accordion-details > div {
+  display: grid;
+  gap: 12px;
+}
+
+.accordion-details > div > div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8edee;
+}
+
+.accordion-details > div > div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.accordion-details label {
+  color: #4c6272;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.accordion-details span,
+.accordion-details p {
+  color: #212b32;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .dash-more {
   position: absolute;
   right: 10px;

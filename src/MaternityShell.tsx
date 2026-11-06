@@ -11,6 +11,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { BreadcrumbProvider, BreadcrumbNav } from "./BreadcrumbNav";
 import {
   ChevronDown,
+  ChevronLeft,
   Search,
   Settings,
   Bell,
@@ -1565,18 +1566,20 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
           {panel && (
             <aside className="record-detail-panel" role="region" aria-labelledby="record-detail-panel-title">
               <div className={`record-panel-heading tone-${panel.tone || "blue"}`}>
+                <button
+                  ref={closeButton}
+                  onClick={closePanel}
+                  aria-label={`Close ${panel.title} details`}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+                >
+                  <ChevronLeft size={20} />
+                  <span>Back</span>
+                </button>
                 <div>
                   {panel.eyebrow && <span>{panel.eyebrow}</span>}
                   <h2 id="record-detail-panel-title">{panel.title}</h2>
                   {panel.status && <b className="record-panel-status">{panel.status}</b>}
                 </div>
-                <button
-                  ref={closeButton}
-                  onClick={closePanel}
-                  aria-label={`Close ${panel.title} details`}
-                >
-                  ×
-                </button>
               </div>
               <div className="record-panel-content">{panel.content}</div>
             </aside>

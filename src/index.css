@@ -3133,3 +3133,486 @@ textarea:focus-visible {
     overflow-y: auto;
   }
 }
+
+/* NHS.UK frontend alignment: tablet-first frame, component classes and contrast. */
+.record-shell * {
+  text-transform: none !important;
+}
+
+.record-frame {
+  width: 100%;
+  max-width: 1024px;
+  margin-inline: auto;
+  border-inline: 1px solid var(--nhs-colour-pale-grey);
+}
+
+.record-context-panel {
+  border-bottom: 1px solid var(--nhs-colour-pale-grey);
+  background: var(--nhs-colour-white);
+}
+
+.record-context-expander {
+  margin: 0;
+  border: 0;
+}
+
+.record-context-summary-row {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.record-context-summary-detail {
+  color: var(--nhs-colour-blue);
+  font-weight: 700;
+}
+
+.record-context-content {
+  display: grid;
+  gap: var(--nhs-space-3);
+  margin-top: 0;
+}
+
+.record-notification-banners {
+  display: grid;
+  gap: var(--nhs-space-3);
+}
+
+.record-notification-banner {
+  margin-bottom: 0;
+}
+
+.record-notification-banner .nhsuk-notification-banner__content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--nhs-space-3);
+}
+
+.record-notification-banner .nhsuk-notification-banner__content p {
+  margin-top: var(--nhs-space-1);
+}
+
+.record-notification-banner .nhsuk-button {
+  margin: 0;
+}
+
+.record-notification-banner.flag-red .nhsuk-notification-banner__header {
+  background: var(--nhs-colour-red);
+}
+
+.record-notification-banner.flag-red .nhsuk-notification-banner__title,
+.record-notification-banner.flag-red .nhsuk-notification-banner__header * {
+  color: var(--nhs-colour-white);
+}
+
+.record-filterbar {
+  padding: 0;
+  border: 0;
+}
+
+.record-tools {
+  margin-left: 0;
+}
+
+.record-tools .nhsuk-button {
+  margin-bottom: 0;
+}
+
+.record-utilities > button:hover,
+.record-tools .nhsuk-button:hover,
+.record-notification-banner .nhsuk-button:hover,
+.record-view-trigger:hover {
+  color: var(--nhs-colour-white) !important;
+  background: var(--nhs-colour-dark-blue) !important;
+  border-color: var(--nhs-colour-dark-blue) !important;
+}
+
+.record-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 650;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nhs-space-3);
+  background: rgb(0 0 0 / 48%);
+}
+
+.record-detail-panel {
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 32px);
+  border-left: 0;
+}
+
+.record-panel-content {
+  overflow: auto;
+}
+
+.priority.high,
+.result-tag.high {
+  color: var(--nhs-colour-white);
+  border-color: var(--nhs-colour-red);
+  background: var(--nhs-colour-red);
+}
+
+.record-shell button:focus-visible,
+.record-shell a:focus-visible,
+.record-shell select:focus-visible,
+.record-shell summary:focus-visible {
+  outline: 4px solid transparent;
+  color: var(--nhs-colour-black) !important;
+  background: var(--nhs-colour-focus) !important;
+  box-shadow:
+    0 -2px var(--nhs-colour-focus),
+    0 4px var(--nhs-colour-black);
+}
+
+@media (max-width: 1023px) {
+  .record-frame {
+    max-width: 100%;
+    border-inline: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .record-notification-banner .nhsuk-notification-banner__content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .record-notification-banner .nhsuk-button {
+    width: 100%;
+  }
+}
+
+/* Enhanced Header Styles */
+.record-utilities {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.utilities-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-right: 1px solid rgb(255 255 255 / 20%);
+  padding: 0 4px;
+}
+
+.utilities-group:last-child {
+  border-right: none;
+}
+
+.utility-button {
+  height: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+}
+
+.utility-button:hover {
+  background: rgb(255 255 255 / 15%);
+}
+
+.utility-button:active {
+  background: rgb(255 255 255 / 25%);
+}
+
+.utility-button.utility-with-icon {
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.utility-button svg {
+  flex-shrink: 0;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb-nav {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background: #fff;
+  border-bottom: 1px solid #d8dde0;
+  font-size: 13px;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-list li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumb-separator {
+  color: #4c6272;
+  flex-shrink: 0;
+}
+
+.breadcrumb-link {
+  padding: 2px 6px;
+  border: none;
+  color: #005eb8;
+  background: transparent;
+  font-size: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 150ms ease;
+}
+
+.breadcrumb-link:hover {
+  background: #e8edee;
+  text-decoration: underline;
+}
+
+.breadcrumb-link:focus {
+  outline: 3px solid #ffb81c;
+  outline-offset: 0;
+}
+
+.breadcrumb-current {
+  color: #212b32;
+  font-weight: 600;
+}
+
+/* Detail Page Styles */
+.detail-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  overflow: hidden;
+}
+
+.detail-page-header {
+  padding: 16px;
+  border-bottom: 1px solid #d8dde0;
+  flex-shrink: 0;
+}
+
+.detail-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: none;
+  color: #005eb8;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 150ms ease;
+  margin-bottom: 8px;
+}
+
+.detail-back-button:hover {
+  background: #f0f4f5;
+  text-decoration: underline;
+}
+
+.detail-back-button:focus {
+  outline: 3px solid #ffb81c;
+  outline-offset: 0;
+}
+
+.detail-back-button svg {
+  flex-shrink: 0;
+}
+
+.detail-eyebrow {
+  margin: 0 0 4px 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4c6272;
+}
+
+.detail-page-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #212b32;
+}
+
+.detail-page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 16px;
+}
+
+.detail-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e8edee;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #212b32;
+  font-size: 14px;
+}
+
+.detail-value {
+  margin: 0;
+  color: #212b32;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Prominent Risk Banner */
+.risk-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #fee2e2;
+  border-left: 4px solid #d5281b;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.risk-banner.high {
+  background: #fee2e2;
+  border-left-color: #d5281b;
+}
+
+.risk-banner.medium {
+  background: #fef3c7;
+  border-left-color: #f59e0b;
+}
+
+.risk-banner.low {
+  background: #dbeafe;
+  border-left-color: #3b82f6;
+}
+
+.risk-banner-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.risk-banner-content {
+  flex: 1;
+}
+
+.risk-banner-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #212b32;
+  margin: 0 0 2px 0;
+}
+
+.risk-banner-message {
+  font-size: 12px;
+  color: #4c6272;
+  margin: 0;
+}
+
+/* List Item Styling with Icons */
+.list-row-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.list-item-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item-label {
+  font-weight: 500;
+  font-size: 13px;
+  color: #212b32;
+  margin: 0 0 2px 0;
+}
+
+.list-item-meta {
+  font-size: 12px;
+  color: #4c6272;
+  margin: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .utilities-group {
+    border-right: none;
+    padding: 0 2px;
+  }
+
+  .utility-button span {
+    display: none;
+  }
+
+  .utility-button {
+    padding: 0 8px;
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .detail-label {
+    font-size: 12px;
+  }
+
+  .detail-value {
+    font-size: 12px;
+  }
+}
+
+/* Risk Banner Group */
+.risk-banner-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}

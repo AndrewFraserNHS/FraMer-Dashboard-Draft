@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDetailPanel } from "./MaternityShell";
+import { RiskBannerGroup } from "./RiskBanner";
 
 const risks = [
   ["high", "Gestational diabetes", "Diagnosed 5 September 2026 · Lab results"],
@@ -244,6 +245,14 @@ export default function App() {
 
   return <div className="ncrs-app maternity-dashboard"><div className="ncrs-main">
     <h1 className="record-page-title">Summary</h1>
+
+    <RiskBannerGroup risks={[
+      { level: "high", title: "Gestational diabetes", message: "Diagnosed 5 September 2026" },
+      { level: "high", title: "Penicillin allergy", message: "Reaction: rash" },
+      { level: "medium", title: "High body mass index (32)", message: "BMI 32 - requires monitoring" },
+      { level: "medium", title: "Depression and anxiety (history)", message: "Currently managed by Perinatal mental health team" },
+    ]} />
+
     <ExpanderCard
       title="Artificial intelligence clinical summary"
       count="High confidence"

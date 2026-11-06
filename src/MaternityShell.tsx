@@ -8,6 +8,16 @@ import {
   useState,
 } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { BreadcrumbProvider, BreadcrumbNav } from "./BreadcrumbNav";
+import {
+  ChevronDown,
+  Search,
+  Settings,
+  Bell,
+  LogOut,
+  MessageSquare,
+  HelpCircle,
+} from "lucide-react";
 
 export type DetailPanel = {
   title: string;
@@ -1192,62 +1202,99 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className={`record-shell text-${textSize}`}>
-      <a className="record-skip-link" href="#main-content">
-        Skip to main content
-      </a>
+    <BreadcrumbProvider>
+      <div className={`record-shell text-${textSize}`}>
+        <a className="record-skip-link" href="#main-content">
+          Skip to main content
+        </a>
 
-      <div className="record-frame">
-        {accessToastVisible && (
-          <div className="access-toast" role="status" aria-live="polite">
-            Access logged — this record access has been recorded for audit
-          </div>
-        )}
-        <header className="record-header">
-          <div className="record-brand">
-            <img
-              className="record-nhs-logo-image"
-              src="/assets/1b6bd.png"
-              alt="NHS"
-            />
-            <span>National Care Records Service</span>
-          </div>
-          <nav aria-label="Service navigation" className="record-utilities">
-            <button className="tablet-preview" type="button">
-              Tablet preview
-            </button>
-            <div className="record-patient-switcher">
-              <strong>Patient</strong>
-              <button type="button">
-                Existing patient
-                <span aria-hidden="true" />
-              </button>
+        <div className="record-frame">
+          {accessToastVisible && (
+            <div className="access-toast" role="status" aria-live="polite">
+              Access logged — this record access has been recorded for audit
             </div>
-            <button
-              onClick={() => setAppView("search")}
-            >
-              Find patient
-            </button>
-            <button onClick={() => {}}>
-              List birth notifications
-            </button>
-            <button onClick={() => {}}>
-              Change role
-            </button>
-            <button onClick={() => {}}>
-              What’s new
-            </button>
-            <button onClick={() => {}}>
-              Give feedback
-            </button>
-            <button onClick={() => {}}>
-              Log out
-            </button>
-          </nav>
-        </header>
+          )}
+          <header className="record-header">
+            <div className="record-brand">
+              <img
+                className="record-nhs-logo-image"
+                src="/assets/1b6bd.png"
+                alt="NHS"
+              />
+              <span>National Care Records Service</span>
+            </div>
+            <nav aria-label="Service navigation" className="record-utilities">
+              <div className="utilities-group utilities-patient">
+                <div className="record-patient-switcher">
+                  <strong>Patient</strong>
+                  <button type="button" className="utility-button">
+                    Existing patient
+                    <ChevronDown size={16} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
 
-        <section className="record-patient-banner" aria-label="Patient identity">
-          <div className="record-demographics">
+              <div className="utilities-group utilities-actions">
+                <button
+                  className="utility-button utility-with-icon"
+                  onClick={() => setAppView("search")}
+                  title="Find patient"
+                >
+                  <Search size={18} />
+                  <span>Find patient</span>
+                </button>
+                <button className="utility-button" onClick={() => {}}>
+                  List birth notifications
+                </button>
+              </div>
+
+              <div className="utilities-group utilities-settings">
+                <button
+                  className="utility-button utility-with-icon"
+                  onClick={() => {}}
+                  title="Change role"
+                >
+                  <Settings size={18} />
+                  <span>Change role</span>
+                </button>
+                <button
+                  className="utility-button utility-with-icon"
+                  onClick={() => {}}
+                  title="What's new"
+                >
+                  <Bell size={18} />
+                  <span>What's new</span>
+                </button>
+                <button
+                  className="utility-button utility-with-icon"
+                  onClick={() => {}}
+                  title="Give feedback"
+                >
+                  <MessageSquare size={18} />
+                  <span>Give feedback</span>
+                </button>
+                <button
+                  className="utility-button utility-with-icon"
+                  onClick={() => {}}
+                  title="Help"
+                >
+                  <HelpCircle size={18} />
+                  <span>Help</span>
+                </button>
+                <button
+                  className="utility-button utility-with-icon"
+                  onClick={() => {}}
+                  title="Log out"
+                >
+                  <LogOut size={18} />
+                  <span>Log out</span>
+                </button>
+              </div>
+            </nav>
+          </header>
+
+          <section className="record-patient-banner" aria-label="Patient identity">
+            <div className="record-demographics">
             <h1>Leila KHAN</h1>
             <span>31 years old</span>
             <i>|</i>
@@ -1511,6 +1558,7 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
             }}
           >
             <DetailPanelContext.Provider value={openPanel}>
+              <BreadcrumbNav />
               {children}
             </DetailPanelContext.Provider>
           </main>
@@ -1535,6 +1583,7 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </BreadcrumbProvider>
   );
 }

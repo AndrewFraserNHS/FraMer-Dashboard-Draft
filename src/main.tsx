@@ -10,6 +10,7 @@ import CarePlans from "./CarePlans";
 import Documents from "./Documents";
 import Audit from "./Audit";
 import MaternityShell from "./MaternityShell";
+import "nhsuk-frontend/dist/nhsuk/nhsuk-frontend.css";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

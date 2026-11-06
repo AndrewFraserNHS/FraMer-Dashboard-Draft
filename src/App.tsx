@@ -194,93 +194,10 @@ function ListRow({ children, onOpen, label }: { children: ReactNode; onOpen?: ()
   return <div className="dash-list-row">{children}</div>;
 }
 
-function ReorderModal({ 
-  isOpen, 
-  onClose, 
-  cards, 
-  onReorder 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
-  cards: string[]; 
-  onReorder: (newOrder: string[]) => void;
-}) {
-  const [order, setOrder] = useState(cards);
-
-  const moveCard = (index: number, direction: 'up' | 'down') => {
-    const newOrder = [...order];
-    if (direction === 'up' && index > 0) {
-      [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
-      setOrder(newOrder);
-    } else if (direction === 'down' && index < newOrder.length - 1) {
-      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
-      setOrder(newOrder);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="reorder-modal-overlay" onClick={onClose}>
-      <div className="reorder-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="reorder-modal-header">
-          <h2>Reorder sections</h2>
-          <button type="button" onClick={onClose} aria-label="Close reorder modal" style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
-        </div>
-        <div className="reorder-modal-list">
-          {order.map((card, index) => (
-            <div key={card} className="reorder-modal-item">
-              <span>{card}</span>
-              <div className="reorder-buttons">
-                <button 
-                  type="button" 
-                  onClick={() => moveCard(index, 'up')} 
-                  disabled={index === 0}
-                  aria-label={`Move ${card} up`}
-                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                >
-                  ↑
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => moveCard(index, 'down')} 
-                  disabled={index === order.length - 1}
-                  aria-label={`Move ${card} down`}
-                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                >
-                  ↓
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="reorder-modal-footer" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <button type="button" onClick={onClose} className="nhsuk-button nhsuk-button--secondary">Cancel</button>
-          <button type="button" onClick={() => { onReorder(order); onClose(); }} className="nhsuk-button">Apply</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
   const openPanel = useDetailPanel();
   const [medicineSort, setMedicineSort] = useState("date-desc");
   const [resultSort, setResultSort] = useState("date-desc");
-  const [showReorderModal, setShowReorderModal] = useState(false);
-  const [cardOrder, setCardOrder] = useState([
-    "AI summary",
-    "Clinical risks",
-    "Pregnancy conditions",
-    "Social context",
-    "Test results",
-    "Care plans",
-    "Medicines",
-    "Clinical events",
-    "Documents",
-    "Upcoming care",
-    "Care team",
-  ]);
   const medicineDates: Record<string, number> = {
     Metformin: Date.parse("2026-09-12"),
     Sertraline: Date.parse("2022-01-01"),
@@ -339,24 +256,8 @@ export default function App() {
 
   return (
     <div className="ncrs-app maternity-dashboard">
-      <ReorderModal 
-        isOpen={showReorderModal} 
-        onClose={() => setShowReorderModal(false)} 
-        cards={cardOrder}
-        onReorder={setCardOrder}
-      />
       <div className="ncrs-main">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h1 className="record-page-title">Summary</h1>
-          <button 
-            type="button" 
-            onClick={() => setShowReorderModal(true)}
-            className="nhsuk-button"
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            Reorder sections
-          </button>
-        </div>
+        <h1 className="record-page-title">Summary</h1>
 
         <RiskBannerGroup
           risks={[

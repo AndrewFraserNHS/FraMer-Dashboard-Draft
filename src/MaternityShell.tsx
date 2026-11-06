@@ -9,6 +9,7 @@ import {
 } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { BreadcrumbProvider, BreadcrumbNav } from "./BreadcrumbNav";
+import { DetailPanel as DetailPanelComponent } from "./DetailPanel";
 import {
   ChevronDown,
   ChevronLeft,
@@ -1649,38 +1650,25 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
               <div style={{ display: panel ? 'none' : 'block' }}>
                 {children}
               </div>
+              <DetailPanelComponent 
+                isOpen={!!panel}
+                title={panel?.title || ""}
+                eyebrow={panel?.eyebrow}
+                status={panel?.status}
+                tone={panel?.tone}
+                content={panel?.content}
+                onClose={closePanel}
+              />
             </DetailPanelContext.Provider>
           </main>
-          <ReorderModal 
-            isOpen={showReorderModal} 
-            onClose={() => setShowReorderModal(false)} 
-            cards={cardOrder}
-            onReorder={setCardOrder}
-          />
-          {panel && (
-            <div className="record-detail-panel" role="region" aria-labelledby="record-detail-panel-title" style={{ display: panel ? 'flex' : 'none' }}>
-              <div className={`record-panel-heading tone-${panel.tone || "blue"}`}>
-                <button
-                  ref={closeButton}
-                  onClick={closePanel}
-                  aria-label={`Close ${panel.title} details`}
-                  className="nhsuk-button nhsuk-button--reverse"
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}
-                >
-                  <ChevronLeft size={20} />
-                  <span>Back</span>
-                </button>
-                <div>
-                  {panel.eyebrow && <span>{panel.eyebrow}</span>}
-                  <h2 id="record-detail-panel-title">{panel.title}</h2>
-                  {panel.status && <b className="record-panel-status">{panel.status}</b>}
-                </div>
-              </div>
-              <div className="record-panel-content">{panel.content}</div>
-            </div>
-          )}
         </div>
-        </div>
+        <ReorderModal 
+          isOpen={showReorderModal} 
+          onClose={() => setShowReorderModal(false)} 
+          cards={cardOrder}
+          onReorder={setCardOrder}
+        />
+      </div>
       </div>
     </BreadcrumbProvider>
   );

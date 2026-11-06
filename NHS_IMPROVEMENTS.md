@@ -58,19 +58,19 @@ This update brings significant improvements to the FraMer Dashboard's UI/UX, foc
 - **Accessibility**: Proper heading hierarchy and semantic HTML
 - **Responsive Layout**: Adapts to different screen sizes
 
-### 5. **Centered Layout with Optimal Content Container** 📐
+### 5. **Centered Layout with Full-Width Colored Sections** 📐
 
-**Before:** Full-width content with side navigation panel
-**After:** Centered white content container with side margins and removed side nav
+**Before:** Centered white container with grey margins on sides
+**After:** Full-width backgrounds with centered text content (1280px max-width)
 
 #### Features:
-- **Content Container**: White background container centered on page
-- **Maximum Width**: 1280px max-width for optimal reading and element sizing
-- **Side Margins**: Automatic margins that scale gracefully on larger screens
-- **Visual Separation**: Light gray background (#f0f4f5) provides visual contrast
-- **Responsive Padding**: Adjusts padding based on viewport size (24px desktop, 12px tablet/mobile)
-- **No Side Navigation**: Removed side nav entirely - all content is core and centralized
-- **Tablet-First Approach**: Optimized for tablet screens, scales up appropriately for desktop
+- **Full-Width Backgrounds**: Colored sections extend edge-to-edge (risk banners, pregnancy info, etc.)
+- **Centered Content**: Text, headings, and core content constrained to 1280px with auto margins
+- **Proper Gutters**: 16px side spacing on mobile/tablet, scales appropriately on desktop
+- **Visual Separation**: Colored backgrounds provide visual emphasis and hierarchy
+- **No Side Navigation**: All content centralized and full-width capable
+- **Tablet-First Responsive**: Optimized for tablet, scales well to desktop
+- **Clean Modern Look**: Minimalist design with NHS color compliance
 
 ## Technical Implementation
 

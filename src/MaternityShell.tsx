@@ -1560,11 +1560,13 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
           >
             <DetailPanelContext.Provider value={openPanel}>
               <BreadcrumbNav />
-              {children}
+              <div style={{ display: panel ? 'none' : 'block' }}>
+                {children}
+              </div>
             </DetailPanelContext.Provider>
           </main>
           {panel && (
-            <aside className="record-detail-panel" role="region" aria-labelledby="record-detail-panel-title">
+            <aside className="record-detail-panel" role="region" aria-labelledby="record-detail-panel-title" style={{ display: panel ? 'flex' : 'none' }}>
               <div className={`record-panel-heading tone-${panel.tone || "blue"}`}>
                 <button
                   ref={closeButton}

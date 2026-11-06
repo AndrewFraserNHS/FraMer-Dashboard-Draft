@@ -894,23 +894,6 @@ button {
   background: #aeb7bd;
 }
 
-@media (min-width: 768px) and (max-width: 1279px) {
-  .tablet-section-nav {
-    display: flex;
-  }
-
-  .record-tabs-row {
-    display: block;
-    padding: 0;
-  }
-
-  .maternity-content .ncrs-main [class*='grid-cols-2'],
-  .maternity-content .ncrs-main [class*='grid-cols-3'],
-  .maternity-content .ncrs-main [class*='grid-cols-4'] {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-}
-
 @media (max-width: 1279px) {
   .record-brand {
     position: sticky;
@@ -930,6 +913,17 @@ button {
 
   .maternity-content .ncrs-main {
     padding: 12px !important;
+  }
+
+  .record-tabs-row {
+    display: block;
+    padding: 0;
+  }
+
+  .maternity-content .ncrs-main [class*='grid-cols-2'],
+  .maternity-content .ncrs-main [class*='grid-cols-3'],
+  .maternity-content .ncrs-main [class*='grid-cols-4'] {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }
 

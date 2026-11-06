@@ -445,10 +445,9 @@ button {
   min-width: 0;
   flex: 1;
   overflow: auto;
-  background: #f0f4f5;
+  background: transparent;
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 0;
 }
 
@@ -462,18 +461,75 @@ button {
 
 .maternity-content .ncrs-app {
   min-height: auto !important;
-  background: #f0f4f5 !important;
+  background: transparent !important;
   width: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .maternity-content .ncrs-main {
-  width: calc(100% - 32px);
-  max-width: 1280px !important;
-  margin: 0 auto !important;
-  padding: 24px 16px !important;
-  background: #fff;
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent;
   border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Constrain main content elements to 1280px with gutters */
+.maternity-content .ncrs-main > h1,
+.maternity-content .ncrs-main > .dash-grid,
+.maternity-content .ncrs-main > .ai-card,
+.maternity-content .ncrs-main > p,
+.maternity-content .ncrs-main > button {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1280px;
+  width: calc(100% - 32px);
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Risk banners extend full width but with constrained inner content */
+.maternity-content .ncrs-main > .risk-banner-group {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.maternity-content .risk-banner-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.maternity-content .risk-banner-group .risk-banner {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1280px;
+  width: calc(100% - 32px);
+  padding-left: 16px;
+  padding-right: 16px;
+  margin-bottom: 0;
+}
+
+.maternity-content .ncrs-main [class*='max-w-[1440px]'] {
+  max-width: none !important;
+}
+
+.maternity-content .ncrs-main [class*='border-[#d5dce0]'],
+.maternity-content .ncrs-main [class*='border-[#ddd]'] {
+  border-color: #d8dde0 !important;
+}
+
+.maternity-content .ncrs-main [class*='bg-[#f5f7fa]'],
+.maternity-content .ncrs-main [class*='bg-[#f5f5f5]'] {
+  background: #fff !important;
 }
 
 .maternity-content .ncrs-main [class*='max-w-[1440px]'] {
@@ -3507,6 +3563,7 @@ textarea:focus-visible {
   border-left: 4px solid #d5281b;
   margin: 0;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .risk-banner.high {

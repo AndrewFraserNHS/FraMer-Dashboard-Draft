@@ -489,6 +489,7 @@ button {
 .maternity-content .ncrs-main > h1,
 .maternity-content .ncrs-main > .dash-grid,
 .maternity-content .ncrs-main > .ai-card,
+.maternity-content .ncrs-main > .nhs-expander-card,
 .maternity-content .ncrs-main > p,
 .maternity-content .ncrs-main > button {
   margin-left: auto;
@@ -1204,9 +1205,9 @@ button {
   padding-bottom: 40px;
 }
 
-.nhs-expander-content .dash-list-row {
+/* .nhs-expander-content .dash-list-row {
   padding-inline: 0;
-}
+} */
 
 .dash-card-header {
   min-height: 38px;
@@ -3194,6 +3195,10 @@ textarea:focus-visible {
   text-transform: none !important;
 }
 
+.record-shell dt {
+  padding-left: 10px;
+}
+
 .record-frame {
   width: 100%;
   margin-inline: auto;
@@ -3306,9 +3311,9 @@ textarea:focus-visible {
 
 .priority.high,
 .result-tag.high {
-  color: var(--nhs-colour-white);
-  border-color: var(--nhs-colour-red);
-  background: var(--nhs-colour-red);
+  color: var(--nhs-colour-white) !important;
+  border-color: var(--nhs-colour-red) !important;
+  background: var(--nhs-colour-red) !important;
 }
 
 .record-shell button:focus-visible,

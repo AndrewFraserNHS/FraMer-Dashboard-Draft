@@ -3339,21 +3339,23 @@ textarea:focus-visible {
 }
 
 .record-detail-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
   width: 100%;
   max-width: 100%;
-  max-height: 100dvh;
+  max-height: none;
   background: var(--nhs-colour-white);
-  z-index: 1000;
+  z-index: auto;
   display: flex;
   flex-direction: column;
   padding: 0;
   border: none;
-  overflow: hidden;
+  overflow: visible;
+  margin-top: 32px;
+  border-top: 2px solid var(--nhs-colour-pale-grey);
 }
 
 .record-panel-heading {

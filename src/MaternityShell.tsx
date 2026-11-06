@@ -1570,7 +1570,8 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
                   ref={closeButton}
                   onClick={closePanel}
                   aria-label={`Close ${panel.title} details`}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+                  className="nhsuk-button nhsuk-button--reverse"
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}
                 >
                   <ChevronLeft size={20} />
                   <span>Back</span>

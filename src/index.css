@@ -374,7 +374,7 @@ button {
 
 .tablet-section-nav {
   width: 190px;
-  display: none;
+  display: none !important;
   flex-direction: column;
   flex-shrink: 0;
   overflow-y: auto;
@@ -445,6 +445,11 @@ button {
   min-width: 0;
   flex: 1;
   overflow: auto;
+  background: #f0f4f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
 }
 
 /* The route components retain their clinical content and state, but their
@@ -458,13 +463,17 @@ button {
 .maternity-content .ncrs-app {
   min-height: auto !important;
   background: #f0f4f5 !important;
+  width: 100%;
+  max-width: 100%;
 }
 
 .maternity-content .ncrs-main {
-  width: 100%;
-  max-width: none !important;
-  padding: 14px 18px 18px !important;
-  background: #f0f4f5;
+  width: calc(100% - 32px);
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  padding: 24px 16px !important;
+  background: #fff;
+  border-radius: 0;
 }
 
 .maternity-content .ncrs-main [class*='max-w-[1440px]'] {

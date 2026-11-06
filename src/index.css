@@ -468,9 +468,14 @@ button {
   flex-direction: column;
 }
 
+.maternity-dashboard {
+  align-items: center;
+}
+
 .maternity-content .ncrs-main {
   width: 100%;
-  max-width: 100% !important;
+  max-width: 1200px;
+  align-items: center;
   margin: 0 !important;
   padding: 0 !important;
   background: transparent;
@@ -490,8 +495,8 @@ button {
   margin-right: auto;
   max-width: 1280px;
   width: calc(100% - 32px);
-  padding-left: 16px;
-  padding-right: 16px;
+  /* padding-left: 16px;
+  padding-right: 16px; */
 }
 
 /* Risk banners extend full width but with constrained inner content */
@@ -1033,18 +1038,20 @@ button {
 }
 
 .dash-grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   align-items: stretch;
   gap: 12px;
   margin-bottom: 12px;
 }
 
 .dash-grid-three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
 }
 
 .dash-grid-three > .nhs-expander-card {
-  height: 100%;
+  width: 100%;
   align-self: stretch;
 }
 
@@ -1058,7 +1065,8 @@ button {
 }
 
 .dash-grid-lower {
-  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  display: flex;
+  flex-direction: column;
 }
 
 .dash-card {
@@ -1081,6 +1089,10 @@ button {
   background: var(--nhs-colour-white);
 }
 
+.nhs-expander-card ai-card {
+  margin-top: 12px;
+}
+
 .nhs-expander-summary {
   width: 100%;
   min-height: 76px;
@@ -1088,6 +1100,7 @@ button {
   align-items: center;
   gap: 12px;
   padding: 20px 24px;
+  /* margin-top: 10px; */
   border: solid var(--nhs-colour-pale-grey);
   border-width: 1px 1px 4px;
   color: var(--nhs-colour-blue);
@@ -1394,7 +1407,7 @@ button {
 
 .ai-card,
 .timeline-card {
-  margin-bottom: 12px;
+  margin: 12px 0;
 }
 
 .ai-full p {
@@ -1758,17 +1771,7 @@ button {
 }
 
 @media (max-width: 1279px) {
-  .dash-grid-three {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .dash-grid-three > :last-child {
-    grid-column: 1 / -1;
-  }
-
-  .dash-grid-lower {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  /* Cards now full-width in flexbox layout */
 
   .dash-card-body {
     min-height: 0;
@@ -1801,14 +1804,7 @@ button {
     margin-inline: 12px;
   }
 
-  .dash-grid-three {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .dash-grid-three > :last-child {
-    grid-column: auto;
-  }
-
+  /* Cards use flexbox for full-width stacked layout */
   .dash-card-header {
     align-items: flex-start;
   }
@@ -3200,7 +3196,6 @@ textarea:focus-visible {
 
 .record-frame {
   width: 100%;
-  max-width: 1024px;
   margin-inline: auto;
   border-inline: 1px solid var(--nhs-colour-pale-grey);
 }

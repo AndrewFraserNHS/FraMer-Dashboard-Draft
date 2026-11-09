@@ -16,11 +16,6 @@ const recordViews = [
   "Planned and elective care",
 ] as const;
 
-const externalViews: Record<string, string> = {
-  "Core record": "https://nhs-ncrs-core-record.figma.site",
-  Frailty: "https://nhs-ncrs-frailty.figma.site/",
-};
-
 type OptionsSidebarProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -117,20 +112,16 @@ export function OptionsSidebar({
           <ul id={viewsId} className="ncrs-options__views" hidden={!viewsOpen}>
             {recordViews.map((view, index) => (
               <li key={view} className={index === 1 || index === 7 ? "has-separator" : undefined}>
-                {externalViews[view] ? (
-                  <a href={externalViews[view]}>{view}</a>
-                ) : (
-                  <button
-                    type="button"
-                    aria-pressed={recordView === view}
-                    onClick={() => {
-                      onRecordView(view);
-                      setViewsOpen(false);
-                    }}
-                  >
-                    {view}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  aria-pressed={recordView === view}
+                  onClick={() => {
+                    onRecordView(view);
+                    setViewsOpen(false);
+                  }}
+                >
+                  {view}
+                </button>
               </li>
             ))}
           </ul>

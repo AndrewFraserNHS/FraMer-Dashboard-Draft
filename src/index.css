@@ -5533,3 +5533,25 @@ button.systems-grid__item:hover {
 .ncrs-patient__row .ncrs-menu__trigger { border: 1px solid var(--nhs-colour-dark-grey); padding: 3px 10px; background: #fff; color: var(--nhs-colour-black); }
 .ncrs-patient__row .ncrs-menu__list { min-width: 260px; }
 .ncrs-patient__row .ncrs-menu__trigger { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+
+/* =========================================================================
+   Callouts, accessible: no pastel fills. White surface, dark text (15:1),
+   and a thick left rule plus icon in a colour that is at least 3:1 on white
+   (WCAG 1.4.11). Red is the most emphatic: a full 2px red border. The tone
+   is always also stated in text, so colour is never the only signal.
+   ========================================================================= */
+.callout {
+  --callout-colour: #4c6272;
+  background: #fff;
+  color: #212b32;
+  border: 1px solid #aeb7bd;
+  border-left: 8px solid var(--callout-colour);
+}
+.callout--red   { --callout-colour: #d5281b; border-color: #d5281b; border-width: 2px; border-left-width: 8px; background: #fff; }
+.callout--amber { --callout-colour: #8f4f00; background: #fff; }
+.callout--blue  { --callout-colour: #005eb8; background: #fff; }
+.callout--grey  { --callout-colour: #4c6272; background: #fff; }
+.callout .callout__icon { color: var(--callout-colour); }
+.callout__title { color: #212b32; }
+.callout--red .callout__title { color: #8a1a12; }
+.callout__source { color: #4c6272; }

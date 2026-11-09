@@ -82,7 +82,10 @@ export default function Comorbidities() {
         defaultOpen={false}
       >
         <Callout tone="red" title="Gestational diabetes — at risk">
-          <p>Risk factors identified from connected records. Diagnosis may or may not be confirmed.</p>
+          <p>
+            Risk factors identified from connected records. Diagnosis may or may
+            not be confirmed.
+          </p>
         </Callout>
 
         <Subsection title="Risk factors (auto-detected)">
@@ -91,7 +94,11 @@ export default function Comorbidities() {
             rows={riskFactors}
             rowKey={(row) => row.factor}
             columns={[
-              { header: "Factor", cell: (r) => <strong>{r.factor}</strong>, sort: (r) => r.factor },
+              {
+                header: "Factor",
+                cell: (r) => <strong>{r.factor}</strong>,
+                sort: (r) => r.factor,
+              },
               {
                 header: "Detail",
                 cell: (r) => (
@@ -101,33 +108,64 @@ export default function Comorbidities() {
                   </>
                 ),
               },
-              { header: "Source", cell: (r) => <SourceTag>{r.source}</SourceTag>, sort: (r) => r.source },
-              { header: "Flagged", cell: (r) => <StatusTag tone={r.flagged ? "red" : "grey"}>{r.flagged ? "Yes" : "No"}</StatusTag>, sort: (r) => (r.flagged ? "Yes" : "No") },
+              {
+                header: "Source",
+                cell: (r) => <SourceTag>{r.source}</SourceTag>,
+                sort: (r) => r.source,
+              },
+              {
+                header: "Flagged",
+                cell: (r) => (
+                  <StatusTag tone={r.flagged ? "red" : "grey"}>
+                    {r.flagged ? "Yes" : "No"}
+                  </StatusTag>
+                ),
+                sort: (r) => (r.flagged ? "Yes" : "No"),
+              },
             ]}
           />
         </Subsection>
 
         <Callout tone="blue" title="Recommended action">
           <p>
-            Refer for GTT at 24–28 weeks. Advise on dietary modification with interpreter
-            support. <Link className="nhsuk-link" to="/results">View the Results tab</Link>
+            Refer for GTT at 24–28 weeks. Advise on dietary modification with
+            interpreter support.{" "}
+            <Link className="nhsuk-link" to="/results">
+              View the Results tab
+            </Link>
           </p>
         </Callout>
 
         <Subsection
           title="Previous glucose and HbA1c results (GP record)"
-          aside={<Link className="nhsuk-link" to="/results">All results</Link>}
+          aside={
+            <Link className="nhsuk-link" to="/results">
+              All results
+            </Link>
+          }
         >
           <DataTable
             caption="Previous glucose and HbA1c results from the GP record"
             rows={glucoseResults}
             rowKey={(row) => row.test}
             columns={[
-              { header: "Test", cell: (r) => <strong>{r.test}</strong>, sort: (r) => r.test },
+              {
+                header: "Test",
+                cell: (r) => <strong>{r.test}</strong>,
+                sort: (r) => r.test,
+              },
               { header: "Result", cell: (r) => r.result },
               { header: "Reference range", cell: (r) => r.range },
-              { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
-              { header: "Source", cell: (r) => <SourceTag>{r.source}</SourceTag>, sort: (r) => r.source },
+              {
+                header: "Date",
+                cell: (r) => r.date,
+                sort: (r) => dateKey(r.date),
+              },
+              {
+                header: "Source",
+                cell: (r) => <SourceTag>{r.source}</SourceTag>,
+                sort: (r) => r.source,
+              },
             ]}
           />
         </Subsection>
@@ -138,7 +176,10 @@ export default function Comorbidities() {
         badge={<StatusTag tone="yellow">Screening due</StatusTag>}
         defaultOpen={false}
       >
-        <Callout tone="amber" title="Formal perinatal mental health screening has not yet been completed. Complete at this appointment." />
+        <Callout
+          tone="amber"
+          title="Formal perinatal mental health screening has not yet been completed. Complete at this appointment."
+        />
 
         <Subsection title="History and current involvement">
           <DataTable
@@ -146,9 +187,18 @@ export default function Comorbidities() {
             rows={mentalHealthHistory}
             rowKey={(row) => row.item}
             columns={[
-              { header: "Item", cell: (r) => <strong>{r.item}</strong>, sort: (r) => r.item },
+              {
+                header: "Item",
+                cell: (r) => <strong>{r.item}</strong>,
+                sort: (r) => r.item,
+              },
               { header: "Detail", cell: (r) => r.detail },
-              { header: "Source", cell: (r) => (r.source ? <SourceTag>{r.source}</SourceTag> : "—"), sort: (r) => r.source || null },
+              {
+                header: "Source",
+                cell: (r) =>
+                  r.source ? <SourceTag>{r.source}</SourceTag> : "—",
+                sort: (r) => r.source || null,
+              },
             ]}
           />
         </Subsection>
@@ -159,11 +209,27 @@ export default function Comorbidities() {
             rows={assessments}
             rowKey={(row) => `${row.date}-${row.tool}`}
             columns={[
-              { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
-              { header: "Tool", cell: (r) => <strong>{r.tool}</strong>, sort: (r) => r.tool },
+              {
+                header: "Date",
+                cell: (r) => r.date,
+                sort: (r) => dateKey(r.date),
+              },
+              {
+                header: "Tool",
+                cell: (r) => <strong>{r.tool}</strong>,
+                sort: (r) => r.tool,
+              },
               { header: "Score", cell: (r) => r.score },
-              { header: "Risk level", cell: (r) => r.risk, sort: (r) => r.risk },
-              { header: "Clinician", cell: (r) => r.clinician, sort: (r) => r.clinician },
+              {
+                header: "Risk level",
+                cell: (r) => r.risk,
+                sort: (r) => r.risk,
+              },
+              {
+                header: "Clinician",
+                cell: (r) => r.clinician,
+                sort: (r) => r.clinician,
+              },
               { header: "Notes", cell: (r) => r.notes },
             ]}
           />
@@ -175,10 +241,22 @@ export default function Comorbidities() {
             rows={contacts}
             rowKey={(row) => `${row.date}-${row.type}`}
             columns={[
-              { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
-              { header: "Service", cell: (r) => <strong>{r.service}</strong>, sort: (r) => r.service },
+              {
+                header: "Date",
+                cell: (r) => r.date,
+                sort: (r) => dateKey(r.date),
+              },
+              {
+                header: "Service",
+                cell: (r) => <strong>{r.service}</strong>,
+                sort: (r) => r.service,
+              },
               { header: "Type", cell: (r) => r.type, sort: (r) => r.type },
-              { header: "Clinician", cell: (r) => r.clinician, sort: (r) => r.clinician },
+              {
+                header: "Clinician",
+                cell: (r) => r.clinician,
+                sort: (r) => r.clinician,
+              },
               { header: "Interpreter", cell: (r) => r.interpreter },
               { header: "Outcome", cell: (r) => r.outcome },
             ]}
@@ -187,10 +265,19 @@ export default function Comorbidities() {
 
         <Subsection
           title="Wellbeing support plan (summary)"
-          aside={<>Last updated: 15 September 2026 · <Link className="nhsuk-link" to="/care-plans">View care plans</Link></>}
+          aside={
+            <>
+              Last updated: 15 September 2026 ·{" "}
+              <Link className="nhsuk-link" to="/care-plans">
+                View care plans
+              </Link>
+            </>
+          }
         >
           <ul className="bullet-list">
-            {wellbeingPlan.map((item) => <li key={item}>{item}</li>)}
+            {wellbeingPlan.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </Subsection>
 
@@ -200,20 +287,30 @@ export default function Comorbidities() {
             rows={safetyContacts}
             rowKey={(row) => row.item}
             columns={[
-              { header: "Contact", cell: (r) => <strong>{r.item}</strong>, sort: (r) => r.item },
+              {
+                header: "Contact",
+                cell: (r) => <strong>{r.item}</strong>,
+                sort: (r) => r.item,
+              },
               { header: "Detail", cell: (r) => r.detail },
-              { header: "Source", cell: (r) => <SourceTag>{r.source}</SourceTag>, sort: (r) => r.source },
+              {
+                header: "Source",
+                cell: (r) => <SourceTag>{r.source}</SourceTag>,
+                sort: (r) => r.source,
+              },
             ]}
           />
           <ul className="bullet-list">
-            {safetyPlanActions.map((item) => <li key={item}>{item}</li>)}
+            {safetyPlanActions.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </Subsection>
 
         <Callout tone="grey" title="Clinical note">
           <p>
-            Mental health history may be under-reported due to language barrier and limited
-            prior NHS engagement — clinical judgement required.
+            Mental health history may be under-reported due to language barrier
+            and limited prior NHS engagement — clinical judgement required.
           </p>
         </Callout>
 
@@ -224,7 +321,9 @@ export default function Comorbidities() {
                 <p className="record-card__heading">
                   {action.title}
                   <span className="record-card__status">
-                    <StatusTag tone={action.priority === "High" ? "red" : "blue"}>
+                    <StatusTag
+                      tone={action.priority === "High" ? "red" : "blue"}
+                    >
                       {action.priority} priority
                     </StatusTag>
                   </span>
@@ -232,7 +331,13 @@ export default function Comorbidities() {
                 <small>
                   Category: {action.category}
                   {"link" in action && action.link && (
-                    <> · <Link className="nhsuk-link" to={action.link.to}>{action.link.label}</Link></>
+                    <>
+                      {" "}
+                      ·{" "}
+                      <Link className="nhsuk-link" to={action.link.to}>
+                        {action.link.label}
+                      </Link>
+                    </>
                   )}
                 </small>
               </li>
@@ -241,29 +346,50 @@ export default function Comorbidities() {
         </Subsection>
       </DataSection>
 
-      <DataSection title="Social complexity" defaultOpen={false}>
+      <DataSection title="Social Context" defaultOpen={false}>
         <DetailList
           rows={socialFacts.map((fact) => [
             fact.label,
-            <StatusTag key={fact.label} tone={fact.tone}>{fact.value}</StatusTag>,
+            <StatusTag key={fact.label} tone={fact.tone}>
+              {fact.value}
+            </StatusTag>,
           ])}
         />
         <Callout tone="amber" title="Cause for concern" source="GP Referral">
-          <p>Social complexity flagged in referral (language barrier, limited extended family locally)</p>
+          <p>
+            Social complexity flagged in referral (language barrier, limited
+            extended family locally)
+          </p>
         </Callout>
       </DataSection>
 
-      <DataSection title="Current medicines" summary={`${medicines.length} active`} defaultOpen={false}>
+      <DataSection
+        title="Current medicines"
+        summary={`${medicines.length} active`}
+        defaultOpen={false}
+      >
         <DataTable
           caption="Current medicines"
           rows={medicines}
           rowKey={(row) => row.name}
           columns={[
-            { header: "Medication", cell: (r) => <strong>{r.name}</strong>, sort: (r) => r.name },
+            {
+              header: "Medication",
+              cell: (r) => <strong>{r.name}</strong>,
+              sort: (r) => r.name,
+            },
             { header: "Dose", cell: (r) => r.dose },
             { header: "Frequency", cell: (r) => r.frequency },
-            { header: "Prescriber", cell: (r) => r.prescriber, sort: (r) => r.prescriber },
-            { header: "Source", cell: (r) => <SourceTag>{r.source}</SourceTag>, sort: (r) => r.source },
+            {
+              header: "Prescriber",
+              cell: (r) => r.prescriber,
+              sort: (r) => r.prescriber,
+            },
+            {
+              header: "Source",
+              cell: (r) => <SourceTag>{r.source}</SourceTag>,
+              sort: (r) => r.source,
+            },
           ]}
         />
       </DataSection>

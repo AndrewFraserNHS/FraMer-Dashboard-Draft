@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useId, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 
 export type MenuItem = {
   label: string;
@@ -7,6 +7,12 @@ export type MenuItem = {
   onSelect: () => void;
   /** Draws a divider above this item */
   separatorBefore?: boolean;
+  /** The selected item. Stated in text and with aria-current. */
+  current?: boolean;
+  /** Visible second line, e.g. why an item is unavailable */
+  hint?: string;
+  /** Stays focusable (aria-disabled) so its reason can be read, but does nothing */
+  disabled?: boolean;
 };
 
 type MenuButtonProps = {
@@ -73,13 +79,21 @@ export function MenuButton({ label, items, className = "" }: MenuButtonProps) {
           <li key={item.label} className={item.separatorBefore ? "has-separator" : undefined}>
             <button
               type="button"
+              aria-current={item.current ? "true" : undefined}
+              aria-disabled={item.disabled || undefined}
               onClick={() => {
+                if (item.disabled) return;
                 setOpen(false);
                 item.onSelect();
               }}
             >
               {item.icon}
-              {item.label}
+              <span className="ncrs-menu__text">
+                {item.label}
+                {item.current && <span className="nhs-visually-hidden"> (current)</span>}
+                {item.hint && <small>{item.hint}</small>}
+              </span>
+              {item.current && <Check size={16} aria-hidden="true" className="ncrs-menu__check" />}
             </button>
           </li>
         ))}

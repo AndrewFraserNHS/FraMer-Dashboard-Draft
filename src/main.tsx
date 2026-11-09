@@ -10,6 +10,9 @@ import CarePlans from "./CarePlans";
 import Documents from "./Documents";
 import Audit from "./Audit";
 import MaternityShell from "./MaternityShell";
+import FrailtySnapshot from "./frailty/Snapshot";
+import FrailtyCga from "./frailty/Cga";
+import FrailtyCarePlan from "./frailty/CarePlan";
 import "nhsuk-frontend/dist/nhsuk/nhsuk-frontend.css";
 import "./index.css";
 
@@ -26,6 +29,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/care-plans" element={<CarePlans />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/audit" element={<Audit />} />
+          <Route path="/frailty" element={<FrailtySnapshot />} />
+          <Route path="/frailty/cga" element={<FrailtyCga />} />
+          <Route path="/frailty/care-plan" element={<FrailtyCarePlan />} />
         </Routes>
       </MaternityShell>
     </BrowserRouter>

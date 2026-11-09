@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { BreadcrumbProvider, BreadcrumbNav } from "./BreadcrumbNav";
 import { DetailPanel as DetailPanelComponent } from "./DetailPanel";
 import { Dialog } from "./components/ui/Dialog";
@@ -16,9 +16,11 @@ import { ServiceHeader } from "./components/shell/ServiceHeader";
 import { PatientBar } from "./components/shell/PatientBar";
 import { AlertsBand } from "./components/shell/AlertsBand";
 import { OptionsSidebar, TextSize } from "./components/shell/OptionsSidebar";
+import { MenuButton } from "./components/shell/MenuButton";
 import { defaultSectionOrder, SectionOrderContext } from "./components/ui/SectionOrder";
 import { risks } from "./data/patient";
-
+import { FrailtyFlagPanel, frailtyFlags } from "./frailty/FlagPanel";
+import { allViewLabels, recordViews, viewForPath } from "./views";
 
 export type DetailPanel = {
   title: string;
@@ -37,17 +39,6 @@ export function useDetailPanel() {
   }
   return openPanel;
 }
-
-const tabs = [
-  ["Summary", "/"],
-  ["Pregnancy", "/pregnancy"],
-  ["Appointments", "/appointments"],
-  ["Results", "/results"],
-  ["Conditions", "/comorbidities"],
-  ["Care plans", "/care-plans"],
-  ["Documents", "/documents"],
-  ["Audit", "/audit"],
-] as const;
 
 
 type SafetyFlagKind =
@@ -1071,8 +1062,13 @@ function ReorderList({
 
 export default function MaternityShell({ children }: { children: ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const view = recordViews[viewForPath(location.pathname)];
+  const tabs = view.tabs;
   const currentTabLabel =
-    tabs.find(([, path]) => path === location.pathname)?.[0] ?? "Summary";
+    tabs.find(([, path]) => path === location.pathname)?.[0] ?? tabs[0][0];
+  const [viewAnnouncement, setViewAnnouncement] = useState("");
+  const previousView = useRef(view.key);
   const [appView, setAppView] = useState<"search" | "confirm" | "record">(
     "record",
   );
@@ -1081,7 +1077,6 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
     "small",
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [selectedRecordView, setSelectedRecordView] = useState("Maternity");
   const [optionsOpen, setOptionsOpen] = useState(
     () => typeof window === "undefined" || window.innerWidth >= 1200,
   );
@@ -1109,11 +1104,71 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    const current =
-      tabs.find(([, path]) => path === location.pathname)?.[0] ?? "Summary";
-    document.title = `${current} — Leila Khan — NHS National Care Records Service`;
+    document.title = `${currentTabLabel} — ${view.patient.name} — NHS National Care Records Service`;
     setPanel(null);
-  }, [location.pathname]);
+  }, [location.pathname, currentTabLabel, view]);
+
+  // Changing view changes the patient on screen, so say so, and move focus to the new content.
+  useEffect(() => {
+    if (previousView.current === view.key) return;
+    previousView.current = view.key;
+    setViewAnnouncement(`Now viewing ${view.patient.name}, ${view.label} record.`);
+    requestAnimationFrame(() => document.getElementById("main-content")?.focus());
+  }, [view]);
+
+  const patientMenu = (
+    <MenuButton
+      label={<>Patient: {view.patient.name.split(" ")[0]}</>}
+      items={Object.values(recordViews).map((item) => ({
+        label: item.patient.name,
+        hint: `${item.label} record`,
+        current: item.key === view.key,
+        onSelect: () => item.key !== view.key && navigate(item.home),
+      }))}
+    />
+  );
+
+  const viewMenu = (
+    <MenuButton
+      label={<>Record view: {view.label}</>}
+      items={allViewLabels.map((label) => ({
+        label,
+        current: label === view.label,
+        disabled: label !== view.label,
+        hint: label === view.label ? undefined : `No ${label.toLowerCase()} data for this patient`,
+        onSelect: () => {},
+      }))}
+    />
+  );
+
+  const flags =
+    view.key === "frailty"
+      ? frailtyFlags.map((flag) => ({
+          id: flag.id,
+          label: flag.label,
+          level: flag.level,
+          onOpen: () =>
+            openPanel({
+              eyebrow: "Clinical alert",
+              title: flag.label,
+              status: flag.status,
+              tone: flag.level === "high" ? "red" : "amber",
+              content: <FrailtyFlagPanel flag={flag} />,
+            }),
+        }))
+      : safetyFlags.map((flag) => ({
+          id: flag.id,
+          label: flag.label,
+          level: flag.level,
+          onOpen: () =>
+            openPanel({
+              eyebrow: "Clinical alert",
+              title: flag.title,
+              status: flag.status,
+              tone: flag.tone,
+              content: <SafetyFlagPanel kind={flag.kind} />,
+            }),
+        }));
 
   if (appView === "search") {
     return (
@@ -1152,23 +1207,10 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
               Access logged — this record access has been recorded for audit
             </div>
           )}
-          <ServiceHeader onFindPatient={() => setAppView("search")} />
-          <PatientBar />
-          <AlertsBand
-            flags={safetyFlags.map((flag) => ({
-              id: flag.id,
-              label: flag.label,
-              level: flag.level,
-              onOpen: () =>
-                openPanel({
-                  eyebrow: "Clinical alert",
-                  title: flag.title,
-                  status: flag.status,
-                  tone: flag.tone,
-                  content: <SafetyFlagPanel kind={flag.kind} />,
-                }),
-            }))}
-          />
+          <ServiceHeader onFindPatient={() => setAppView("search")} patientMenu={patientMenu} />
+          <PatientBar key={view.key} patient={view.patient} viewMenu={viewMenu} />
+          <AlertsBand key={`alerts-${view.key}`} flags={flags} />
+          <p role="status" className="nhs-visually-hidden">{viewAnnouncement}</p>
           <nav aria-label="Patient record sections" className="ncrs-tabs">
             <ul>
               {tabs.map(([label, path]) => (
@@ -1181,7 +1223,7 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
             </ul>
           </nav>
 
-        {filtersOpen && <section className="record-filterbar" aria-label="Record filters">
+        {view.hasFilters && filtersOpen && <section className="record-filterbar" aria-label="Record filters">
           <label>
             Care setting
             <select defaultValue="all">
@@ -1239,11 +1281,9 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
             onOpenChange={setOptionsOpen}
             textSize={textSize}
             onTextSize={setTextSize}
-            recordView={selectedRecordView}
-            onRecordView={setSelectedRecordView}
             filtersOpen={filtersOpen}
-            onToggleFilters={() => setFiltersOpen((value) => !value)}
-            onReorder={() => setShowReorderModal(true)}
+            onToggleFilters={view.hasFilters ? () => setFiltersOpen((value) => !value) : undefined}
+            onReorder={view.canReorder ? () => setShowReorderModal(true) : undefined}
           />
           <main
             id="main-content"

@@ -1,31 +1,19 @@
 import { useId, useState } from "react";
-import { ChevronDown, ChevronLeft, ListOrdered, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, ListOrdered, SlidersHorizontal } from "lucide-react";
 import { useSetAllDisclosures } from "../ui/DisclosureGroup";
 
 export type TextSize = "small" | "medium" | "large";
-
-const recordViews = [
-  "Core record",
-  "Cancer",
-  "Children and young people",
-  "Diagnostics",
-  "Frailty",
-  "Long-term conditions",
-  "Maternity",
-  "Mental health",
-  "Planned and elective care",
-] as const;
 
 type OptionsSidebarProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   textSize: TextSize;
   onTextSize: (size: TextSize) => void;
-  recordView: string;
-  onRecordView: (view: string) => void;
   filtersOpen: boolean;
-  onToggleFilters: () => void;
-  onReorder: () => void;
+  /** Omit when the current view has no filters */
+  onToggleFilters?: () => void;
+  /** Omit when the current view's sections cannot be reordered */
+  onReorder?: () => void;
 };
 
 /** Expands or collapses every DataSection on the page through DisclosureGroup state. */
@@ -54,15 +42,11 @@ export function OptionsSidebar({
   onOpenChange,
   textSize,
   onTextSize,
-  recordView,
-  onRecordView,
   filtersOpen,
   onToggleFilters,
   onReorder,
 }: OptionsSidebarProps) {
   const bodyId = useId();
-  const viewsId = useId();
-  const [viewsOpen, setViewsOpen] = useState(false);
 
   return (
     <aside className={`ncrs-options${open ? " is-open" : ""}`} aria-label="Page options">
@@ -98,46 +82,20 @@ export function OptionsSidebar({
         </fieldset>
 
         <div className="ncrs-options__group">
-          <p className="ncrs-options__label">Record view</p>
-          <button
-            type="button"
-            className="ncrs-options__disclosure"
-            aria-expanded={viewsOpen}
-            aria-controls={viewsId}
-            onClick={() => setViewsOpen((value) => !value)}
-          >
-            {recordView}
-            <ChevronDown size={16} aria-hidden="true" className="ncrs-menu__chevron" />
-          </button>
-          <ul id={viewsId} className="ncrs-options__views" hidden={!viewsOpen}>
-            {recordViews.map((view, index) => (
-              <li key={view} className={index === 1 || index === 7 ? "has-separator" : undefined}>
-                <button
-                  type="button"
-                  aria-pressed={recordView === view}
-                  onClick={() => {
-                    onRecordView(view);
-                    setViewsOpen(false);
-                  }}
-                >
-                  {view}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="ncrs-options__group">
           <p className="ncrs-options__label">This page</p>
           <div className="ncrs-options__actions">
             <ExpandAllButton />
-            <button type="button" onClick={onReorder}>
-              <ListOrdered size={16} aria-hidden="true" />
-              Reorder sections
-            </button>
-            <button type="button" aria-expanded={filtersOpen} onClick={onToggleFilters}>
-              {filtersOpen ? "Hide filters" : "Show filters"}
-            </button>
+            {onReorder && (
+              <button type="button" onClick={onReorder}>
+                <ListOrdered size={16} aria-hidden="true" />
+                Reorder sections
+              </button>
+            )}
+            {onToggleFilters && (
+              <button type="button" aria-expanded={filtersOpen} onClick={onToggleFilters}>
+                {filtersOpen ? "Hide filters" : "Show filters"}
+              </button>
+            )}
           </div>
         </div>
       </div>

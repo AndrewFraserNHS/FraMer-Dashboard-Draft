@@ -5371,3 +5371,164 @@ button.systems-grid__item:hover {
 .ncrs-alerts__list {
   grid-template-columns: repeat(auto-fill, minmax(min(345px, 100%), 1fr));
 }
+
+/* ───────────────────────────── Frailty view ─────────────────────────────
+   Components added for the frailty record: ProvenanceTag, KeyFigure, ReviewField/ReviewPrompt,
+   plus small layout helpers shared by the three frailty pages. */
+
+/* Source tag you can open (native popover, so it is never clipped by a scrolling table) */
+.provenance-tag {
+  cursor: pointer;
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.provenance-tag:hover { text-decoration: underline; }
+.provenance-tag:focus-visible,
+.review-button:focus-visible,
+.link-button:focus-visible {
+  outline: 4px solid var(--nhs-colour-focus);
+  outline-offset: 0;
+  box-shadow: 0 4px 0 0 var(--nhs-colour-black);
+}
+.provenance-panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 12px 14px;
+  width: min(320px, calc(100vw - 16px));
+  background: var(--nhs-colour-white);
+  color: var(--nhs-colour-black);
+  border: 1px solid var(--nhs-colour-black);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  font-size: 14px;
+}
+.provenance-panel dl { margin: 0; display: grid; gap: 6px; font-size: inherit; }
+.provenance-panel dl > div { display: grid; grid-template-columns: 110px 1fr; gap: 8px; }
+.provenance-panel dt { font-weight: 700; color: var(--nhs-colour-dark-grey); font-size: inherit; }
+.provenance-panel dd { margin: 0; font-size: inherit; }
+
+.panel-sources { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin-top: 12px; }
+.panel-sources__label { font-size: 14px; font-weight: 700; color: var(--nhs-colour-dark-grey); margin: 0; }
+
+/* Key figure: a measurement or score, shown large */
+.key-figure {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 14px 16px;
+  background: var(--nhs-colour-white);
+  border: 1px solid var(--nhs-colour-pale-grey);
+  border-left: 4px solid var(--nhs-colour-blue);
+  min-width: 0;
+}
+.key-figure p { margin: 0; }
+.key-figure__label { font-size: 14px; font-weight: 700; color: var(--nhs-colour-dark-grey); }
+.key-figure__value { font-size: 28px; font-weight: 700; line-height: 1.1; color: var(--nhs-colour-black); }
+.key-figure--large .key-figure__value { font-size: 56px; }
+.key-figure__unit { font-size: 14px; font-weight: 600; color: var(--nhs-colour-dark-grey); }
+.key-figure__trend { display: flex; gap: 6px; align-items: flex-start; font-size: 14px; }
+.key-figure__trend svg { flex: none; margin-top: 2px; }
+.key-figure__trend--up, .key-figure__trend--down { color: #8a1c13; }
+.key-figure__trend--stable { color: #00542a; }
+.key-figure__note { font-size: 14px; color: var(--nhs-colour-dark-grey); }
+.key-figure__footer { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 6px; }
+
+.link-button {
+  background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600;
+  color: var(--nhs-colour-blue); text-decoration: underline;
+}
+.link-button:hover { color: var(--nhs-colour-dark-blue); }
+
+/* Frailty page layout helpers */
+.frailty-overview { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 24px; align-items: start; }
+.frailty-overview__text p { margin: 0 0 10px; font-size: 16px; }
+.frailty-overview__text .subsection__title { margin: 0 0 8px; }
+.frailty-risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 12px; }
+.frailty-vitals { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px; }
+.frailty-filter { display: grid; gap: 4px; }
+.cell-note { display: block; color: var(--nhs-colour-dark-grey); font-size: 14px; margin-top: 2px; font-weight: 400; }
+.plain-list { list-style: none; margin: 0; padding: 0; font-size: 14px; display: grid; gap: 2px; }
+.cga-progress { margin: 0; font-weight: 700; font-size: 16px; }
+.page-steps { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.page-steps .nhsuk-button { margin: 0; }
+.page-steps__status { margin: 0; font-weight: 700; }
+.maternity-content .ncrs-main > .page-steps,
+.maternity-content .ncrs-main > .cga-progress { width: calc(100% - 32px); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+/* Review field: read what the system found, then accept, edit or reject it */
+.review-fields, .review-prompts { display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }
+.review-field, .review-prompt {
+  display: grid; gap: 8px; padding: 14px 16px;
+  background: var(--nhs-colour-light-grey);
+  border: 1px solid var(--nhs-colour-pale-grey);
+  border-left: 4px solid var(--nhs-colour-warm-yellow);
+  min-width: 0;
+}
+.review-field[data-status="accepted"], .review-prompt[data-status="confirmed"] { border-left-color: var(--nhs-colour-green); }
+.review-field[data-status="edited"] { border-left-color: var(--nhs-colour-blue); }
+.review-field--rejected, .review-prompt[data-status="dismissed"] { border-left-color: var(--nhs-colour-mid-grey); background: var(--nhs-colour-white); }
+.review-field__head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.review-field__title { margin: 0; font-size: 16px; font-weight: 700; }
+.review-field__hint, .review-field__note { margin: 0; color: var(--nhs-colour-dark-grey); font-size: 14px; }
+.review-field__value { margin: 0; font-size: 16px; line-height: 1.6; white-space: pre-line; }
+.review-field__textarea { width: 100%; }
+.review-field__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.review-field__source { display: flex; }
+.review-field__choices { margin: 0; }
+.review-button {
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  padding: 6px 14px; min-height: 36px;
+  background: var(--nhs-colour-white); color: var(--nhs-colour-dark-grey);
+  border: 2px solid var(--nhs-colour-dark-grey);
+}
+.review-button:hover { background: var(--nhs-colour-light-grey); }
+.review-button[aria-pressed="true"], .review-button[aria-expanded="true"] { background: var(--nhs-colour-blue); border-color: var(--nhs-colour-blue); color: #fff; }
+.review-button--accept[aria-pressed="true"] { background: #00542a; border-color: #00542a; }
+
+/* Add-action form */
+.action-form { display: grid; gap: 8px; max-width: 520px; padding: 16px; margin-bottom: 16px; background: var(--nhs-colour-light-grey); border: 1px solid var(--nhs-colour-pale-grey); }
+.action-form__title { margin: 0; font-size: 18px; }
+.action-form .nhsuk-form-group { margin: 0; }
+
+@media (max-width: 760px) {
+  .frailty-overview { grid-template-columns: 1fr; }
+  .key-figure--large .key-figure__value { font-size: 44px; }
+}
+
+/* Legacy rule `.text-* .maternity-dashboard .dash-card-body *` forces one size on every descendant.
+   Frailty components set their own scale, so they need to out-rank it. Sizes follow --ncrs-fs. */
+.record-shell .maternity-dashboard .dash-card-body :is(.key-figure__label, .key-figure__trend, .review-field__title, .review-field__value, .review-button, .link-button, .frailty-overview__text p, .cga-progress) {
+  font-size: var(--ncrs-fs, 14px);
+}
+.record-shell .maternity-dashboard .dash-card-body :is(.key-figure__note, .key-figure__unit, .review-field__hint, .review-field__note, .cell-note, .plain-list, .panel-sources__label, .provenance-panel, .provenance-panel dt, .provenance-panel dd) {
+  font-size: calc(var(--ncrs-fs, 14px) - 1px);
+}
+.record-shell .maternity-dashboard .dash-card-body .key-figure__value { font-size: 28px; }
+.record-shell .maternity-dashboard .dash-card-body .key-figure--large .key-figure__value { font-size: 56px; }
+.record-shell .maternity-dashboard .dash-card-body .key-figure__unit { font-weight: 600; }
+.record-shell .maternity-dashboard .dash-card-body .provenance-tag { font-size: 12px; }
+.record-shell .maternity-dashboard .dash-card-body .nhsuk-textarea,
+.record-shell .maternity-dashboard .dash-card-body .nhsuk-select,
+.record-shell .maternity-dashboard .dash-card-body .nhsuk-label,
+.record-shell .maternity-dashboard .dash-card-body .nhsuk-radios__label { font-size: var(--ncrs-fs, 14px); }
+.record-shell .maternity-dashboard .dash-card-body .nhsuk-hint { font-size: calc(var(--ncrs-fs, 14px) - 1px); }
+.record-shell .maternity-dashboard .dash-card-body .key-figure__trend--up,
+.record-shell .maternity-dashboard .dash-card-body .key-figure__trend--down { color: #8a1c13; }
+@media (max-width: 760px) {
+  .record-shell .maternity-dashboard .dash-card-body .key-figure--large .key-figure__value { font-size: 44px; }
+}
+
+/* Menu items with a current marker and a reason line (patient and record view menus) */
+.ncrs-menu__list button { display: flex; align-items: center; gap: 8px; }
+.ncrs-menu__text { display: grid; flex: 1; text-align: left; }
+.ncrs-menu__text small { font-size: 0.85em; color: var(--nhs-colour-dark-grey); font-weight: 400; }
+.ncrs-menu__list button[aria-current="true"] { font-weight: 700; }
+.ncrs-menu__list button[aria-disabled="true"] { cursor: not-allowed; color: var(--nhs-colour-dark-grey); }
+.ncrs-menu__list button[aria-disabled="true"]:hover { background: transparent; }
+.ncrs-patient__row .ncrs-menu__trigger { border: 1px solid var(--nhs-colour-dark-grey); padding: 3px 10px; background: #fff; color: var(--nhs-colour-black); }
+.ncrs-patient__row .ncrs-menu__list { min-width: 260px; }
+.ncrs-patient__row .ncrs-menu__trigger { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }

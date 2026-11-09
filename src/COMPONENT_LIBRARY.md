@@ -176,5 +176,10 @@ Every record tab is built from these. Pages must not render their own header, pa
 | `ConnectedSystems` | Connected-systems panel | Status as text tag |
 | `Dialog` | Modal dialogs | Native `<dialog>`: focus trap, Escape, focus return |
 | `DetailPanel` | Drill-in view | Focus moves to heading; Back button text is its name |
+| `ProvenanceTag` | A source tag that opens to show organisation, system, date and author | Native Popover API: opens on click or Enter (never hover alone), Escape closes, never clipped by a scrolling table; `aria-expanded` |
+| `KeyFigure` | A measurement or score shown large (vitals, Clinical Frailty Scale) | Trend is an icon plus words, never colour alone |
+| `ReviewField` / `ReviewPrompt` | Pre-populated assessment items to accept, edit or reject; suggestions to confirm or dismiss | Title is the control's label; hint text is visible, not placeholder-only; reject and dismiss are reversible and move focus to Undo; status is stated in text |
+
+Record views (Maternity, Frailty) are configuration in `src/views.ts`: patient, tabs and which page tools apply. The shell reads it, so a new view is one entry plus its pages and data (`src/data/frailty.ts` is the pattern). The route decides the view.
 
 Patient data lives in `src/data/`, so risks, banners and safety flags share one source.

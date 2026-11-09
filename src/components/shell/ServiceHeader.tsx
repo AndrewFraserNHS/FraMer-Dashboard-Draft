@@ -5,7 +5,14 @@ import { MenuButton } from "./MenuButton";
  * Slim NHS service header: identity on the left, the one thing clinicians do constantly
  * (find a patient) and a single account menu on the right.
  */
-export function ServiceHeader({ onFindPatient }: { onFindPatient: () => void }) {
+export function ServiceHeader({
+  onFindPatient,
+  patientMenu,
+}: {
+  onFindPatient: () => void;
+  /** Demo patient picker, shown beside Find patient */
+  patientMenu?: React.ReactNode;
+}) {
   const noop = () => {};
   return (
     <header className="ncrs-service">
@@ -19,6 +26,7 @@ export function ServiceHeader({ onFindPatient }: { onFindPatient: () => void }) 
           <Search size={18} aria-hidden="true" />
           Find patient
         </button>
+        {patientMenu}
         <MenuButton
           label="Dr Amrita Kaur"
           items={[

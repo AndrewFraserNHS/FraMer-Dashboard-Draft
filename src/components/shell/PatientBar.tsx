@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { patient } from "../../data/patient";
+import type { PatientSummary } from "../../views";
 import { DetailList } from "../ui/DetailList";
 import { StatusTag } from "../ui/StatusTag";
 
@@ -8,9 +8,11 @@ import { StatusTag } from "../ui/StatusTag";
  * Who the patient is, and nothing else. Address, GP, next of kin and the
  * cross-boundary explanation sit behind "Patient details".
  */
-export function PatientBar() {
+export function PatientBar({ patient, viewMenu }: { patient: PatientSummary; viewMenu?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const id = useId();
+  const crossBoundary =
+    !!patient.registeredIcb && !!patient.viewingIcb && patient.registeredIcb !== patient.viewingIcb;
 
   return (
     <section className="ncrs-patient" aria-label="Patient identity">
@@ -21,7 +23,8 @@ export function PatientBar() {
           <div><dt>Date of birth</dt><dd><strong>{patient.dob}</strong></dd></div>
           <div><dt>NHS number</dt><dd><strong>{patient.nhsNumber}</strong></dd></div>
         </dl>
-        <StatusTag tone="blue">Cross-boundary</StatusTag>
+        {viewMenu}
+        {crossBoundary && <StatusTag tone="blue">Cross-boundary</StatusTag>}
         <button
           type="button"
           className="ncrs-patient__toggle"
@@ -42,10 +45,12 @@ export function PatientBar() {
             ["Next of kin", patient.nextOfKin],
           ]}
         />
-        <p className="ncrs-inset">
-          <strong>Cross-boundary access.</strong> This patient is registered with{" "}
-          {patient.registeredIcb}. You are viewing as {patient.viewingIcb}.
-        </p>
+        {crossBoundary && (
+          <p className="ncrs-inset">
+            <strong>Cross-boundary access.</strong> This patient is registered with{" "}
+            {patient.registeredIcb}. You are viewing as {patient.viewingIcb}.
+          </p>
+        )}
       </div>
     </section>
   );

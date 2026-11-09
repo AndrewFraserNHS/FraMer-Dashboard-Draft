@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ConnectedSystems } from "./ConnectedSystems";
+import { ConnectedSystem, ConnectedSystems } from "./ConnectedSystems";
 import { connectedSystems } from "../../data/systems";
 
 /**
@@ -11,12 +11,15 @@ export function RecordPage({
   title,
   intro,
   showSystems = true,
+  systems = connectedSystems,
   className = "",
   children,
 }: {
   title: string;
   intro?: ReactNode;
   showSystems?: boolean;
+  /** The systems feeding this record view. Defaults to the maternity set. */
+  systems?: readonly ConnectedSystem[];
   className?: string;
   children: ReactNode;
 }) {
@@ -27,7 +30,7 @@ export function RecordPage({
         {intro && <p className="record-page-intro">{intro}</p>}
         <div className="record-page-stack">
           {children}
-          {showSystems && <ConnectedSystems systems={connectedSystems} />}
+          {showSystems && <ConnectedSystems systems={systems} />}
         </div>
       </div>
       <p className="prototype-note">Demo prototype – fictional data</p>

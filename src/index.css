@@ -30,6 +30,12 @@ body,
   box-sizing: border-box;
 }
 
+@media (min-width: 40.0625em) {
+    ol > li, ul > li, .nhsuk-list > li {
+        margin-bottom: 0;
+    }
+}
+
 button,
 input,
 select,
@@ -1186,7 +1192,7 @@ button {
 }
 
 .nhs-expander-content {
-  padding: 0 24px 24px;
+  padding: 24px;
   border: 1px solid var(--nhs-colour-pale-grey);
   border-top: 0;
 }
@@ -1194,7 +1200,7 @@ button {
 .nhs-expander-action {
   display: flex;
   justify-content: flex-end;
-  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .nhs-expander-content .dash-card-body {
@@ -3237,10 +3243,6 @@ textarea:focus-visible {
   text-transform: none !important;
 }
 
-.record-shell dt {
-  padding-left: 10px;
-}
-
 .record-frame {
   width: 100%;
   margin-inline: auto;
@@ -4244,8 +4246,7 @@ textarea:focus-visible {
 }
 
 .callout + .subsection,
-.subsection + .callout,
-.callout + .callout {
+.subsection + .callout {
   margin-top: 16px;
 }
 
@@ -4637,7 +4638,7 @@ button.systems-grid__item:hover {
 
 .documents-table.data-table th:first-child,
 .documents-table.data-table td:first-child {
-  padding-left: 0;
+  padding-left: 2px;
 }
 
 .documents-table.data-table th:last-child,

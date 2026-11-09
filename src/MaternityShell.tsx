@@ -1195,128 +1195,150 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
   return (
     <BreadcrumbProvider>
       <DisclosureGroup>
-      <SectionOrderContext.Provider value={cardOrder}>
-      <div className={`record-shell text-${textSize}`}>
-        <a className="record-skip-link" href="#main-content">
-          Skip to main content
-        </a>
+        <SectionOrderContext.Provider value={cardOrder}>
+          <div className={`record-shell text-${textSize}`}>
+            <a className="record-skip-link" href="#main-content">
+              Skip to main content
+            </a>
 
-        <div className="record-frame">
-          {accessToastVisible && (
-            <div className="access-toast" role="status" aria-live="polite">
-              Access logged — this record access has been recorded for audit
-            </div>
-          )}
-          <ServiceHeader onFindPatient={() => setAppView("search")} patientMenu={patientMenu} />
-          <PatientBar key={view.key} patient={view.patient} viewMenu={viewMenu} />
-          <AlertsBand key={`alerts-${view.key}`} flags={flags} />
-          <p role="status" className="nhs-visually-hidden">{viewAnnouncement}</p>
-          <nav aria-label="Patient record sections" className="ncrs-tabs">
-            <ul>
-              {tabs.map(([label, path]) => (
-                <li key={path}>
-                  <NavLink to={path} end={path === "/"}>
-                    {label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-        {view.hasFilters && filtersOpen && <section className="record-filterbar" aria-label="Record filters">
-          <label>
-            Care setting
-            <select defaultValue="all">
-              <option value="all">All care settings</option>
-              <option>Community maternity</option>
-              <option>Antenatal clinic</option>
-              <option>Outpatient</option>
-              <option>Inpatient</option>
-            </select>
-          </label>
-          <label>
-            Event type
-            <select defaultValue="all">
-              <option value="all">All event types</option>
-              <option>Appointments</option>
-              <option>Scans</option>
-              <option>Investigations</option>
-              <option>Reviews</option>
-            </select>
-          </label>
-          <label>
-            Organisation
-            <select defaultValue="all">
-              <option value="all">All organisations</option>
-              <option>BadgerNet Maternity</option>
-              <option>Central City Practice</option>
-              <option>Community Perinatal Service</option>
-              <option>Diabetes Antenatal Clinic</option>
-            </select>
-          </label>
-          <label>
-            Specialty
-            <select defaultValue="all">
-              <option value="all">All specialties</option>
-              <option>Maternity</option>
-              <option>Diabetes</option>
-              <option>Perinatal mental health</option>
-              <option>Ultrasound</option>
-            </select>
-          </label>
-          <label>
-            Date range
-            <select defaultValue="all">
-              <option value="all">All time</option>
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>This pregnancy</option>
-            </select>
-          </label>
-        </section>}
-
-        <div className="record-workspace">
-          <OptionsSidebar
-            open={optionsOpen}
-            onOpenChange={setOptionsOpen}
-            textSize={textSize}
-            onTextSize={setTextSize}
-            filtersOpen={filtersOpen}
-            onToggleFilters={view.hasFilters ? () => setFiltersOpen((value) => !value) : undefined}
-            onReorder={view.canReorder ? () => setShowReorderModal(true) : undefined}
-          />
-          <main
-            id="main-content"
-            className="maternity-content"
-            tabIndex={-1}
-          >
-            <DetailPanelContext.Provider value={openPanel}>
-              <BreadcrumbNav />
-              <div style={{ display: panel ? 'none' : 'block' }}>
-                {children}
-              </div>
-              <DetailPanelComponent 
-                isOpen={!!panel}
-                title={panel?.title || ""}
-                eyebrow={panel?.eyebrow}
-                status={panel?.status}
-                tone={panel?.tone}
-                content={panel?.content}
-                onClose={closePanel}
-                backLabel={`Back to ${currentTabLabel}`}
+            <div className="record-frame">
+              {accessToastVisible && (
+                <div className="access-toast" role="status" aria-live="polite">
+                  Access logged — this record access has been recorded for audit
+                </div>
+              )}
+              <ServiceHeader
+                onFindPatient={() => setAppView("search")}
+                patientMenu={patientMenu}
               />
-            </DetailPanelContext.Provider>
-          </main>
-        </div>
-        <ReorderModal 
-          isOpen={showReorderModal} 
-          onClose={() => setShowReorderModal(false)} 
-          cards={cardOrder}
-          onReorder={setCardOrder}
-        />
-      </div>
-      </div>
-      </SectionOrderContext.Provider>
+              <PatientBar
+                key={view.key}
+                patient={view.patient}
+                viewMenu={viewMenu}
+              />
+              <AlertsBand key={`alerts-${view.key}`} flags={flags} />
+              <p role="status" className="nhs-visually-hidden">
+                {viewAnnouncement}
+              </p>
+              <nav aria-label="Patient record sections" className="ncrs-tabs">
+                <ul>
+                  {tabs.map(([label, path]) => (
+                    <li key={path}>
+                      <NavLink to={path} end={path === "/"}>
+                        {label}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              {view.hasFilters && filtersOpen && (
+                <section
+                  className="record-filterbar"
+                  aria-label="Record filters"
+                >
+                  <label>
+                    Care setting
+                    <select defaultValue="all">
+                      <option value="all">All care settings</option>
+                      <option>Community maternity</option>
+                      <option>Antenatal clinic</option>
+                      <option>Outpatient</option>
+                      <option>Inpatient</option>
+                    </select>
+                  </label>
+                  <label>
+                    Event type
+                    <select defaultValue="all">
+                      <option value="all">All event types</option>
+                      <option>Appointments</option>
+                      <option>Scans</option>
+                      <option>Investigations</option>
+                      <option>Reviews</option>
+                    </select>
+                  </label>
+                  <label>
+                    Organisation
+                    <select defaultValue="all">
+                      <option value="all">All organisations</option>
+                      <option>BadgerNet Maternity</option>
+                      <option>Central City Practice</option>
+                      <option>Community Perinatal Service</option>
+                      <option>Diabetes Antenatal Clinic</option>
+                    </select>
+                  </label>
+                  <label>
+                    Specialty
+                    <select defaultValue="all">
+                      <option value="all">All specialties</option>
+                      <option>Maternity</option>
+                      <option>Diabetes</option>
+                      <option>Perinatal mental health</option>
+                      <option>Ultrasound</option>
+                    </select>
+                  </label>
+                  <label>
+                    Date range
+                    <select defaultValue="all">
+                      <option value="all">All time</option>
+                      <option>Last 7 days</option>
+                      <option>Last 30 days</option>
+                      <option>This pregnancy</option>
+                    </select>
+                  </label>
+                </section>
+              )}
+
+              <div className="record-workspace">
+                <OptionsSidebar
+                  open={optionsOpen}
+                  onOpenChange={setOptionsOpen}
+                  textSize={textSize}
+                  onTextSize={setTextSize}
+                  filtersOpen={filtersOpen}
+                  onToggleFilters={
+                    view.hasFilters
+                      ? () => setFiltersOpen((value) => !value)
+                      : undefined
+                  }
+                  onReorder={
+                    view.canReorder
+                      ? () => setShowReorderModal(true)
+                      : undefined
+                  }
+                />
+                <main
+                  id="main-content"
+                  className="maternity-content"
+                  tabIndex={-1}
+                >
+                  <DetailPanelContext.Provider value={openPanel}>
+                    <BreadcrumbNav />
+                    <div style={{ display: panel ? "none" : "block" }}>
+                      {children}
+                    </div>
+                    <DetailPanelComponent
+                      isOpen={!!panel}
+                      title={panel?.title || ""}
+                      eyebrow={panel?.eyebrow}
+                      status={panel?.status}
+                      tone={panel?.tone}
+                      content={panel?.content}
+                      onClose={closePanel}
+                      backLabel={`Back`}
+                    />
+                  </DetailPanelContext.Provider>
+                </main>
+              </div>
+              <ReorderModal
+                isOpen={showReorderModal}
+                onClose={() => setShowReorderModal(false)}
+                cards={cardOrder}
+                onReorder={setCardOrder}
+              />
+            </div>
+          </div>
+        </SectionOrderContext.Provider>
       </DisclosureGroup>
     </BreadcrumbProvider>
   );

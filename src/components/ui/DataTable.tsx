@@ -1,0 +1,144 @@
+import { ReactNode, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
+import { RowChevron } from "./ExpandableRow";
+
+export type SortKey = string | number | null;
+
+export type Column<T> = {
+  header: string;
+  cell: (row: T) => ReactNode;
+  /** Makes the column sortable. Return null for "no value"; those rows sort last. */
+  sort?: (row: T) => SortKey;
+};
+
+type Direction = "ascending" | "descending";
+
+type DataTableProps<T> = {
+  /** Describes the table to assistive technology. Not shown visually. */
+  caption: string;
+  columns: readonly Column<T>[];
+  rows: readonly T[];
+  rowKey: (row: T, index: number) => string;
+  /** Header of the column to sort by initially */
+  defaultSort?: { header: string; direction: Direction };
+  /** When set, each row gets a "view" button as its last cell */
+  onView?: (row: T) => void;
+  /** Accessible name of the row's view button, e.g. `View ${row.name}` */
+  viewLabel?: (row: T) => string;
+};
+
+function compare(a: SortKey, b: SortKey): number {
+  if (a === null && b === null) return 0;
+  if (a === null) return 1; // empty values always last
+  if (b === null) return -1;
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  return String(a).localeCompare(String(b), "en-GB", { numeric: true, sensitivity: "base" });
+}
+
+/**
+ * NHS-style data table: caption, column headers, optional sorting and a
+ * keyboard-scrollable wrapper. Sortable headers are real buttons and the th carries
+ * aria-sort. Rows are never buttons; the optional last cell holds a real button.
+ */
+export function DataTable<T>({
+  caption,
+  columns,
+  rows,
+  rowKey,
+  defaultSort,
+  onView,
+  viewLabel,
+}: DataTableProps<T>) {
+  const [sort, setSort] = useState<{ header: string; direction: Direction } | null>(
+    defaultSort ?? null,
+  );
+  const [announcement, setAnnouncement] = useState("");
+
+  const sortedRows = useMemo(() => {
+    const column = columns.find((candidate) => candidate.header === sort?.header);
+    if (!sort || !column?.sort) return rows;
+    const key = column.sort;
+    const factor = sort.direction === "ascending" ? 1 : -1;
+    // Array.prototype.sort is stable, so equal rows keep their original order
+    return [...rows].sort((first, second) => {
+      const a = key(first);
+      const b = key(second);
+      // keep empty values last in both directions
+      if (a === null || b === null) return compare(a, b);
+      return factor * compare(a, b);
+    });
+  }, [rows, columns, sort]);
+
+  function toggleSort(header: string) {
+    const direction: Direction =
+      sort?.header === header && sort.direction === "ascending" ? "descending" : "ascending";
+    setSort({ header, direction });
+    setAnnouncement(`Sorted by ${header}, ${direction}`);
+  }
+
+  return (
+    <div className="table-scroll" role="region" aria-label={caption} tabIndex={0}>
+      <table className="documents-table data-table">
+        <caption className="nhs-visually-hidden">{caption}</caption>
+        <thead>
+          <tr>
+            {columns.map((column) => {
+              const active = sort?.header === column.header ? sort.direction : undefined;
+              return (
+                <th key={column.header} scope="col" aria-sort={column.sort ? (active ?? "none") : undefined}>
+                  {column.sort ? (
+                    <button
+                      type="button"
+                      className="data-table__sort"
+                      onClick={() => toggleSort(column.header)}
+                    >
+                      {column.header}
+                      {active === "ascending" ? (
+                        <ArrowUp size={14} aria-hidden="true" />
+                      ) : active === "descending" ? (
+                        <ArrowDown size={14} aria-hidden="true" />
+                      ) : (
+                        <ChevronsUpDown size={14} aria-hidden="true" />
+                      )}
+                    </button>
+                  ) : (
+                    column.header
+                  )}
+                </th>
+              );
+            })}
+            {onView && (
+              <th scope="col">
+                <span className="nhs-visually-hidden">Actions</span>
+              </th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {sortedRows.map((row, index) => (
+            <tr key={rowKey(row, index)}>
+              {columns.map((column) => (
+                <td key={column.header}>{column.cell(row)}</td>
+              ))}
+              {onView && (
+                <td>
+                  <button
+                    type="button"
+                    className="row-chevron-button"
+                    aria-label={viewLabel?.(row) ?? "View details"}
+                    onClick={() => onView(row)}
+                  >
+                    <RowChevron />
+                  </button>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <span role="status" className="nhs-visually-hidden">
+        {announcement}
+      </span>
+    </div>
+  );
+}

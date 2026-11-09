@@ -1,258 +1,421 @@
-import { ReactNode, useState } from "react";
+import { Fragment, ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDetailPanel } from "./MaternityShell";
 import { RiskBannerGroup } from "./RiskBanner";
-
-type AccordionItemProps = {
-  label: string;
-  detail: string;
-  children: ReactNode;
-  expandedContent: ReactNode;
-};
-
-function AccordionItem({ label, detail, children, expandedContent }: AccordionItemProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <>
-      <button
-        type="button"
-        className={`dash-list-row interactive${isExpanded ? " expanded" : ""}`}
-        onClick={() => setIsExpanded(!isExpanded)}
-        aria-label={`${isExpanded ? "Collapse" : "Expand"} ${label} detail`}
-        aria-expanded={isExpanded}
-      >
-        {children}
-        <RowChevron />
-      </button>
-      {isExpanded && (
-        <div className="accordion-details">
-          {expandedContent}
-        </div>
-      )}
-    </>
-  );
-}
-
-const risks = [
-  ["high", "Gestational diabetes", "Diagnosed 5 September 2026 · Lab results"],
-  ["high", "Penicillin allergy", "Reaction: rash · GP record"],
-  ["medium", "High body mass index (32)", "Added to record 15 August 2026 · BadgerNet Maternity"],
-  ["medium", "Depression and anxiety (history)", "Currently managed by Perinatal mental health team"],
-  ["medium", "Sertraline in pregnancy", "50mg once daily · GP record"],
-  ["medium", "Language need", "Urdu interpreter required"],
-  ["low", "Safeguarding", "3 concerns on record · 1 active"],
-] as const;
-
-const conditions = [
-  ["Gestational diabetes mellitus", "Active · Diagnosed 5 September 2026", "Lab results"],
-  ["Depression and anxiety (history)", "Currently managed · Since 2022", "GP record"],
-  ["Obesity (body mass index 32)", "Active · Since 15 August 2026", "BadgerNet Maternity"],
-];
-
-const medicines = [
-  ["Metformin", "500mg", "gestational diabetes mellitus management", "Diabetes service"],
-  ["Sertraline", "50mg", "Once daily", "Dr Sarah Wilson (GP)"],
-  ["Prenatal Vitamins", "Standard", "Once daily", "Midwife"],
-];
-
-const results = [
-  ["Oral glucose tolerance test (75 g)", "Fasting 5.6 · 2-hour 8.7 mmol/L", "5 September 2026", "Abnormal", "high"],
-  ["HbA1c", "41 mmol/mol", "5 September 2026", "Borderline", "medium"],
-  ["full blood count", "Hb 122 · WCC 7.8 · Plt 262", "15 August 2026", "Normal", "low"],
-  ["HIV, hepatitis B and syphilis", "Negative", "15 August 2026", "Normal", "low"],
-  ["ABO blood group and rhesus D status", "A+", "15 August 2026", "Added to record", "low"],
-] as const;
-
-const events = [
-  ["15 September 2026", "Community", "Perinatal mental health assessment", "Wellbeing assessment completed. Safety plan reviewed.", "Community Perinatal Service", "Perinatal mental health team", "Perinatal mental health"],
-  ["12 September 2026", "Outpatient", "Gestational diabetes management", "Metformin commenced. Glucose monitoring 4 times a day.", "Diabetes Antenatal Clinic", "Dr James Chen", "Diabetes service"],
-  ["5 September 2026", "Antenatal clinic", "Glucose tolerance test", "Gestational diabetes mellitus confirmed following an abnormal oral glucose tolerance test.", "Antenatal Clinic", "Phlebotomy", "Lab results"],
-  ["15 August 2026", "Community", "Antenatal booking", "Baseline observations and risk assessment completed.", "Community Midwifery - Central", "Midwife J. Davies", "BadgerNet Maternity"],
-];
-
-const documents = [
-  ["Structured referral (GP)", "GP structured referral", "25 July 2026", "GP Referral", "Received", "Clinical"],
-  ["Booking appointment summary", "Booking summary", "15 August 2026", "BadgerNet", "Document filed", "Clinical"],
-  ["Diabetes clinic letter", "Clinic letter", "12 September 2026", "Diabetes service", "Document filed", "Clinical"],
-  ["Wellbeing support plan", "Care plan", "15 September 2026", "Perinatal mental health team", "Document filed", "Clinical"],
-  ["Interpreter booking confirmation", "Admin note", "20 September 2026", "Booking Office", "Document filed", "Admin"],
-];
-
-const socialContext = [
-  ["Pregnancy", "Third pregnancy, 1 previous birth · 34 weeks and 1 day · estimated due date 15 November 2026"],
-  ["Language", "Urdu · Interpreter required"],
-  ["Living situation", "Lives with partner, Imran Khan"],
-  ["Employment", "Retail assistant (part-time)"],
-  ["Safeguarding", "No active concern recorded"],
-  ["Next of kin", "Imran Khan · 07811 223344"],
-  ["Phone", "07980782416"],
-  ["Email", "leila.khan@example.com"],
-  ["GP", "Dr Sarah Wilson · Central City Practice"],
-  ["Ethnicity", "Asian / Asian British - Pakistani"],
-  ["Blood group", "A+"],
-  ["Previous pregnancies", "2 · No stillbirths"],
-  ["Vaccinations", "Seasonal Flu and Pertussis completed"],
-  ["Disability", "None recorded"],
-] as const;
-
-function Card({ title, count, children, className = "", action, defaultOpen = true }: { title: string; count?: string; children: ReactNode; className?: string; action?: ReactNode; defaultOpen?: boolean }) {
-  return (
-    <ExpanderCard
-      title={title}
-      count={count}
-      className={className}
-      action={action}
-      defaultOpen={defaultOpen}
-    >
-      {children}
-    </ExpanderCard>
-  );
-}
-
-function ExpanderCard({
-  title,
-  count,
-  children,
-  className = "",
-  action,
-  defaultOpen = true,
-}: {
-  title: string;
-  count?: string;
-  children: ReactNode;
-  className?: string;
-  action?: ReactNode;
-  defaultOpen?: boolean;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  return (
-    <details
-      className={`nhs-expander-card ${className}`}
-      open={open}
-      onToggle={(event) => setOpen(event.currentTarget.open)}
-    >
-      <summary
-        className="nhs-expander-summary"
-        data-section-toggle
-        aria-expanded={open}
-      >
-        <span className="nhs-expander-summary-text">{title}</span>
-        {count && <span className="nhs-expander-count" aria-live="polite">{count}</span>}
-      </summary>
-      <div className="nhs-expander-content">
-        {action && <div className="nhs-expander-action">{action}</div>}
-        <div className="dash-card-body">{children}</div>
-      </div>
-    </details>
-  );
-}
+import { DataSection } from "./components/ui/DataSection";
+import { DetailList } from "./components/ui/DetailList";
+import { ExpandableRow, RowChevron } from "./components/ui/ExpandableRow";
+import { DataTable } from "./components/ui/DataTable";
+import { dateKey } from "./utils/sort";
+import { SortSelect, SortValue } from "./components/ui/SortSelect";
+import { PriorityTag, ResultTag } from "./components/ui/StatusTag";
+import { SectionName, useSectionOrder } from "./components/ui/SectionOrder";
+import { DocumentDetail } from "./components/record/DocumentDetail";
+import {
+  careTeam,
+  carePlans,
+  ClinicalDocument,
+  conditions,
+  documents,
+  events,
+  formatDate,
+  medicines,
+  priorityLabel,
+  results,
+  risks,
+  socialContext,
+  upcomingCare,
+} from "./data/patient";
 
 function More({ to, children }: { to: string; children: ReactNode }) {
-  return <Link className="dash-more" to={to}>{children}</Link>;
-}
-
-function SortControl({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
   return (
-    <select
-      className="dash-sort"
-      aria-label={`Sort ${label}`}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-    >
-      <option value="date-desc">Newest first</option>
-      <option value="date-asc">Oldest first</option>
-      <option value="az">A–Z</option>
-      <option value="za">Z–A</option>
-    </select>
+    <Link className="dash-more" to={to}>
+      {children}
+    </Link>
   );
 }
 
-function DetailRows({ rows }: { rows: Array<[string, ReactNode]> }) {
-  return <dl className="panel-detail-list">
-    {rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
-  </dl>;
+function sortRecords<T>(
+  records: readonly T[],
+  sort: SortValue,
+  getName: (record: T) => string,
+  getDate: (record: T) => string,
+): T[] {
+  return [...records].sort((first, second) => {
+    if (sort === "az") return getName(first).localeCompare(getName(second));
+    if (sort === "za") return getName(second).localeCompare(getName(first));
+    // ISO dates compare correctly as strings
+    const order = getDate(first).localeCompare(getDate(second));
+    return sort === "date-asc" ? order : -order;
+  });
 }
 
-function RowChevron() {
-  return <span className="side-panel-chevron" aria-hidden="true" />;
-}
-
-function ListRow({ children, onOpen, label }: { children: ReactNode; onOpen?: () => void; label?: string }) {
-  if (onOpen) {
-    return <button type="button" className="dash-list-row interactive" onClick={onOpen} aria-label={label}>{children}<RowChevron /></button>;
-  }
-  return <div className="dash-list-row">{children}</div>;
-}
+const activeCount = (count: number, noun = "active") =>
+  `Showing ${count} of ${count} ${noun}`;
 
 export default function App() {
   const openPanel = useDetailPanel();
-  const [medicineSort, setMedicineSort] = useState("date-desc");
-  const [resultSort, setResultSort] = useState("date-desc");
-  const medicineDates: Record<string, number> = {
-    Metformin: Date.parse("2026-09-12"),
-    Sertraline: Date.parse("2022-01-01"),
-    "Prenatal Vitamins": Date.parse("2026-08-15"),
-  };
-  const sortRecords = <T extends readonly string[]>(
-    records: readonly T[],
-    sort: string,
-    getDate: (record: T) => number,
-  ) =>
-    [...records].sort((first, second) => {
-      if (sort === "az") return first[0].localeCompare(second[0]);
-      if (sort === "za") return second[0].localeCompare(first[0]);
-      return sort === "date-asc"
-        ? getDate(first) - getDate(second)
-        : getDate(second) - getDate(first);
-    });
+  const sectionOrder = useSectionOrder();
+  const [medicineSort, setMedicineSort] = useState<SortValue>("date-desc");
+  const [resultSort, setResultSort] = useState<SortValue>("date-desc");
+
   const sortedMedicines = sortRecords(
     medicines,
     medicineSort,
-    ([name]) => medicineDates[name] ?? 0,
+    (medicine) => medicine.name,
+    (medicine) => medicine.started,
   );
   const sortedResults = sortRecords(
     results,
     resultSort,
-    ([, , date]) => Date.parse(date),
+    (result) => result.test,
+    (result) => result.date,
   );
 
-  function showDocumentDetail([name, type, date, source, status, confidentiality]: (typeof documents)[number]) {
+  function showDocumentDetail(document: ClinicalDocument) {
     openPanel({
-      eyebrow: type,
-      title: name,
-      content: <article className="panel-document">
-        <div className="panel-document-meta">
-          <strong>University Hospitals of Morecambe Bay NHS Foundation Trust</strong>
-          <span><b>Date:</b> {date}</span>
-          <span><b>Source:</b> {source}</span>
-          <span><b>Status:</b> {status} · {confidentiality}</span>
-        </div>
-        <div className="panel-patient-block">
-          <span><b>Patient:</b> Leila Khan</span>
-          <span><b>NHS No:</b> 485 777 2910</span>
-          <span><b>DoB:</b> 14 June 1995</span>
-          <span><b>Address:</b> 14 Ryelands Crescent, Lancaster</span>
-        </div>
-        <h3>{name}</h3>
-        <h4>Clinical summary</h4>
-        <p>This document forms part of Leila Khan’s shared maternity record and has been made available to the maternity care team.</p>
-        <h4>Current pregnancy</h4>
-        <p>Leila is in her third pregnancy, with 1 previous birth, and is 34 weeks and 1 day pregnant. Gestational diabetes mellitus is managed with metformin and regular glucose monitoring. She needs an Urdu interpreter.</p>
-        <h4>Plan</h4>
-        <p>Continue the agreed maternity pathway and review at the next scheduled appointment. Escalate any new clinical or safeguarding concerns.</p>
-      </article>,
+      eyebrow: document.type,
+      title: document.name,
+      content: <DocumentDetail document={document} />,
     });
   }
+
+  const sections: Record<SectionName, ReactNode> = {
+    "Clinical risks": (
+      <DataSection title="Clinical risks and alerts" summary={activeCount(risks.length)}>
+        {risks.map((risk) => (
+          <ExpandableRow
+            key={risk.id}
+            detail={
+              <DetailList
+                rows={[
+                  ["Risk or flag", risk.title],
+                  ["Priority", priorityLabel[risk.level]],
+                  ["Clinical detail", risk.detail],
+                  ["Applies to", "Current pregnancy"],
+                  ["Review status", risk.level === "low" ? "No action required" : "Active review required"],
+                  ["Record source", risk.source],
+                ]}
+              />
+            }
+          >
+            <div>
+              <strong>{risk.title}</strong>
+              <small>{risk.detail}</small>
+            </div>
+            <PriorityTag level={risk.level} />
+          </ExpandableRow>
+        ))}
+      </DataSection>
+    ),
+
+    "Pregnancy conditions": (
+      <DataSection title="Pregnancy conditions" summary={activeCount(conditions.length)}>
+        {conditions.map((condition) => (
+          <ExpandableRow
+            key={condition.name}
+            detail={
+              <DetailList
+                rows={[
+                  ["Condition or problem", condition.name],
+                  ["Clinical status", condition.status],
+                  ["Date recorded", condition.recorded],
+                  ["Recorder", condition.recorder],
+                  ["Service", condition.source],
+                  ["Record source", condition.source],
+                ]}
+              />
+            }
+          >
+            <div>
+              <strong>{condition.name}</strong>
+              <small>{condition.status} · {condition.source}</small>
+            </div>
+          </ExpandableRow>
+        ))}
+        <More to="/comorbidities">View full condition history</More>
+      </DataSection>
+    ),
+
+    "Social context": (
+      <DataSection title="Social and maternity context" summary={`Showing ${socialContext.length} of ${socialContext.length} recorded`}>
+        <div className="context-data">
+          {socialContext.map(([label, value]) => (
+            <ExpandableRow
+              key={label}
+              detail={
+                <DetailList
+                  rows={[
+                    [label, value],
+                    ["Patient", "Leila Khan"],
+                    ["Record status", "Current"],
+                    ["Record source", label === "GP" ? "GP record" : "BadgerNet Maternity"],
+                    ["Last reviewed", "5 October 2026"],
+                  ]}
+                />
+              }
+            >
+              <strong>{label}</strong>
+              <span>{value}</span>
+            </ExpandableRow>
+          ))}
+        </div>
+      </DataSection>
+    ),
+
+    "Test results": (
+      <DataSection
+        title="Recent test results and investigations"
+        summary={`Showing ${results.length} of ${results.length} results`}
+        defaultOpen={false}
+        toolbar={
+          <SortSelect
+            label="test results"
+            value={resultSort}
+            onChange={setResultSort}
+            count={sortedResults.length}
+          />
+        }
+      >
+        {sortedResults.map((result) => (
+          <ExpandableRow
+            key={result.test}
+            detail={
+              <DetailList
+                rows={[
+                  ["Investigation", result.test],
+                  ["Result", result.value],
+                  ["Result date", formatDate(result.date)],
+                  ["Status", result.status],
+                  ["Requested by", "Maternity clinical team"],
+                  ["Record source", "Lab results"],
+                ]}
+              />
+            }
+          >
+            <div>
+              <strong>{result.test}</strong>
+              <span>{result.value}</span>
+              <small>{formatDate(result.date)} · Lab results</small>
+            </div>
+            <ResultTag tone={result.tone}>{result.status}</ResultTag>
+          </ExpandableRow>
+        ))}
+        <More to="/results">View all results</More>
+      </DataSection>
+    ),
+
+    "Care plans": (
+      <DataSection
+        title="Care plans and treatment preferences"
+        summary={activeCount(carePlans.length)}
+        defaultOpen={false}
+      >
+        {carePlans.map((plan) => (
+          <ExpandableRow
+            key={plan.title}
+            detail={
+              <>
+                <DetailList rows={plan.rows} />
+                <h3>Plan</h3>
+                <p>{plan.planText}</p>
+              </>
+            }
+          >
+            <div>
+              <strong>{plan.title}</strong>
+              <small>Updated {plan.updated} · {plan.service}</small>
+              <span>{plan.summary}</span>
+            </div>
+          </ExpandableRow>
+        ))}
+        <More to="/care-plans">View all care plans</More>
+      </DataSection>
+    ),
+
+    Medicines: (
+      <DataSection
+        title="Medicines"
+        summary={activeCount(medicines.length)}
+        defaultOpen={false}
+        toolbar={
+          <SortSelect
+            label="medicines"
+            value={medicineSort}
+            onChange={setMedicineSort}
+            count={sortedMedicines.length}
+          />
+        }
+      >
+        {sortedMedicines.map((medicine) => (
+          <ExpandableRow
+            key={medicine.name}
+            detail={
+              <DetailList
+                rows={[
+                  ["Medicine", medicine.name],
+                  ["Dose", medicine.dose],
+                  ["Directions or indication", medicine.direction],
+                  ["Status", "Current"],
+                  ["Prescriber or service", medicine.source],
+                  ["Pregnancy review", "Reviewed for current pregnancy"],
+                ]}
+              />
+            }
+          >
+            <div>
+              <strong>{medicine.name} <em>{medicine.dose}</em></strong>
+              <small>{medicine.direction} · {medicine.source}</small>
+            </div>
+          </ExpandableRow>
+        ))}
+        <More to="/pregnancy">View complete medicines record</More>
+      </DataSection>
+    ),
+
+    "Clinical events": (
+      <DataSection
+        title="Clinical events"
+        summary={`Showing ${events.length} of ${events.length} events`}
+        defaultOpen={false}
+      >
+        {events.map((item) => (
+          <ExpandableRow
+            key={`${item.date}-${item.event}`}
+            detail={
+              <DetailList
+                rows={[
+                  ["Date", item.date],
+                  ["Care setting", item.setting],
+                  ["Reason for contact", item.reason],
+                  ["Organisation", item.organisation],
+                  ["Clinician or team", item.clinician],
+                  ["Record source", item.source],
+                ]}
+              />
+            }
+          >
+            <div>
+              <strong>{item.event}</strong>
+              <small>{item.date} · {item.setting}</small>
+              <span className="event-type-tag">{item.source}</span>
+            </div>
+          </ExpandableRow>
+        ))}
+        <More to="/appointments">View full maternity timeline</More>
+      </DataSection>
+    ),
+
+    Documents: (
+      <DataSection
+        title="Clinical documents"
+        summary={`Showing ${documents.length} of ${documents.length} documents`}
+        className="documents-card"
+        defaultOpen={false}
+      >
+        <DataTable
+          caption="Clinical documents"
+          rows={documents}
+          rowKey={(document) => document.name}
+          onView={showDocumentDetail}
+          viewLabel={(document) => `View ${document.name}`}
+          columns={[
+            {
+              header: "Document",
+              cell: (d) => (
+                <>
+                  <strong>{d.name}</strong>
+                  <small>{d.confidentiality}</small>
+                </>
+              ),
+              sort: (d) => d.name,
+            },
+            { header: "Type", cell: (d) => <span className="outline-tag">{d.type}</span>, sort: (d) => d.type },
+            { header: "Date", cell: (d) => d.date, sort: (d) => dateKey(d.date) },
+            { header: "Source", cell: (d) => <span className="source-tag">{d.source}</span>, sort: (d) => d.source },
+            { header: "Status", cell: (d) => d.status, sort: (d) => d.status },
+          ]}
+          defaultSort={{ header: "Date", direction: "descending" }}
+        />
+        <More to="/documents">View full document library</More>
+      </DataSection>
+    ),
+
+    "Upcoming care": (
+      <DataSection
+        title="Upcoming care"
+        summary={`Showing ${upcomingCare.length} of ${upcomingCare.length} upcoming`}
+        defaultOpen={false}
+      >
+        <div className="upcoming-list">
+          {upcomingCare.map((appointment) => (
+            <button
+              key={appointment.title}
+              type="button"
+              onClick={() =>
+                openPanel({
+                  eyebrow: "Upcoming appointment",
+                  title: appointment.title,
+                  content: <DetailList rows={appointment.rows} />,
+                })
+              }
+            >
+              <div>
+                <strong>{appointment.title}</strong>
+                <span>{appointment.when}</span>
+                <small>{appointment.summary}</small>
+              </div>
+              <RowChevron />
+            </button>
+          ))}
+        </div>
+        <More to="/appointments">View all upcoming care</More>
+      </DataSection>
+    ),
+
+    "Care team": (
+      <DataSection
+        title="Care team and health services"
+        summary={activeCount(careTeam.length)}
+        className="team-card"
+        defaultOpen={false}
+      >
+        <div className="team-list">
+          {careTeam.map(([name, service, detail]) => (
+            <button
+              type="button"
+              key={name}
+              onClick={() =>
+                openPanel({
+                  eyebrow: "Care team and service detail",
+                  title: name,
+                  content: (
+                    <DetailList
+                      rows={[
+                        ["Name or service", name],
+                        ["Role or organisation", service],
+                        ["Activity", detail],
+                        ["Patient", "Leila Khan"],
+                        ["Status", "Active in current pregnancy"],
+                        ["Record source", "Shared maternity record"],
+                      ]}
+                    />
+                  ),
+                })
+              }
+            >
+              <div>
+                <strong>{name}</strong>
+                <span>{service}</span>
+                <small>{detail}</small>
+              </div>
+              <RowChevron />
+            </button>
+          ))}
+        </div>
+      </DataSection>
+    ),
+  };
 
   return (
     <div className="ncrs-app maternity-dashboard">
@@ -260,33 +423,19 @@ export default function App() {
         <h1 className="record-page-title">Summary</h1>
 
         <RiskBannerGroup
-          risks={[
-            {
-              level: "high",
-              title: "Gestational diabetes",
-              message: "Diagnosed 5 September 2026",
-            },
-            {
-              level: "high",
-              title: "Penicillin allergy",
-              message: "Reaction: rash",
-            },
-            {
-              level: "medium",
-              title: "High body mass index (32)",
-              message: "BMI 32 - requires monitoring",
-            },
-            {
-              level: "medium",
-              title: "Depression and anxiety (history)",
-              message: "Currently managed by Perinatal mental health team",
-            },
-          ]}
+          risks={risks
+            .filter((risk) => risk.banner)
+            .map((risk) => ({
+              id: risk.id,
+              level: risk.level,
+              title: risk.title,
+              message: risk.banner,
+            }))}
         />
 
-        <ExpanderCard
+        <DataSection
           title="Artificial intelligence clinical summary"
-          count="High confidence"
+          summary="High confidence"
           className="ai-card"
         >
           <div className="ai-full">
@@ -322,20 +471,14 @@ export default function App() {
                         and a history of depression and anxiety. She has a
                         penicillin allergy and needs an Urdu interpreter.
                       </p>
-                      <DetailRows
+                      <DetailList
                         rows={[
                           ["Generated", "5 October 2026, 9:15am"],
                           ["Confidence", "High"],
                           ["Connected sources", "4"],
                           ["Review status", "Clinical review required"],
-                          [
-                            "Key medicines",
-                            "Metformin 500mg, Sertraline 50mg, prenatal vitamins",
-                          ],
-                          [
-                            "Next planned care",
-                            "34-week routine review · 5 October 2026",
-                          ],
+                          ["Key medicines", "Metformin 500mg, Sertraline 50mg, prenatal vitamins"],
+                          ["Next planned care", "34-week routine review · 5 October 2026"],
                         ]}
                       />
                     </>
@@ -346,539 +489,12 @@ export default function App() {
               View summary detail
             </button>
           </div>
-        </ExpanderCard>
+        </DataSection>
 
         <div className="dash-grid dash-grid-three">
-          <ExpanderCard
-            title="Clinical risks and alerts"
-            count="Showing 7 of 7 active"
-          >
-            {risks.map(([tone, label, detail], index) => (
-              <AccordionItem
-                key={label}
-                label={label}
-                detail={detail}
-                children={
-                  <>
-                    <div>
-                      <strong>{label}</strong>
-                      <small>{detail}</small>
-                    </div>
-                    <b
-                      className={`priority ${tone}${index % 2 === 1 ? " priority-filled" : ""}`}
-                    >
-                      {tone === "high"
-                        ? "High priority"
-                        : tone === "medium"
-                          ? "Medium priority"
-                          : "Low priority"}
-                    </b>
-                  </>
-                }
-                expandedContent={
-                  <DetailRows
-                    rows={[
-                      ["Risk or flag", label],
-                      [
-                        "Priority",
-                        tone === "high"
-                          ? "High priority"
-                          : tone === "medium"
-                            ? "Medium priority"
-                            : "Low priority",
-                      ],
-                      ["Clinical detail", detail],
-                      ["Applies to", "Current pregnancy"],
-                      [
-                        "Review status",
-                        tone === "low"
-                          ? "No action required"
-                          : "Active review required",
-                      ],
-                      [
-                        "Record source",
-                        detail.includes("·")
-                          ? detail.split("·")[1].trim()
-                          : "Maternity record",
-                      ],
-                    ]}
-                  />
-                }
-              />
-            ))}
-          </ExpanderCard>
-          <Card title="Pregnancy conditions" count="Showing 3 of 3 active">
-            {conditions.map(([name, meta, source]) => (
-              <AccordionItem
-                key={name}
-                label={name}
-                detail={`${meta} · ${source}`}
-                children={
-                  <div>
-                    <strong>{name}</strong>
-                    <small>
-                      {meta} · {source}
-                    </small>
-                  </div>
-                }
-                expandedContent={
-                  <DetailRows
-                    rows={[
-                      ["Condition or problem", name],
-                      ["Clinical status", meta],
-                      [
-                        "Date recorded",
-                        meta.includes("Diagnosed")
-                          ? "5 September 2026"
-                          : "15 August 2026",
-                      ],
-                      [
-                        "Recorder",
-                        source === "GP record"
-                          ? "Dr Sarah Wilson"
-                          : "Maternity clinical team",
-                      ],
-                      ["Service", source],
-                      ["Record source", source],
-                    ]}
-                  />
-                }
-              />
-            ))}
-            <More to="/comorbidities">View full condition history</More>
-          </Card>
-          <Card
-            title="Social and maternity context"
-            count="Showing 14 of 14 recorded"
-          >
-            <div className="context-data">
-              {socialContext.map(([label, value], index) => (
-                <AccordionItem
-                  key={label}
-                  label={label}
-                  detail={value}
-                  children={
-                    <>
-                      <strong>{label}</strong>
-                      <span>{value}</span>
-                    </>
-                  }
-                  expandedContent={
-                    <DetailRows
-                      rows={[
-                        [label, value],
-                        ["Patient", "Leila Khan"],
-                        ["Record status", "Current"],
-                        [
-                          "Record source",
-                          label === "GP" ? "GP record" : "BadgerNet Maternity",
-                        ],
-                        ["Last reviewed", "5 October 2026"],
-                      ]}
-                    />
-                  }
-                />
-              ))}
-            </div>
-          </Card>
-          <Card
-            title="Recent test results and investigations"
-            count="Showing 5 of 5 results"
-            defaultOpen={false}
-            action={
-              <SortControl
-                label="test results"
-                value={resultSort}
-                onChange={setResultSort}
-              />
-            }
-          >
-            {sortedResults.map(([test, value, date, status, tone]) => (
-              <AccordionItem
-                key={test}
-                label={test}
-                detail={`${value} · ${date}`}
-                children={
-                  <>
-                    <div>
-                      <strong>{test}</strong>
-                      <span>{value}</span>
-                      <small>{date} · Lab results</small>
-                    </div>
-                    <b className={`result-tag ${tone}`}>{status}</b>
-                  </>
-                }
-                expandedContent={
-                  <DetailRows
-                    rows={[
-                      ["Investigation", test],
-                      ["Result", value],
-                      ["Result date", date],
-                      ["Status", status],
-                      ["Requested by", "Maternity clinical team"],
-                      ["Record source", "Lab results"],
-                    ]}
-                  />
-                }
-              />
-            ))}
-            <More to="/results">View all results</More>
-          </Card>
-          <Card
-            title="Care plans and treatment preferences"
-            count="Showing 2 of 2 active"
-            defaultOpen={false}
-          >
-            <AccordionItem
-              label="Wellbeing Support Plan"
-              detail="Updated 15 September 2026 · Perinatal mental health team"
-              children={
-                <div>
-                  <strong>Wellbeing Support Plan</strong>
-                  <small>
-                    Updated 15 September 2026 · Perinatal mental health team
-                  </small>
-                  <span>
-                    Regular contact; safety plan in place; partner involved;
-                    social services aware and supportive.
-                  </span>
-                </div>
-              }
-              expandedContent={
-                <>
-                  <DetailRows
-                    rows={[
-                      ["Status", "Active"],
-                      ["Last updated", "15 September 2026"],
-                      ["Responsible service", "Perinatal mental health team"],
-                      ["Review frequency", "Regular contact"],
-                    ]}
-                  />
-                  <h3>Plan</h3>
-                  <p>
-                    Safety plan in place; partner involved; social services
-                    aware and supportive.
-                  </p>
-                </>
-              }
-            />
-            <AccordionItem
-              label="Gestational diabetes management"
-              detail="Updated 12 September 2026 · Diabetes service"
-              children={
-                <div>
-                  <strong>Gestational diabetes management</strong>
-                  <small>Updated 12 September 2026 · Diabetes service</small>
-                  <span>
-                    Metformin 500mg; glucose monitoring 4 times a day; dietitian
-                    referral requested.
-                  </span>
-                </div>
-              }
-              expandedContent={
-                <>
-                  <DetailRows
-                    rows={[
-                      ["Status", "Active"],
-                      ["Last updated", "12 September 2026"],
-                      ["Responsible service", "Diabetes service"],
-                      ["Lead clinician", "Dr James Chen"],
-                    ]}
-                  />
-                  <h3>Plan</h3>
-                  <p>
-                    Metformin 500mg; glucose monitoring four times daily;
-                    dietitian referral requested.
-                  </p>
-                </>
-              }
-            />
-            <More to="/care-plans">View all care plans</More>
-          </Card>
-          <Card
-            title="Medicines"
-            count="Showing 3 of 3 active"
-            defaultOpen={false}
-            action={
-              <SortControl
-                label="medicines"
-                value={medicineSort}
-                onChange={setMedicineSort}
-              />
-            }
-          >
-            {sortedMedicines.map(([name, dose, direction, source]) => (
-              <AccordionItem
-                key={name}
-                label={name}
-                detail={`${dose} · ${direction}`}
-                children={
-                  <div>
-                    <strong>
-                      {name} <em>{dose}</em>
-                    </strong>
-                    <small>
-                      {direction} · {source}
-                    </small>
-                  </div>
-                }
-                expandedContent={
-                  <DetailRows
-                    rows={[
-                      ["Medicine", name],
-                      ["Dose", dose],
-                      ["Directions or indication", direction],
-                      ["Status", "Current"],
-                      ["Prescriber or service", source],
-                      ["Pregnancy review", "Reviewed for current pregnancy"],
-                    ]}
-                  />
-                }
-              />
-            ))}
-            <More to="/pregnancy">View complete medicines record</More>
-          </Card>
-          <ExpanderCard
-            title="Clinical events"
-            count="Showing 4 of 4 events"
-            defaultOpen={false}
-          >
-            {events.map(
-              ([date, setting, event, reason, org, clinician, source]) => (
-                <AccordionItem
-                  key={`${date}-${event}`}
-                  label={event}
-                  detail={`${date} · ${setting}`}
-                  children={
-                    <div>
-                      <strong>{event}</strong>
-                      <small>
-                        {date} · {setting}
-                      </small>
-                      <span className="event-type-tag">{source}</span>
-                    </div>
-                  }
-                  expandedContent={
-                    <DetailRows
-                      rows={[
-                        ["Date", date],
-                        ["Care setting", setting],
-                        ["Reason for contact", reason],
-                        ["Organisation", org],
-                        ["Clinician or team", clinician],
-                        ["Record source", source],
-                      ]}
-                    />
-                  }
-                />
-              ),
-            )}
-            <More to="/appointments">View full maternity timeline</More>
-          </ExpanderCard>
-
-          <ExpanderCard
-            title="Clinical documents"
-            count="Showing 5 of 5 documents"
-            className="documents-card"
-            defaultOpen={false}
-          >
-            <div className="table-scroll">
-              <table className="documents-table">
-                <caption className="nhs-visually-hidden">
-                  Clinical documents
-                </caption>
-                <thead>
-                  <tr>
-                    <th>Document</th>
-                    <th>Type</th>
-                    <th>Date</th>
-                    <th>Source</th>
-                    <th>Status</th>
-                    <th>
-                      <span className="nhs-visually-hidden">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {documents.map((document) => {
-                    const [name, type, date, source, status, confidentiality] =
-                      document;
-                    return (
-                      <tr key={name}>
-                        <td>
-                          <strong>{name}</strong>
-                          <small>{confidentiality}</small>
-                        </td>
-                        <td>
-                          <span className="outline-tag">{type}</span>
-                        </td>
-                        <td>{date}</td>
-                        <td>
-                          <span className="source-tag">{source}</span>
-                        </td>
-                        <td>{status}</td>
-                        <td>
-                          <button
-                            className="row-chevron-button"
-                            type="button"
-                            aria-label={`View ${name}`}
-                            onClick={() => showDocumentDetail(document)}
-                          >
-                            <RowChevron />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <More to="/documents">View full document library</More>
-          </ExpanderCard>
-          <ExpanderCard
-            title="Upcoming care"
-            count="Showing 2 of 2 upcoming"
-            defaultOpen={false}
-          >
-            <div className="upcoming-list">
-              <button
-                type="button"
-                onClick={() =>
-                  openPanel({
-                    eyebrow: "Upcoming appointment",
-                    title: "34-week routine review",
-                    content: (
-                      <DetailRows
-                        rows={[
-                          ["Date and time", "5 October 2026, 9am"],
-                          ["Care setting", "Community"],
-                          ["Organisation", "Community Midwifery - Central"],
-                          ["Clinician", "Midwife J. Davies"],
-                          ["Interpreter", "Urdu interpreter booked"],
-                          ["Status", "Scheduled"],
-                        ]}
-                      />
-                    ),
-                  })
-                }
-              >
-                <div>
-                  <strong>34-week routine review</strong>
-                  <span>5 October 2026, 9am</span>
-                  <small>
-                    Community Midwifery - Central · Urdu interpreter booked
-                  </small>
-                </div>
-                <RowChevron />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  openPanel({
-                    eyebrow: "Upcoming appointment",
-                    title: "36-week growth scan",
-                    content: (
-                      <DetailRows
-                        rows={[
-                          ["Date and time", "16 October 2026, 11:10am"],
-                          ["Care setting", "Outpatient"],
-                          ["Organisation", "Ultrasound Department"],
-                          [
-                            "Reason",
-                            "Scheduled due to gestational diabetes mellitus pathway",
-                          ],
-                          ["Preparation", "Attend with maternity notes"],
-                          ["Status", "Scheduled"],
-                        ]}
-                      />
-                    ),
-                  })
-                }
-              >
-                <div>
-                  <strong>36-week growth scan</strong>
-                  <span>16 October 2026, 11:10am</span>
-                  <small>
-                    Ultrasound department · Scheduled due to gestational
-                    diabetes mellitus pathway
-                  </small>
-                </div>
-                <RowChevron />
-              </button>
-            </div>
-            <More to="/appointments">View all upcoming care</More>
-          </ExpanderCard>
-          <ExpanderCard
-            title="Care team and health services"
-            count="Showing 6 of 6 active"
-            className="team-card"
-            defaultOpen={false}
-          >
-            <div className="team-list">
-              {[
-                [
-                  "Midwife J. Davies",
-                  "Community Midwifery - Central",
-                  "Last contact: 15 August 2026",
-                ],
-                [
-                  "Dr James Chen",
-                  "Diabetes Antenatal Clinic",
-                  "Last contact: 12 September 2026",
-                ],
-                [
-                  "Dr Sarah Wilson",
-                  "Central City Practice · GP",
-                  "Record updated: 5 October 2026",
-                ],
-                [
-                  "Perinatal mental health team",
-                  "Community Perinatal Service",
-                  "Last contact: 15 September 2026",
-                ],
-                [
-                  "Social services",
-                  "Supportive involvement",
-                  "Last update: 2 October 2026",
-                ],
-                [
-                  "University Hospitals of Morecambe Bay",
-                  "Maternity hospital service",
-                  "Active service",
-                ],
-              ].map(([name, service, detail]) => (
-                <button
-                  type="button"
-                  key={name}
-                  onClick={() =>
-                    openPanel({
-                      eyebrow: "Care team and service detail",
-                      title: name,
-                      content: (
-                        <DetailRows
-                          rows={[
-                            ["Name or service", name],
-                            ["Role or organisation", service],
-                            ["Activity", detail],
-                            ["Patient", "Leila Khan"],
-                            ["Status", "Active in current pregnancy"],
-                            ["Record source", "Shared maternity record"],
-                          ]}
-                        />
-                      ),
-                    })
-                  }
-                >
-                  <div>
-                    <strong>{name}</strong>
-                    <span>{service}</span>
-                    <small>{detail}</small>
-                  </div>
-                  <RowChevron />
-                </button>
-              ))}
-            </div>
-          </ExpanderCard>
+          {sectionOrder.map((name) => (
+            <Fragment key={name}>{sections[name as SectionName] ?? null}</Fragment>
+          ))}
         </div>
       </div>
 

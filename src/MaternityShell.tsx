@@ -10,16 +10,15 @@ import {
 import { NavLink, useLocation } from "react-router-dom";
 import { BreadcrumbProvider, BreadcrumbNav } from "./BreadcrumbNav";
 import { DetailPanel as DetailPanelComponent } from "./DetailPanel";
-import {
-  ChevronDown,
-  ChevronLeft,
-  Search,
-  Settings,
-  Bell,
-  LogOut,
-  MessageSquare,
-  HelpCircle,
-} from "lucide-react";
+import { Dialog } from "./components/ui/Dialog";
+import { DisclosureGroup } from "./components/ui/DisclosureGroup";
+import { ServiceHeader } from "./components/shell/ServiceHeader";
+import { PatientBar } from "./components/shell/PatientBar";
+import { AlertsBand } from "./components/shell/AlertsBand";
+import { OptionsSidebar, TextSize } from "./components/shell/OptionsSidebar";
+import { defaultSectionOrder, SectionOrderContext } from "./components/ui/SectionOrder";
+import { risks } from "./data/patient";
+
 
 export type DetailPanel = {
   title: string;
@@ -50,17 +49,6 @@ const tabs = [
   ["Audit", "/audit"],
 ] as const;
 
-const recordViews = [
-  "Core record",
-  "Cancer",
-  "Children and young people",
-  "Diagnostics",
-  "Frailty",
-  "Long-term conditions",
-  "Maternity",
-  "Mental health",
-  "Planned and elective care",
-] as const;
 
 type SafetyFlagKind =
   | "allergies"
@@ -73,63 +61,34 @@ type SafetyFlagKind =
   | "mentalHealth"
   | "medicine";
 
+// Flag labels come from the shared risk data (src/data/patient.ts) so the
+// banners, the risks card and this strip cannot drift apart.
+const flagDetails: Record<string, { kind: SafetyFlagKind; status: string }> = {
+  "gestational-diabetes": { kind: "gestationalDiabetes", status: "Active" },
+  "penicillin-allergy": { kind: "allergies", status: "Confirmed allergy" },
+  "body-mass-index": { kind: "bodyMassIndex", status: "Active" },
+  "mental-health": { kind: "mentalHealth", status: "Currently managed" },
+  sertraline: { kind: "medicine", status: "Active medicine" },
+  language: { kind: "adjustment", status: "Active" },
+  safeguarding: { kind: "safeguarding", status: "1 active concern" },
+};
+
 const safetyFlags: ReadonlyArray<{
+  id: string;
+  level: (typeof risks)[number]["level"];
   label: string;
   title: string;
   tone: DetailPanel["tone"];
   kind: SafetyFlagKind;
   status?: string;
-}> = [
-  {
-    label: "Gestational diabetes",
-    title: "Gestational diabetes",
-    tone: "blue",
-    kind: "gestationalDiabetes",
-    status: "Active",
-  },
-  {
-    label: "Penicillin allergy",
-    title: "Penicillin allergy",
-    tone: "blue",
-    kind: "allergies",
-    status: "Confirmed allergy",
-  },
-  {
-    label: "High body mass index (32)",
-    title: "High body mass index (32)",
-    tone: "blue",
-    kind: "bodyMassIndex",
-    status: "Active",
-  },
-  {
-    label: "Depression and anxiety (history)",
-    title: "Depression and anxiety (history)",
-    tone: "blue",
-    kind: "mentalHealth",
-    status: "Currently managed",
-  },
-  {
-    label: "Sertraline in pregnancy",
-    title: "Sertraline in pregnancy",
-    tone: "blue",
-    kind: "medicine",
-    status: "Active medicine",
-  },
-  {
-    label: "Language need",
-    title: "Language need",
-    tone: "blue",
-    kind: "adjustment",
-    status: "Active",
-  },
-  {
-    label: "Safeguarding",
-    title: "Safeguarding",
-    tone: "blue",
-    kind: "safeguarding",
-    status: "1 active concern",
-  },
-];
+}> = risks.map((risk) => ({
+  id: risk.id,
+  level: risk.level,
+  label: risk.title,
+  title: risk.title,
+  tone: "blue" as const,
+  ...flagDetails[risk.id],
+}));
 
 type SafetyDocument = {
   title: string;
@@ -1011,108 +970,126 @@ function PatientConfirmScreen({
   );
 }
 
-function ReorderModal({ 
-  isOpen, 
-  onClose, 
-  cards, 
-  onReorder 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
-  cards: string[]; 
+function ReorderModal({
+  isOpen,
+  onClose,
+  cards,
+  onReorder,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  cards: readonly string[];
   onReorder: (newOrder: string[]) => void;
 }) {
-  const [order, setOrder] = useState(cards);
+  return (
+    <Dialog open={isOpen} title="Reorder sections" onClose={onClose}>
+      {/* Mounted only while open, so the working order resets each time */}
+      <ReorderList cards={cards} onApply={(order) => { onReorder(order); onClose(); }} onCancel={onClose} />
+    </Dialog>
+  );
+}
 
-  const moveCard = (index: number, direction: 'up' | 'down') => {
-    const newOrder = [...order];
-    if (direction === 'up' && index > 0) {
-      [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
-      setOrder(newOrder);
-    } else if (direction === 'down' && index < newOrder.length - 1) {
-      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
-      setOrder(newOrder);
-    }
-  };
+function ReorderList({
+  cards,
+  onApply,
+  onCancel,
+}: {
+  cards: readonly string[];
+  onApply: (order: string[]) => void;
+  onCancel: () => void;
+}) {
+  const [order, setOrder] = useState<string[]>([...cards]);
+  const [announcement, setAnnouncement] = useState("");
+  const list = useRef<HTMLUListElement | null>(null);
+  const refocus = useRef<{ card: string; direction: "up" | "down" } | null>(null);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    const target = refocus.current;
+    if (!target) return;
+    refocus.current = null;
+    const row = list.current?.querySelector<HTMLElement>(`[data-card="${CSS.escape(target.card)}"]`);
+    const buttons = row?.querySelectorAll<HTMLButtonElement>("button");
+    if (!buttons) return;
+    const [up, down] = [buttons[0], buttons[1]];
+    // Keep focus on the button that was pressed; if it is now disabled, use the other one
+    const preferred = target.direction === "up" ? up : down;
+    (preferred.disabled ? (target.direction === "up" ? down : up) : preferred).focus();
+  }, [order]);
+
+  function move(index: number, direction: "up" | "down") {
+    const next = [...order];
+    const target = direction === "up" ? index - 1 : index + 1;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    refocus.current = { card: order[index], direction };
+    setOrder(next);
+    setAnnouncement(`${order[index]} moved to position ${target + 1} of ${next.length}`);
+  }
 
   return (
-    <div className="reorder-modal-overlay" onClick={onClose}>
-      <div className="reorder-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="reorder-modal-header">
-          <h2>Reorder sections</h2>
-          <button type="button" onClick={onClose} aria-label="Close reorder modal" style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
-        </div>
-        <div className="reorder-modal-list">
-          {order.map((card, index) => (
-            <div key={card} className="reorder-modal-item">
-              <span>{card}</span>
-              <div className="reorder-buttons">
-                <button 
-                  type="button" 
-                  onClick={() => moveCard(index, 'up')} 
-                  disabled={index === 0}
-                  aria-label={`Move ${card} up`}
-                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                >
-                  ↑
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => moveCard(index, 'down')} 
-                  disabled={index === order.length - 1}
-                  aria-label={`Move ${card} down`}
-                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                >
-                  ↓
-                </button>
-              </div>
+    <>
+      <p>Use the arrow buttons to change the order of the sections on the Summary page.</p>
+      <ul className="reorder-list" ref={list}>
+        {order.map((card, index) => (
+          <li key={card} data-card={card}>
+            <span>{card}</span>
+            <div className="reorder-buttons">
+              <button
+                type="button"
+                className="nhsuk-button nhsuk-button--secondary"
+                onClick={() => move(index, "up")}
+                disabled={index === 0}
+                aria-label={`Move ${card} up`}
+              >
+                <span aria-hidden="true">↑</span>
+              </button>
+              <button
+                type="button"
+                className="nhsuk-button nhsuk-button--secondary"
+                onClick={() => move(index, "down")}
+                disabled={index === order.length - 1}
+                aria-label={`Move ${card} down`}
+              >
+                <span aria-hidden="true">↓</span>
+              </button>
             </div>
-          ))}
-        </div>
-        <div className="reorder-modal-footer" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <button type="button" onClick={onClose} className="nhsuk-button nhsuk-button--secondary">Cancel</button>
-          <button type="button" onClick={() => { onReorder(order); onClose(); }} className="nhsuk-button">Apply</button>
-        </div>
+          </li>
+        ))}
+      </ul>
+      <p role="status" className="nhs-visually-hidden">{announcement}</p>
+      <div className="ncrs-dialog__footer">
+        <button type="button" className="nhsuk-button nhsuk-button--secondary" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="button" className="nhsuk-button" onClick={() => onApply(order)}>
+          Apply
+        </button>
       </div>
-    </div>
+    </>
   );
 }
 
 export default function MaternityShell({ children }: { children: ReactNode }) {
   const location = useLocation();
+  const currentTabLabel =
+    tabs.find(([, path]) => path === location.pathname)?.[0] ?? "Summary";
   const [appView, setAppView] = useState<"search" | "confirm" | "record">(
     "record",
   );
   const [accessToastVisible, setAccessToastVisible] = useState(false);
-  const [textSize, setTextSize] = useState<"small" | "medium" | "large">(
+  const [textSize, setTextSize] = useState<TextSize>(
     "small",
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [allExpanded, setAllExpanded] = useState(false);
   const [selectedRecordView, setSelectedRecordView] = useState("Maternity");
-  const [viewMenuOpen, setViewMenuOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(
+    () => typeof window === "undefined" || window.innerWidth >= 1200,
+  );
   const [showReorderModal, setShowReorderModal] = useState(false);
-  const [cardOrder, setCardOrder] = useState([
-    "AI summary",
-    "Clinical risks",
-    "Pregnancy conditions",
-    "Social context",
-    "Test results",
-    "Care plans",
-    "Medicines",
-    "Clinical events",
-    "Documents",
-    "Upcoming care",
-    "Care team",
-  ]);
+  const [cardOrder, setCardOrder] = useState<string[]>([...defaultSectionOrder]);
   const [panel, setPanel] = useState<DetailPanel | null>(null);
   const panelTrigger = useRef<HTMLElement | null>(null);
   const savedScrollPosition = useRef(0);
-  const closeButton = useRef<HTMLButtonElement | null>(null);
-  const viewMenu = useRef<HTMLDivElement | null>(null);
-  const viewMenuTrigger = useRef<HTMLButtonElement | null>(null);
 
   function openPanel(nextPanel: DetailPanel) {
     panelTrigger.current = document.activeElement as HTMLElement;
@@ -1132,137 +1109,11 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    if (!panel) return;
-    closeButton.current?.focus();
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closePanel();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [panel]);
-
-  useEffect(() => {
-    if (!viewMenuOpen) return;
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!viewMenu.current?.contains(event.target as Node)) setViewMenuOpen(false);
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setViewMenuOpen(false);
-      viewMenuTrigger.current?.focus();
-    };
-    window.addEventListener("pointerdown", handlePointerDown);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [viewMenuOpen]);
-
-  useEffect(() => {
     const current =
       tabs.find(([, path]) => path === location.pathname)?.[0] ?? "Summary";
     document.title = `${current} — Leila Khan — NHS National Care Records Service`;
     setPanel(null);
   }, [location.pathname]);
-
-  useEffect(() => {
-    if (location.pathname === "/" || location.pathname === "/audit") return;
-    const main = document.querySelector<HTMLElement>(".maternity-content .ncrs-main");
-    if (!main) return;
-
-    const decorateRecords = () => {
-      main.querySelectorAll<HTMLElement>("[data-section-toggle]").forEach((button) => {
-        const title = button
-          .querySelector<HTMLElement>("p, span")
-          ?.innerText.trim() || "section";
-        const action = button.getAttribute("aria-expanded") === "true" ? "Hide" : "Show";
-        button.setAttribute("aria-label", `${action} ${title}`);
-      });
-
-      main.querySelectorAll<HTMLTableElement>("table").forEach((table, index) => {
-        table.querySelectorAll<HTMLTableCellElement>("th").forEach((heading) => {
-          if (!heading.innerText.trim()) heading.setAttribute("aria-label", "Actions");
-        });
-        if (table.hasAttribute("aria-label") || table.querySelector("caption")) return;
-        const sectionTitle = table
-          .closest<HTMLElement>("[class*='border']")
-          ?.querySelector<HTMLElement>("button[data-section-toggle] p, button[data-section-toggle] span")
-          ?.innerText.trim();
-        table.setAttribute(
-          "aria-label",
-          sectionTitle || `${tabs.find(([, path]) => path === location.pathname)?.[0] ?? "Clinical"} records table ${index + 1}`,
-        );
-      });
-
-      main.querySelectorAll<HTMLElement>(
-        "tbody tr, ul li, div[class*='border'][class*='px-'][class*='py-']",
-      ).forEach((item) => {
-        if (item.matches("div") && item.querySelector("table, ul, button[data-section-toggle]")) return;
-        const interactiveChild = item.querySelector<HTMLElement>("button, a[href]");
-        if (interactiveChild) {
-          item.classList.add("specialist-detail-parent");
-          interactiveChild.classList.add("specialist-detail-trigger");
-          interactiveChild.setAttribute("aria-label", `View details for ${item.innerText.trim().split("\n")[0] || "record"}`);
-        } else {
-          item.classList.add("specialist-detail-trigger");
-          item.setAttribute("role", "button");
-          item.setAttribute("tabindex", "0");
-          item.setAttribute("aria-label", `View details for ${item.innerText.trim().split("\n")[0] || "record"}`);
-        }
-      });
-    };
-
-    decorateRecords();
-    const observer = new MutationObserver(decorateRecords);
-    observer.observe(main, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["aria-expanded"],
-    });
-    return () => observer.disconnect();
-  }, [location.pathname]);
-
-  function openSpecialistDetail(item: HTMLElement) {
-    const cells = Array.from(item.querySelectorAll<HTMLElement>("td"));
-    const table = item.closest("table");
-    const headings = table
-      ? Array.from(table.querySelectorAll<HTMLElement>("thead th")).map((heading) => heading.innerText.trim())
-      : [];
-    const values = cells.length
-      ? cells.map((cell) => cell.innerText.trim()).filter(Boolean)
-      : item.innerText.split("\n").map((value) => value.trim()).filter(Boolean);
-    const rows = values.map((value, index) => [
-      headings[index] || (index === 0 ? "Record detail" : `Detail ${index + 1}`),
-      value,
-    ]);
-    const title = values[2] || values[1] || values[0] || "Record detail";
-
-    openPanel({
-      eyebrow: `${tabs.find(([, path]) => path === location.pathname)?.[0] ?? "Clinical"} detail`,
-      title: title.length > 80 ? `${title.slice(0, 77)}…` : title,
-      content: <dl className="panel-detail-list">
-        {rows.map(([label, value], index) => <div key={`${label}-${index}`}><dt>{label}</dt><dd>{value}</dd></div>)}
-        <div><dt>Patient</dt><dd>Leila Khan</dd></div>
-        <div><dt>Record source</dt><dd>Shared maternity record</dd></div>
-      </dl>,
-    });
-  }
-
-  function toggleAllSections() {
-    const nextExpanded = !allExpanded;
-    const toggles = document.querySelectorAll<HTMLElement>(
-      ".maternity-content [data-section-toggle]",
-    );
-
-    toggles.forEach((button) => {
-      if ((button.getAttribute("aria-expanded") === "true") !== nextExpanded) {
-        button.click();
-      }
-    });
-    setAllExpanded(nextExpanded);
-  }
 
   if (appView === "search") {
     return (
@@ -1288,6 +1139,8 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
 
   return (
     <BreadcrumbProvider>
+      <DisclosureGroup>
+      <SectionOrderContext.Provider value={cardOrder}>
       <div className={`record-shell text-${textSize}`}>
         <a className="record-skip-link" href="#main-content">
           Skip to main content
@@ -1299,254 +1152,34 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
               Access logged — this record access has been recorded for audit
             </div>
           )}
-          <header className="record-header">
-            <div className="record-brand">
-              <img
-                className="record-nhs-logo-image"
-                src="/assets/1b6bd.png"
-                alt="NHS"
-              />
-              <span>National Care Records Service</span>
-            </div>
-            <nav aria-label="Service navigation" className="record-utilities">
-              <div className="utilities-group utilities-patient">
-                <div className="record-patient-switcher">
-                  <strong>Patient</strong>
-                  <button type="button" className="utility-button">
-                    Existing patient
-                    <ChevronDown size={16} aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="utilities-group utilities-actions">
-                <button
-                  className="utility-button utility-with-icon"
-                  onClick={() => setAppView("search")}
-                  title="Find patient"
-                >
-                  <Search size={18} />
-                  <span>Find patient</span>
-                </button>
-                <button className="utility-button" onClick={() => {}}>
-                  List birth notifications
-                </button>
-              </div>
-
-              <div className="utilities-group utilities-settings">
-                <button
-                  className="utility-button utility-with-icon"
-                  onClick={() => {}}
-                  title="Change role"
-                >
-                  <Settings size={18} />
-                  <span>Change role</span>
-                </button>
-                <button
-                  className="utility-button utility-with-icon"
-                  onClick={() => {}}
-                  title="What's new"
-                >
-                  <Bell size={18} />
-                  <span>What's new</span>
-                </button>
-                <button
-                  className="utility-button utility-with-icon"
-                  onClick={() => {}}
-                  title="Give feedback"
-                >
-                  <MessageSquare size={18} />
-                  <span>Give feedback</span>
-                </button>
-                <button
-                  className="utility-button utility-with-icon"
-                  onClick={() => {}}
-                  title="Help"
-                >
-                  <HelpCircle size={18} />
-                  <span>Help</span>
-                </button>
-                <button
-                  className="utility-button utility-with-icon"
-                  onClick={() => {}}
-                  title="Log out"
-                >
-                  <LogOut size={18} />
-                  <span>Log out</span>
-                </button>
-              </div>
-            </nav>
-          </header>
-
-          <section className="record-patient-banner" aria-label="Patient identity">
-            <div className="record-demographics">
-            <h1>Leila KHAN</h1>
-            <span>31 years old</span>
-            <i>|</i>
-            <span>Female</span>
-            <i>|</i>
-            <span>
-              DoB: <strong>14 June 1995</strong>
-            </span>
-            <i>|</i>
-            <span>
-              NHS number: <strong>485 777 2910</strong>
-            </span>
-            <i>|</i>
-            <span>
-              Address:{" "}
-              <strong>14 Ryelands Crescent, Lancaster, LA1 3PQ</strong>
-            </span>
-          </div>
-          <div className="record-context-ribbon" aria-label="Maternity context">
-            <strong>
-              Cross-boundary: registered with Surrey Heartlands Integrated Care
-              Board (ICB) — viewing clinician is NHS South East London ICB
-            </strong>
-          </div>
-
-          <div className="record-tabs-row">
-            <nav aria-label="Patient record sections" className="record-tabs">
+          <ServiceHeader onFindPatient={() => setAppView("search")} />
+          <PatientBar />
+          <AlertsBand
+            flags={safetyFlags.map((flag) => ({
+              id: flag.id,
+              label: flag.label,
+              level: flag.level,
+              onOpen: () =>
+                openPanel({
+                  eyebrow: "Clinical alert",
+                  title: flag.title,
+                  status: flag.status,
+                  tone: flag.tone,
+                  content: <SafetyFlagPanel kind={flag.kind} />,
+                }),
+            }))}
+          />
+          <nav aria-label="Patient record sections" className="ncrs-tabs">
+            <ul>
               {tabs.map(([label, path]) => (
-                <NavLink
-                  key={path}
-                  to={path}
-                  end={path === "/"}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  {label}
-                </NavLink>
+                <li key={path}>
+                  <NavLink to={path} end={path === "/"}>
+                    {label}
+                  </NavLink>
+                </li>
               ))}
-            </nav>
-            <div className="record-tab-tools">
-              <fieldset className="text-size-control">
-                <legend>Text size</legend>
-                {(["small", "medium", "large"] as const).map((size) => (
-                  <label key={size}>
-                    <input
-                      type="radio"
-                      name="record-text-size"
-                      checked={textSize === size}
-                      onChange={() => setTextSize(size)}
-                    />
-                    {size[0].toUpperCase() + size.slice(1)}
-                  </label>
-                ))}
-              </fieldset>
-              <div className="record-view-menu" ref={viewMenu}>
-                <button
-                  ref={viewMenuTrigger}
-                  type="button"
-                  className="record-view-trigger"
-                  aria-haspopup="menu"
-                  aria-expanded={viewMenuOpen}
-                  onClick={() => setViewMenuOpen((open) => !open)}
-                  onKeyDown={(event) => {
-                    if (event.key !== "ArrowDown") return;
-                    event.preventDefault();
-                    setViewMenuOpen(true);
-                    requestAnimationFrame(() => {
-                      viewMenu.current?.querySelector<HTMLButtonElement>("[role^='menuitem']")?.focus();
-                    });
-                  }}
-                >
-                  View: {selectedRecordView}
-                </button>
-                {viewMenuOpen && <div
-                  className="record-view-options"
-                  role="menu"
-                  aria-label="Choose record view"
-                  onKeyDown={(event) => {
-                    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
-                    event.preventDefault();
-                    const items = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("[role^='menuitem']"));
-                    const current = items.indexOf(document.activeElement as HTMLButtonElement);
-                    const next = event.key === "Home"
-                      ? 0
-                      : event.key === "End"
-                        ? items.length - 1
-                        : event.key === "ArrowDown"
-                          ? (current + 1) % items.length
-                          : (current - 1 + items.length) % items.length;
-                    items[next]?.focus();
-                  }}
-                >
-                  {recordViews.map((view, index) => <div key={view}>
-                    {(index === 1 || index === 7) && <div className="record-view-separator" role="separator" />}
-                    {view === "Core record" || view === "Frailty" ? <a
-                      href={view === "Frailty"
-                        ? "https://nhs-ncrs-frailty.figma.site/"
-                        : "https://nhs-ncrs-core-record.figma.site"}
-                      role="menuitem"
-                    >
-                      {view}
-                    </a> : <button
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={selectedRecordView === view}
-                      className={selectedRecordView === view ? "active" : ""}
-                      onClick={() => {
-                        setSelectedRecordView(view);
-                        setViewMenuOpen(false);
-                        viewMenuTrigger.current?.focus();
-                      }}
-                    >
-                      {view}
-                    </button>}
-                  </div>)}
-                  <div className="record-view-separator" role="separator" />
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => setViewMenuOpen(false)}
-                  >
-                    All views (16)
-                  </button>
-                </div>}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="record-safety-strip" aria-label="Safety flags">
-          <strong className="safety-label">
-            Safety flags:
-          </strong>
-          <div className="safety-flags">
-            {safetyFlags.map((flag) => (
-              <button
-                key={flag.label}
-                className={`safety-flag ${flag.tone}`}
-                onClick={() =>
-                  openPanel({
-                    eyebrow: "Clinical alert",
-                    title: flag.title,
-                    status: flag.status,
-                    tone: flag.tone,
-                    content: <SafetyFlagPanel kind={flag.kind} />,
-                  })
-                }
-              >
-                {flag.label}
-              </button>
-            ))}
-          </div>
-          <div className="record-tools">
-            <button type="button" onClick={toggleAllSections}>
-              {allExpanded ? "Collapse all sections" : "Expand all sections"}
-            </button>
-            <button type="button" onClick={() => setShowReorderModal(true)}>
-              Reorder sections
-            </button>
-            <button
-              type="button"
-              aria-expanded={filtersOpen}
-              onClick={() => setFiltersOpen((value) => !value)}
-            >
-              {filtersOpen ? "Hide filters" : "Show filters"}
-            </button>
-          </div>
-        </section>
+            </ul>
+          </nav>
 
         {filtersOpen && <section className="record-filterbar" aria-label="Record filters">
           <label>
@@ -1601,49 +1234,21 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
         </section>}
 
         <div className="record-workspace">
-          <nav className="tablet-section-nav" aria-label="Record sections">
-            <strong>Record sections</strong>
-            {tabs.map(([label, path]) => (
-              <NavLink
-                key={path}
-                to={path}
-                end={path === "/"}
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                {label}
-              </NavLink>
-            ))}
-            <fieldset>
-              <legend>Text size</legend>
-              {(["small", "medium", "large"] as const).map((size) => (
-                <button
-                  key={size}
-                  aria-pressed={textSize === size}
-                  onClick={() => setTextSize(size)}
-                >
-                  {size[0].toUpperCase() + size.slice(1)}
-                </button>
-              ))}
-            </fieldset>
-          </nav>
+          <OptionsSidebar
+            open={optionsOpen}
+            onOpenChange={setOptionsOpen}
+            textSize={textSize}
+            onTextSize={setTextSize}
+            recordView={selectedRecordView}
+            onRecordView={setSelectedRecordView}
+            filtersOpen={filtersOpen}
+            onToggleFilters={() => setFiltersOpen((value) => !value)}
+            onReorder={() => setShowReorderModal(true)}
+          />
           <main
             id="main-content"
             className="maternity-content"
             tabIndex={-1}
-            onClickCapture={(event) => {
-              const trigger = (event.target as HTMLElement).closest<HTMLElement>(".specialist-detail-trigger");
-              if (!trigger) return;
-              const item = trigger.closest<HTMLElement>(".specialist-detail-parent") || trigger;
-              event.preventDefault();
-              openSpecialistDetail(item);
-            }}
-            onKeyDownCapture={(event) => {
-              if (event.key !== "Enter" && event.key !== " ") return;
-              const trigger = (event.target as HTMLElement).closest<HTMLElement>(".specialist-detail-trigger");
-              if (!trigger || event.target !== trigger || trigger.matches("button, a[href]")) return;
-              event.preventDefault();
-              openSpecialistDetail(trigger);
-            }}
           >
             <DetailPanelContext.Provider value={openPanel}>
               <BreadcrumbNav />
@@ -1658,6 +1263,7 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
                 tone={panel?.tone}
                 content={panel?.content}
                 onClose={closePanel}
+                backLabel={`Back to ${currentTabLabel}`}
               />
             </DetailPanelContext.Provider>
           </main>
@@ -1670,6 +1276,8 @@ export default function MaternityShell({ children }: { children: ReactNode }) {
         />
       </div>
       </div>
+      </SectionOrderContext.Provider>
+      </DisclosureGroup>
     </BreadcrumbProvider>
   );
 }

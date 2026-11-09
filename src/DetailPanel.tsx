@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { ChevronLeft } from "lucide-react";
 
 export type DetailPanelProps = {
@@ -9,6 +9,8 @@ export type DetailPanelProps = {
   content: ReactNode;
   onClose: () => void;
   isOpen: boolean;
+  /** Visible text of the back control, e.g. "Back to Summary" */
+  backLabel?: string;
 };
 
 export function DetailPanel({
@@ -19,31 +21,52 @@ export function DetailPanel({
   content,
   onClose,
   isOpen,
+  backLabel = "Back",
 }: DetailPanelProps) {
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  // Move focus to the heading when the panel opens so the new context is announced.
+  useEffect(() => {
+    if (isOpen) headingRef.current?.focus();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Let an open modal dialog handle its own Escape
+      if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
+        onCloseRef.current();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="detail-panel" 
-      role="region" 
-      aria-labelledby="detail-panel-title"
-    >
+    <section className="detail-panel" aria-labelledby="detail-panel-title">
       <div className={`detail-panel-header tone-${tone}`}>
+        {/* No aria-label: the visible text is the accessible name */}
         <button
+          type="button"
           onClick={onClose}
-          aria-label={`Close ${title} details`}
           className="detail-panel-back-button"
         >
-          <ChevronLeft size={20} />
-          <span>Back</span>
+          <ChevronLeft size={20} aria-hidden="true" />
+          <span>{backLabel}</span>
         </button>
         <div className="detail-panel-heading-content">
           {eyebrow && <span className="detail-panel-eyebrow">{eyebrow}</span>}
-          <h2 id="detail-panel-title">{title}</h2>
+          <h2 id="detail-panel-title" tabIndex={-1} ref={headingRef}>
+            {title}
+          </h2>
           {status && <b className="detail-panel-status">{status}</b>}
         </div>
       </div>
       <div className="detail-panel-body">{content}</div>
-    </div>
+    </section>
   );
 }

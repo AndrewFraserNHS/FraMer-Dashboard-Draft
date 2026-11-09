@@ -1,80 +1,59 @@
-import { ReactNode } from "react";
-import {
-  AlertOctagon,
-  AlertTriangle,
-  AlertCircle,
-} from "lucide-react";
+import { Callout, CalloutTone } from "./components/ui/Callout";
+import { Priority, priorityLabel } from "./data/patient";
 
-type RiskLevel = "high" | "medium" | "low";
+const tone: Record<Priority, CalloutTone> = {
+  high: "red",
+  medium: "amber",
+  low: "blue",
+};
 
+/** A clinical risk, rendered with the shared Callout so every alert looks the same. */
 export function RiskBanner({
   level,
   title,
   message,
   count,
 }: {
-  level: RiskLevel;
+  level: Priority;
   title: string;
   message?: string;
   count?: number;
 }) {
-  const icons = {
-    high: AlertOctagon,
-    medium: AlertTriangle,
-    low: AlertCircle,
-  };
-
-  const IconComponent = icons[level];
-  const colorClass = level === "high" ? "high" : level === "medium" ? "medium" : "low";
-
   return (
-    <div className={`risk-banner ${colorClass}`}>
-      <div className="risk-banner-icon">
-        <IconComponent size={20} aria-hidden="true" />
-      </div>
-      <div className="risk-banner-content">
-        <p className="risk-banner-title">
-          {title} {count && `(${count})`}
-        </p>
-        {message && <p className="risk-banner-message">{message}</p>}
-      </div>
-    </div>
+    <Callout
+      tone={tone[level]}
+      label={`${priorityLabel[level]}: `}
+      title={`${title}${count ? ` (${count})` : ""}`}
+    >
+      {message && <p>{message}</p>}
+    </Callout>
   );
 }
 
-export function RiskBannerGroup({ risks }: { risks: Array<{ level: RiskLevel; title: string; message?: string }> }) {
+export function RiskBannerGroup({
+  risks,
+}: {
+  risks: ReadonlyArray<{ id: string; level: Priority; title: string; message?: string }>;
+}) {
   if (risks.length === 0) return null;
 
-  const highRisks = risks.filter((r) => r.level === "high");
-  const mediumRisks = risks.filter((r) => r.level === "medium");
-  const lowRisks = risks.filter((r) => r.level === "low");
+  const high = risks.filter((risk) => risk.level === "high");
+  const medium = risks.filter((risk) => risk.level === "medium");
+  const low = risks.filter((risk) => risk.level === "low");
 
   return (
-    <div className="risk-banner-group">
-      {highRisks.map((risk) => (
-        <RiskBanner
-          key={risk.title}
-          level="high"
-          title={risk.title}
-          message={risk.message}
-        />
+    <section className="risk-banner-group" aria-label="Clinical alerts">
+      {[...high, ...medium].map((risk) => (
+        <RiskBanner key={risk.id} level={risk.level} title={risk.title} message={risk.message} />
       ))}
-      {mediumRisks.map((risk) => (
-        <RiskBanner
-          key={risk.title}
-          level="medium"
-          title={risk.title}
-          message={risk.message}
-        />
-      ))}
-      {lowRisks.length > 0 && (
+      {low.length > 0 && (
         <RiskBanner
           level="low"
           title="Low priority flags"
-          message={lowRisks.map((r) => r.title).join(", ")}
-          count={lowRisks.length}
+          message={low.map((risk) => risk.title).join(", ")}
+          count={low.length}
         />
       )}
-    </div>
+    </section>
   );
 }

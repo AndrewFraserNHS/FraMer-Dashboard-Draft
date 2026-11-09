@@ -156,3 +156,25 @@ Potential additions to the component library:
 - All styling uses CSS classes in `src/index.css` for consistency
 - The component uses semantic HTML for accessibility
 - Center layout is handled by parent container flex layout
+
+## Shared UI components (`src/components/ui`)
+
+Every record tab is built from these. Pages must not render their own header, patient banner or tabs; the shell supplies them.
+
+| Component | Use for | Accessibility notes |
+|---|---|---|
+| `RecordPage` | Page layout: one `<h1>`, stacked sections, connected systems, prototype note | Single h1 per page |
+| `DataSection` | Collapsible section (`title`, `summary`, `badge`, `toolbar`) | Heading containing a button with `aria-expanded` and `aria-controls`; visible text is the name; responds to Expand all |
+| `ExpandableRow` | A list row that reveals a `DetailList` in place | Button name comes from its visible text |
+| `DetailList` / `FactsGrid` | Label/value pairs; missing values show "Not supplied by source" | Description list |
+| `DataTable` | Any table; optional per-row "view" button | Caption, `scope="col"`, keyboard-scrollable region; rows are never buttons |
+| `StatusTag`, `PriorityTag`, `ResultTag`, `SourceTag` | Status and provenance | Text always states the status |
+| `Callout` | Highlighted message (`red`, `amber`, `blue`, `grey`) | Tone also stated in hidden text |
+| `Subsection` | Headed group inside a section | Real `<h3>`/`<h4>` |
+| `ToggleGroup` | Filter buttons | `aria-pressed` |
+| `SortSelect` | Sorting | Visible label, polite announcement |
+| `ConnectedSystems` | Connected-systems panel | Status as text tag |
+| `Dialog` | Modal dialogs | Native `<dialog>`: focus trap, Escape, focus return |
+| `DetailPanel` | Drill-in view | Focus moves to heading; Back button text is its name |
+
+Patient data lives in `src/data/`, so risks, banners and safety flags share one source.

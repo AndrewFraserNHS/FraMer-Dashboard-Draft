@@ -357,7 +357,7 @@ export default function Comorbidities() {
         />
         <Callout tone="amber" title="Cause for concern" source="GP Referral">
           <p>
-            Social complexity flagged in referral (language barrier, limited
+            Social context flagged in referral (language barrier, limited
             extended family locally)
           </p>
         </Callout>

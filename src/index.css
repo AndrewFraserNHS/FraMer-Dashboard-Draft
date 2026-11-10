@@ -4637,14 +4637,10 @@ button.systems-grid__item:hover {
 
 .ncrs-logo {
   flex: none;
-  padding: 0 8px;
-  color: #005eb8;
-  background: #fff;
-  font-size: 20px;
-  font-style: italic;
-  font-weight: 700;
-  line-height: 28px;
-  letter-spacing: -0.5px;
+  width: 54px;
+  height: 23px;
+  display: block;
+  object-fit: fill;
 }
 
 .ncrs-service__name {

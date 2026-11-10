@@ -2,6 +2,7 @@ import { Bell, HelpCircle, LogOut, Menu, MessageSquare, Search, Settings, Baby }
 import { MenuButton } from "./MenuButton";
 
 const noop = () => {};
+const nhsLogoSrc = "/assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg";
 
 /** The signed-in clinician's menu. Shown in the header on wide screens and in the menu drawer on narrow ones. */
 export function AccountMenu() {
@@ -39,7 +40,7 @@ export function ServiceHeader({ onFindPatient, patientMenu, narrow = false, menu
   return (
     <header className="ncrs-service">
       <div className="ncrs-service__brand">
-        <span className="ncrs-logo" role="img" aria-label="NHS">NHS</span>
+        <img className="ncrs-logo" src={nhsLogoSrc} alt="NHS" />
         <span className="ncrs-service__name">
           {narrow ? (
             <>

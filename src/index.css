@@ -625,7 +625,7 @@ button {
 
 .panel-detail-list {
   margin: 0;
-  border-top: 1px solid #d8dde0;
+  border-top: 0;
 }
 
 .panel-detail-list > div {
@@ -4425,6 +4425,109 @@ button.systems-grid__item:hover {
 
 .record-page-stack > * {
   min-width: 0;
+}
+
+.content-pattern-library-page {
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0 40px;
+  background: #f0f4f5;
+}
+
+.content-pattern-library-header {
+  background: #005eb8;
+  color: #fff;
+}
+
+.content-pattern-library-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+}
+
+.content-pattern-library-header__logo {
+  width: 54px;
+  height: 23px;
+  display: block;
+  object-fit: fill;
+}
+
+.content-pattern-library-header__service {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.content-pattern-library-main {
+  padding-top: 24px;
+}
+
+.app-lede-text {
+  margin-bottom: 20px;
+}
+
+.pattern-library-section {
+  padding: 16px;
+  border: 1px solid #d8dde0;
+  background: #fff;
+}
+
+.pattern-library-section .nhsuk-heading-m {
+  margin-bottom: 12px;
+}
+
+.app-side-bar {
+  position: sticky;
+  top: 16px;
+  padding: 12px 14px;
+  border-left: 4px solid #005eb8;
+  background: #fff;
+}
+
+.app-side-bar .nhsuk-heading-s {
+  margin-bottom: 8px;
+}
+
+.app-side-bar .nhsuk-list {
+  margin: 0;
+}
+
+.app-side-bar .nhsuk-list li {
+  margin-bottom: 6px;
+}
+
+.app-side-bar__link {
+  display: inline;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-side-bar__link.is-active {
+  font-weight: 700;
+}
+
+.pattern-library-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+@media (max-width: 899px) {
+  .content-pattern-library-header__service {
+    font-size: 18px;
+  }
+
+  .app-side-bar {
+    position: static;
+    margin-bottom: 12px;
+  }
 }
 
 /* Callout: one alert look for Summary risk banners and every other alert */

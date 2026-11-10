@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Summary from "./pages/Summary";
 import Pregnancy from "./pages/Pregnancy";
 import Appointments from "./pages/Appointments";
@@ -62,25 +62,44 @@ function FrailtyRoute({ element }: { element: React.ReactElement }) {
   );
 }
 
+function RecordRoutes() {
+  return (
+    <RecordShell>
+      <Routes>
+        <Route path="/" element={<Summary />} />
+        <Route path="/pregnancy" element={<Pregnancy />} />
+        <Route path="/appointments" element={<Appointments />} />
+        <Route path="/results" element={<Results />} />
+        <Route path="/comorbidities" element={<Comorbidities />} />
+        <Route path="/care-plans" element={<CarePlans />} />
+        <Route path="/documents" element={<Documents />} />
+        <Route path="/audit" element={<Audit />} />
+        <Route path="/frailty" element={<FrailtyRoute element={<FrailtySnapshot />} />} />
+        <Route path="/frailty/cga" element={<FrailtyRoute element={<FrailtyCga />} />} />
+        <Route path="/frailty/care-plan" element={<FrailtyRoute element={<FrailtyCarePlan />} />} />
+      </Routes>
+    </RecordShell>
+  );
+}
+
+function AppRouter() {
+  const location = useLocation();
+
+  if (location.pathname === "/maternity-content-pattern-library") {
+    return (
+      <Routes>
+        <Route path="/maternity-content-pattern-library" element={<MaternityContentPatternLibrary />} />
+      </Routes>
+    );
+  }
+
+  return <RecordRoutes />;
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <RecordShell>
-        <Routes>
-          <Route path="/" element={<Summary />} />
-          <Route path="/pregnancy" element={<Pregnancy />} />
-          <Route path="/appointments" element={<Appointments />} />
-          <Route path="/results" element={<Results />} />
-          <Route path="/comorbidities" element={<Comorbidities />} />
-          <Route path="/care-plans" element={<CarePlans />} />
-          <Route path="/documents" element={<Documents />} />
-          <Route path="/audit" element={<Audit />} />
-          <Route path="/maternity-content-pattern-library" element={<MaternityContentPatternLibrary />} />
-          <Route path="/frailty" element={<FrailtyRoute element={<FrailtySnapshot />} />} />
-          <Route path="/frailty/cga" element={<FrailtyRoute element={<FrailtyCga />} />} />
-          <Route path="/frailty/care-plan" element={<FrailtyRoute element={<FrailtyCarePlan />} />} />
-        </Routes>
-      </RecordShell>
+      <AppRouter />
     </BrowserRouter>
   </React.StrictMode>,
 );

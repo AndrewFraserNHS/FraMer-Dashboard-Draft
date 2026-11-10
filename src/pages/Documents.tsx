@@ -1,11 +1,11 @@
-import { useDetailPanel } from "./MaternityShell";
-import { DataSection } from "./components/ui/DataSection";
-import { DataTable } from "./components/ui/DataTable";
-import { RecordPage } from "./components/ui/RecordPage";
-import { SourceTag } from "./components/ui/StatusTag";
-import { DocumentDetail } from "./components/record/DocumentDetail";
-import { ClinicalDocument, documents } from "./data/patient";
-import { dateKey } from "./utils/sort";
+import { useDetailPanel } from "../hooks/useDetailPanel";
+import { DataSection } from "../components/ui/DataSection";
+import { DataTable } from "../components/ui/DataTable";
+import { RecordPage } from "../components/ui/RecordPage";
+import { SourceTag } from "../components/ui/StatusTag";
+import { DocumentDetail } from "../components/record/DocumentDetail";
+import { ClinicalDocument, documents } from "../data/patient";
+import { dateKey } from "../utils/sort";
 
 export default function Documents() {
   const openPanel = useDetailPanel();

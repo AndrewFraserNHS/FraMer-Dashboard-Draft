@@ -1,12 +1,13 @@
-import { DataSection } from "./components/ui/DataSection";
-import { ExpandableRow } from "./components/ui/ExpandableRow";
-import { Callout } from "./components/ui/Callout";
-import { RecordPage } from "./components/ui/RecordPage";
+import { formatDate } from "../data/patient";
+import { DataSection } from "../components/ui/DataSection";
+import { ExpandableRow } from "../components/ui/ExpandableRow";
+import { Callout } from "../components/ui/Callout";
+import { RecordPage } from "../components/ui/RecordPage";
 
 const plans = [
   {
     title: "Wellbeing Support Plan",
-    created: "15 September 2026",
+    created: formatDate("2026-09-15"),
     actions: [
       "Regular contact with perinatal mental health team",
       "Safety plan in place - emergency contacts documented",
@@ -16,7 +17,7 @@ const plans = [
   },
   {
     title: "Diabetes management",
-    created: "12 September 2026",
+    created: formatDate("2026-09-12"),
     actions: [
       "Home glucose monitoring 4 times a day",
       "Dietitian review arranged",

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { RowChevron } from "./ExpandableRow";
+import { RowChevron } from "./RowChevron";
 import { DataSection } from "./DataSection";
 import { StatusTag, TagTone } from "./StatusTag";
 

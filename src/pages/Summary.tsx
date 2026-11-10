@@ -1,16 +1,17 @@
 import { Fragment, ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDetailPanel } from "./MaternityShell";
-import { RiskBannerGroup } from "./RiskBanner";
-import { DataSection } from "./components/ui/DataSection";
-import { DetailList } from "./components/ui/DetailList";
-import { ExpandableRow, RowChevron } from "./components/ui/ExpandableRow";
-import { DataTable } from "./components/ui/DataTable";
-import { dateKey } from "./utils/sort";
-import { SortSelect, SortValue } from "./components/ui/SortSelect";
-import { PriorityTag, ResultTag } from "./components/ui/StatusTag";
-import { SectionName, useSectionOrder } from "./components/ui/SectionOrder";
-import { DocumentDetail } from "./components/record/DocumentDetail";
+import { useDetailPanel } from "../hooks/useDetailPanel";
+import { RiskBannerGroup } from "../components/record/RiskBanner";
+import { DataSection } from "../components/ui/DataSection";
+import { DetailList } from "../components/ui/DetailList";
+import { ExpandableRow } from "../components/ui/ExpandableRow";
+import { RowChevron } from "../components/ui/RowChevron";
+import { DataTable } from "../components/ui/DataTable";
+import { dateKey } from "../utils/sort";
+import { SortSelect, SortValue } from "../components/ui/SortSelect";
+import { PriorityTag, ResultTag } from "../components/ui/StatusTag";
+import { SectionName, useSectionOrder } from "../components/ui/SectionOrder";
+import { DocumentDetail } from "../components/record/DocumentDetail";
 import {
   careTeam,
   carePlans,
@@ -25,7 +26,7 @@ import {
   risks,
   socialContext,
   upcomingCare,
-} from "./data/patient";
+} from "../data/patient";
 
 function More({ to, children }: { to: string; children: ReactNode }) {
   return (
@@ -53,7 +54,7 @@ function sortRecords<T>(
 const activeCount = (count: number, noun = "active") =>
   `Showing ${count} of ${count} ${noun}`;
 
-export default function App() {
+export default function Summary() {
   const openPanel = useDetailPanel();
   const sectionOrder = useSectionOrder();
   const [medicineSort, setMedicineSort] = useState<SortValue>("date-desc");
@@ -150,7 +151,7 @@ export default function App() {
                     ["Patient", "Leila Khan"],
                     ["Record status", "Current"],
                     ["Record source", label === "GP" ? "GP record" : "BadgerNet Maternity"],
-                    ["Last reviewed", "5 October 2026"],
+                    ["Last reviewed", formatDate("2026-10-05")],
                   ]}
                 />
               }
@@ -441,8 +442,7 @@ export default function App() {
           <div className="ai-full">
             <p>
               Leila is 31 and in her third pregnancy, with 1 previous birth. She
-              is 34 weeks and 1 day pregnant, with an estimated due date of 15
-              November 2026. Her active conditions are gestational diabetes
+              is 34 weeks and 1 day pregnant, with an estimated due date of {formatDate("2026-11-15")}. Her active conditions are gestational diabetes
               mellitus, obesity and a history of depression and anxiety. Her
               current medicines are sertraline 50mg, prenatal vitamins and
               metformin 500mg. She has a penicillin allergy that caused a rash.
@@ -451,9 +451,9 @@ export default function App() {
               with her partner and works part time as a retail assistant.
             </p>
             <small>
-              Sources: GP record (5 October 2026, 8:45am) · BadgerNet Maternity
-              (5 October 2026, 9:12am) · Lab results (5 October 2026, 7:30am) ·
-              Perinatal mental health (3 October 2026, 2:05pm)
+              Sources: GP record ({formatDate("2026-10-05")}, 8:45am) · BadgerNet Maternity
+              ({formatDate("2026-10-05")}, 9:12am) · Lab results ({formatDate("2026-10-05")}, 7:30am) ·
+              Perinatal mental health ({formatDate("2026-10-03")}, 2:05pm)
             </small>
             <button
               type="button"
@@ -473,12 +473,12 @@ export default function App() {
                       </p>
                       <DetailList
                         rows={[
-                          ["Generated", "5 October 2026, 9:15am"],
+                          ["Generated", `${formatDate("2026-10-05")}, 9:15am`],
                           ["Confidence", "High"],
                           ["Connected sources", "4"],
                           ["Review status", "Clinical review required"],
                           ["Key medicines", "Metformin 500mg, Sertraline 50mg, prenatal vitamins"],
-                          ["Next planned care", "34-week routine review · 5 October 2026"],
+                          ["Next planned care", `34-week routine review · ${formatDate("2026-10-05")}`],
                         ]}
                       />
                     </>

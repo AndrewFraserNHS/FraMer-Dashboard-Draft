@@ -1,5 +1,5 @@
-import { Callout, CalloutTone } from "./components/ui/Callout";
-import { Priority, priorityLabel } from "./data/patient";
+import { Callout, CalloutTone } from "../ui/Callout";
+import { Priority, priorityLabel } from "../../data/patient";
 
 const tone: Record<Priority, CalloutTone> = {
   high: "red",

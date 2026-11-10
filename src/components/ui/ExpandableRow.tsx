@@ -1,9 +1,5 @@
 import { ReactNode, useId, useState } from "react";
-
-/** Decorative chevron. Hidden from assistive technology. */
-export function RowChevron() {
-  return <span className="side-panel-chevron" aria-hidden="true" />;
-}
+import { Minus, Plus } from "lucide-react";
 
 type ExpandableRowProps = {
   /** Always-visible row content. Its text is the button's accessible name. */
@@ -13,12 +9,14 @@ type ExpandableRowProps = {
 };
 
 /**
- * A list row that reveals more detail in place.
- * No aria-label override: the visible text names the control (WCAG 2.5.3).
+ * A list row that reveals more detail in place. A plus becomes a minus while open, so the state is
+ * visible without colour. (A row that opens a modal or page keeps the RowChevron instead.)
+ * No aria-label override: the visible text names the control, and aria-expanded carries the state (WCAG 2.5.3).
  */
 export function ExpandableRow({ children, detail }: ExpandableRowProps) {
   const [open, setOpen] = useState(false);
   const id = useId();
+  const Icon = open ? Minus : Plus;
 
   return (
     <>
@@ -30,7 +28,9 @@ export function ExpandableRow({ children, detail }: ExpandableRowProps) {
         onClick={() => setOpen((value) => !value)}
       >
         {children}
-        <RowChevron />
+        <span className="row-toggle" aria-hidden="true">
+          <Icon size={14} strokeWidth={3} />
+        </span>
       </button>
       <div id={id} className="accordion-details" hidden={!open}>
         {detail}

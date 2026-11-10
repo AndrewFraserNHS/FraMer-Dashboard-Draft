@@ -1,10 +1,11 @@
 import { FormEvent, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { DataSection } from "../components/ui/DataSection";
-import { DataTable } from "../components/ui/DataTable";
-import { RecordPage } from "../components/ui/RecordPage";
-import { StatusTag } from "../components/ui/StatusTag";
-import { Subsection } from "../components/ui/Subsection";
+import { Button, ButtonLink } from "../../components/ui/Button";
+import { SelectField, TextAreaField } from "../../components/ui/FormField";
+import { DataSection } from "../../components/ui/DataSection";
+import { DataTable } from "../../components/ui/DataTable";
+import { RecordPage } from "../../components/ui/RecordPage";
+import { StatusTag } from "../../components/ui/StatusTag";
+import { Subsection } from "../../components/ui/Subsection";
 import {
   actionTone,
   carePlanDomains,
@@ -18,8 +19,8 @@ import {
   riskTone,
   serviceOptions,
   timescaleOptions,
-} from "../data/frailty";
-import { dateKey } from "../utils/sort";
+} from "../../data/frailty";
+import { dateKey } from "../../utils/sort";
 
 /** Splits "Intro:\n• a\n• b" into a lead-in line and its bullets. */
 function PlanText({ text }: { text: string }) {
@@ -141,35 +142,27 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
         {adding && (
           <form className="action-form" onSubmit={save}>
             <h4 className="action-form__title">Add action</h4>
-            {[
-              ["owner", "Owner", ownerOptions],
-              ["service", "Service", serviceOptions],
-              ["timescale", "Timescale", timescaleOptions],
-            ].map(([key, label, options]) => (
-              <div className="nhsuk-form-group" key={key as string}>
-                <label className="nhsuk-label" htmlFor={`${domain.id}-${key}`}>{label as string}</label>
-                <select
-                  id={`${domain.id}-${key}`}
-                  className="nhsuk-select"
-                  required
-                  {...field(key as keyof typeof blankAction)}
-                >
-                  <option value="" disabled>Select</option>
-                  {(options as readonly string[]).map((option) => (
-                    <option key={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
+            {(
+              [
+                ["owner", "Owner", ownerOptions],
+                ["service", "Service", serviceOptions],
+                ["timescale", "Timescale", timescaleOptions],
+              ] as const
+            ).map(([key, label, options]) => (
+              <SelectField
+                key={key}
+                id={`${domain.id}-${key}`}
+                label={label}
+                options={options}
+                placeholder="Select"
+                required
+                {...field(key)}
+              />
             ))}
-            <div className="nhsuk-form-group">
-              <label className="nhsuk-label" htmlFor={`${domain.id}-notes`}>Action details</label>
-              <textarea id={`${domain.id}-notes`} className="nhsuk-textarea" rows={3} required {...field("notes")} />
-            </div>
+            <TextAreaField id={`${domain.id}-notes`} label="Action details" rows={3} required {...field("notes")} />
             <div className="page-steps">
-              <button type="submit" className="nhsuk-button">Save action</button>
-              <button type="button" className="nhsuk-button nhsuk-button--secondary" onClick={() => setAdding(false)}>
-                Cancel
-              </button>
+              <Button type="submit">Save action</Button>
+              <Button variant="secondary" onClick={() => setAdding(false)}>Cancel</Button>
             </div>
           </form>
         )}
@@ -239,12 +232,10 @@ export default function FrailtyCarePlan() {
       ))}
 
       <div className="page-steps">
-        <button type="button" className="nhsuk-button" onClick={() => setSaved(true)}>
-          Save care plan
-        </button>
-        <Link className="nhsuk-button nhsuk-button--secondary" to="/frailty">
+        <Button onClick={() => setSaved(true)}>Save care plan</Button>
+        <ButtonLink variant="secondary" to="/frailty">
           Return to frailty snapshot
-        </Link>
+        </ButtonLink>
         <p role="status" className="page-steps__status">{saved ? "Care plan saved." : ""}</p>
       </div>
     </RecordPage>

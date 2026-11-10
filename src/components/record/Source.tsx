@@ -1,5 +1,5 @@
-import { ProvenanceTag } from "../components/ui/ProvenanceTag";
-import { Provenance, sourceMeta } from "../data/frailty";
+import { ProvenanceTag } from "../ui/ProvenanceTag";
+import { Provenance, sourceMeta } from "../../data/frailty";
 
 /** Source tag for a frailty data point. Opens to show the organisation, system, date and author. */
 export function Source({ of }: { of: Provenance }) {

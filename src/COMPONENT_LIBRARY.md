@@ -7,7 +7,7 @@ This document describes the reusable components available for building consisten
 A reusable panel component for displaying detailed information about a record item. Used consistently across all pages (Summary, Pregnancy, Appointments, etc.).
 
 ### Location
-`src/DetailPanel.tsx`
+`src/components/shell/DetailPanel.tsx` (opened from pages with `useDetailPanel()` in `src/hooks/useDetailPanel.tsx`)
 
 ### Props
 
@@ -165,7 +165,15 @@ Every record tab is built from these. Pages must not render their own header, pa
 |---|---|---|
 | `RecordPage` | Page layout: one `<h1>`, stacked sections, connected systems, prototype note | Single h1 per page |
 | `DataSection` | Collapsible section (`title`, `summary`, `badge`, `toolbar`) | Heading containing a button with `aria-expanded` and `aria-controls`; visible text is the name; responds to Expand all |
-| `ExpandableRow` | A list row that reveals a `DetailList` in place | Button name comes from its visible text |
+| `ExpandableRow` | A list row that reveals a `DetailList` in place. Shows a plus that becomes a minus. Rows that open a modal or page use `RowChevron` instead, so the two behaviours look different | Button name comes from its visible text; `aria-expanded` carries the state, and the icon changes shape, not just colour |
+| `RowChevron` | The arrow on a row that opens a modal, panel or page | Decorative, hidden from assistive technology |
+| `RecordCardList` / `RecordCard` | Read-only record summaries with an optional status tag | Real list; status is text |
+| `Button` / `ButtonLink` | NHS buttons (`primary`, `secondary`); `ButtonLink` goes to another page | Defaults to `type="button"` so it never submits by accident |
+| `TextField` / `TextAreaField` / `SelectField` | Every form control: visible label, hint, error | Hint and error are linked with `aria-describedby`; `aria-invalid`; error is text prefixed "Error:", never colour alone; hints replace placeholder-only instructions |
+| `ErrorSummary` | List of problems at the top of a form, each linking to its field | Takes focus when it appears; `role="alert"` |
+| `BackLink` | Back in a multi-step flow | Visible text is the name |
+| `Drawer` | Side sheet (the narrow-screen menu) | Native `<dialog>`: focus trap, Escape, focus return |
+| `ReorderDialog` | Reorder a list with up and down buttons in a dialog | Focus stays on the pressed button; each move is announced |
 | `DetailList` / `FactsGrid` | Label/value pairs; missing values show "Not supplied by source" | Description list |
 | `DataTable` | Any table; optional per-row "view" button | Caption, `scope="col"`, keyboard-scrollable region; rows are never buttons |
 | `StatusTag`, `PriorityTag`, `ResultTag`, `SourceTag` | Status and provenance | Text always states the status |
@@ -181,5 +189,31 @@ Every record tab is built from these. Pages must not render their own header, pa
 | `ReviewField` / `ReviewPrompt` | Pre-populated assessment items to accept, edit or reject; suggestions to confirm or dismiss | Title is the control's label; hint text is visible, not placeholder-only; reject and dismiss are reversible and move focus to Undo; status is stated in text |
 
 Record views (Maternity, Frailty) are configuration in `src/views.ts`: patient, tabs and which page tools apply. The shell reads it, so a new view is one entry plus its pages and data (`src/data/frailty.ts` is the pattern). The route decides the view.
+
+## Folder structure
+
+```
+src/
+  components/ui/       generic building blocks (no patient knowledge)
+  components/shell/    page chrome: service header, patient bar, alerts, options, filters, detail panel
+  components/record/   record-aware pieces: safety flag panels, risk banners, document detail, source tags
+  components/patient/  the find-a-patient flow
+  pages/               one file per route (pages/frailty for the frailty record)
+  layouts/             RecordShell, which assembles the chrome around a page
+  hooks/               useDetailPanel, useMediaQuery
+  data/                fictional patient data, one file per record view
+  utils/               dates (scenario clock), sorting
+  views.ts             record view configuration
+```
+
+Pages compose components and data; they do not define styles or controls of their own. If a page needs a new pattern, add it to `components/ui` first.
+
+## Dates
+
+Authored dates are written as ISO strings and passed through a scenario clock (`src/utils/dates.ts`), which shifts them so the record keeps its distance from the real today. Use `formatDate()` (maternity) or `formatFrailtyDate()` and never type a display date by hand.
+
+## Narrow screens
+
+Below 768px the service header keeps only the NHS bar and a Menu button, and the patient bar shows identity only. Find patient, the patient and record view menus, patient details, the account menu and page options move into a `Drawer`.
 
 Patient data lives in `src/data/`, so risks, banners and safety flags share one source.

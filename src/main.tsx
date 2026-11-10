@@ -1,27 +1,27 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import App from "./App";
-import Pregnancy from "./Pregnancy";
-import Appointments from "./Appointments";
-import Results from "./Results";
-import Comorbidities from "./Comorbidities";
-import CarePlans from "./CarePlans";
-import Documents from "./Documents";
-import Audit from "./Audit";
-import MaternityShell from "./MaternityShell";
-import FrailtySnapshot from "./frailty/Snapshot";
-import FrailtyCga from "./frailty/Cga";
-import FrailtyCarePlan from "./frailty/CarePlan";
+import Summary from "./pages/Summary";
+import Pregnancy from "./pages/Pregnancy";
+import Appointments from "./pages/Appointments";
+import Results from "./pages/Results";
+import Comorbidities from "./pages/Comorbidities";
+import CarePlans from "./pages/CarePlans";
+import Documents from "./pages/Documents";
+import Audit from "./pages/Audit";
+import RecordShell from "./layouts/RecordShell";
+import FrailtySnapshot from "./pages/frailty/Snapshot";
+import FrailtyCga from "./pages/frailty/Cga";
+import FrailtyCarePlan from "./pages/frailty/CarePlan";
 import "nhsuk-frontend/dist/nhsuk/nhsuk-frontend.css";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <MaternityShell>
+      <RecordShell>
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<Summary />} />
           <Route path="/pregnancy" element={<Pregnancy />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/results" element={<Results />} />
@@ -33,7 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/frailty/cga" element={<FrailtyCga />} />
           <Route path="/frailty/care-plan" element={<FrailtyCarePlan />} />
         </Routes>
-      </MaternityShell>
+      </RecordShell>
     </BrowserRouter>
   </React.StrictMode>,
 );

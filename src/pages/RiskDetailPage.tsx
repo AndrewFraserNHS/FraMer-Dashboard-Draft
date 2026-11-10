@@ -1,7 +1,10 @@
+import { BackLink } from "../components/ui/BackLink";
+import { RecordPage } from "../components/ui/RecordPage";
+import { formatDate } from "../data/patient";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useBreadcrumb } from "./BreadcrumbNav";
-import { DetailPage } from "./DetailPage";
+import { useBreadcrumb } from "../components/shell/BreadcrumbNav";
+import { DetailPage } from "../components/record/DetailPage";
 
 // Map of risk IDs to their details
 const riskDetails: Record<string, any> = {
@@ -11,14 +14,14 @@ const riskDetails: Record<string, any> = {
     rows: [
       ["Risk or flag", "Gestational diabetes mellitus"],
       ["Priority", "High priority"],
-      ["Clinical detail", "Diagnosed 5 September 2026 following abnormal oral glucose tolerance test"],
+      ["Clinical detail", `Diagnosed ${formatDate("2026-09-05")} following abnormal oral glucose tolerance test`],
       ["Applies to", "Current pregnancy"],
       ["Review status", "Active review required"],
       ["Record source", "Lab results"],
-      ["Date diagnosed", "5 September 2026"],
+      ["Date diagnosed", formatDate("2026-09-05")],
       ["Current management", "Metformin 500mg once daily with glucose monitoring 4x daily"],
       ["Care team", "Diabetes Antenatal Clinic"],
-      ["Next review", "1 October 2026"],
+      ["Next review", formatDate("2026-10-01")],
     ],
   },
   "penicillin-allergy": {
@@ -28,7 +31,7 @@ const riskDetails: Record<string, any> = {
       ["Allergen", "Penicillin"],
       ["Priority", "High priority"],
       ["Reaction type", "Rash (non-severe)"],
-      ["Date recorded", "12 August 2026"],
+      ["Date recorded", formatDate("2026-08-12")],
       ["Clinical detail", "Widespread raised rash after oral penicillin in childhood. No breathing difficulty or facial swelling."],
       ["Record source", "GP record"],
       ["Recorder", "Dr Anita Shah - General Practice"],
@@ -44,13 +47,13 @@ const riskDetails: Record<string, any> = {
       ["BMI", "32 kg/m²"],
       ["Priority", "Medium priority"],
       ["Classification", "Obese (class I)"],
-      ["Date recorded", "15 August 2026"],
+      ["Date recorded", formatDate("2026-08-15")],
       ["Clinical detail", "BMI 32 requires monitoring and increased screening during pregnancy"],
       ["Record source", "BadgerNet Maternity"],
       ["Health risks", "Increased risk of gestational diabetes, pre-eclampsia, and operative delivery"],
       ["Monitoring plan", "Regular antenatal screening and lifestyle support"],
       ["Lifestyle recommendations", "Continue healthy diet and safe physical activity as tolerated"],
-      ["Next review", "2 October 2026"],
+      ["Next review", formatDate("2026-10-02")],
     ],
   },
 };
@@ -73,12 +76,10 @@ export default function RiskDetailPage() {
 
   if (!risk) {
     return (
-      <div style={{ padding: "24px" }}>
-        <button onClick={() => navigate("/")} style={{ marginBottom: "16px" }}>
-          ← Back to Summary
-        </button>
-        <p>Risk not found</p>
-      </div>
+      <RecordPage title="Risk not found" showSystems={false}>
+        <BackLink onClick={() => navigate("/")}>Back to Summary</BackLink>
+        <p>This risk is not in the record.</p>
+      </RecordPage>
     );
   }
 

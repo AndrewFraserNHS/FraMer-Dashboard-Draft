@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { DataSection } from "../components/ui/DataSection";
-import { DetailList } from "../components/ui/DetailList";
-import { RecordPage } from "../components/ui/RecordPage";
-import { PromptStatus, ReviewField, ReviewPrompt, ReviewStatus } from "../components/ui/ReviewField";
-import { StatusTag } from "../components/ui/StatusTag";
-import { Subsection } from "../components/ui/Subsection";
-import { cgaDomains, cgaSummary, frailtyConnectedSystems } from "../data/frailty";
-import { Source } from "./Source";
+import { ButtonLink } from "../../components/ui/Button";
+import { DataSection } from "../../components/ui/DataSection";
+import { DetailList } from "../../components/ui/DetailList";
+import { RecordPage } from "../../components/ui/RecordPage";
+import { PromptStatus, ReviewField, ReviewPrompt, ReviewStatus } from "../../components/ui/ReviewField";
+import { StatusTag } from "../../components/ui/StatusTag";
+import { Subsection } from "../../components/ui/Subsection";
+import { cgaDomains, cgaSummary, frailtyConnectedSystems } from "../../data/frailty";
+import { Source } from "../../components/record/Source";
 
 export default function FrailtyCga() {
   const [fields, setFields] = useState<Record<string, ReviewStatus>>({});
@@ -81,12 +81,12 @@ export default function FrailtyCga() {
       })}
 
       <nav className="page-steps" aria-label="Assessment steps">
-        <Link className="nhsuk-button nhsuk-button--secondary" to="/frailty">
+        <ButtonLink variant="secondary" to="/frailty">
           Back to frailty snapshot
-        </Link>
-        <Link className="nhsuk-button" to="/frailty/care-plan">
+        </ButtonLink>
+        <ButtonLink to="/frailty/care-plan">
           Next: care plan
-        </Link>
+        </ButtonLink>
       </nav>
     </RecordPage>
   );

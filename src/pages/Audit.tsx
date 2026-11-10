@@ -1,16 +1,17 @@
-import { useDetailPanel } from "./MaternityShell";
-import { ConnectedSystem, ConnectedSystems, systemStatusLabel } from "./components/ui/ConnectedSystems";
-import { DetailList } from "./components/ui/DetailList";
-import { RecordPage } from "./components/ui/RecordPage";
+import { formatDate } from "../data/patient";
+import { useDetailPanel } from "../hooks/useDetailPanel";
+import { ConnectedSystem, ConnectedSystems, systemStatusLabel } from "../components/ui/ConnectedSystems";
+import { DetailList } from "../components/ui/DetailList";
+import { RecordPage } from "../components/ui/RecordPage";
 
 const systems: readonly ConnectedSystem[] = [
-  { name: "BadgerNet Maternity", updated: "5 October 2026, 9:12am", status: "primary" },
-  { name: "GP record", updated: "5 October 2026, 8:45am", status: "connected" },
-  { name: "Lab results", updated: "5 October 2026, 7:30am", status: "connected" },
-  { name: "Diabetes service", updated: "4 October 2026, 4:20pm", status: "connected" },
-  { name: "Perinatal mental health", updated: "3 October 2026, 2:05pm", status: "connected" },
-  { name: "Ultrasound", updated: "30 September 2026, 10am", status: "connected" },
-  { name: "Social services", updated: "2 October 2026, 11:30am", status: "connected" },
+  { name: "BadgerNet Maternity", updated: `${formatDate("2026-10-05")}, 9:12am`, status: "primary" },
+  { name: "GP record", updated: `${formatDate("2026-10-05")}, 8:45am`, status: "connected" },
+  { name: "Lab results", updated: `${formatDate("2026-10-05")}, 7:30am`, status: "connected" },
+  { name: "Diabetes service", updated: `${formatDate("2026-10-04")}, 4:20pm`, status: "connected" },
+  { name: "Perinatal mental health", updated: `${formatDate("2026-10-03")}, 2:05pm`, status: "connected" },
+  { name: "Ultrasound", updated: `${formatDate("2026-09-30")}, 10am`, status: "connected" },
+  { name: "Social services", updated: `${formatDate("2026-10-02")}, 11:30am`, status: "connected" },
   { name: "Smoking cessation", updated: "No recent update", status: "offline" },
 ];
 
@@ -27,7 +28,7 @@ export default function Audit() {
       <ConnectedSystems
         systems={systems}
         defaultOpen
-        intro="BadgerNet is the home system. Latest connected update: 5 October 2026, 9:12am."
+        intro={`BadgerNet is the home system. Latest connected update: ${formatDate("2026-10-05")}, 9:12am.`}
         onSelect={(system) =>
           openPanel({
             eyebrow: "Connected system detail",

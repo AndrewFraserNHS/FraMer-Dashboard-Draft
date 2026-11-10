@@ -760,9 +760,6 @@ button {
   text-decoration: underline;
 }
 
-.back-link svg {
-  transform: rotate(180deg);
-}
 
 .patient-search-card {
   padding: 28px 32px 32px;
@@ -3808,97 +3805,6 @@ textarea:focus-visible {
   margin-bottom: 16px;
 }
 
-/* Reorder Modal */
-.reorder-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.reorder-modal {
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.reorder-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #d5dce0;
-}
-
-.reorder-modal-header h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.reorder-modal-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0;
-}
-
-.reorder-modal-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f0f4f5;
-  gap: 12px;
-}
-
-.reorder-modal-item span {
-  flex: 1;
-  font-size: 14px;
-}
-
-.reorder-buttons {
-  display: flex;
-  gap: 4px;
-}
-
-.reorder-buttons button {
-  padding: 6px 10px;
-  border: 1px solid #d5dce0;
-  background: white;
-  cursor: pointer;
-  border-radius: 3px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.reorder-buttons button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.reorder-buttons button:hover:not(:disabled) {
-  background: #f0f4f5;
-}
-
-.reorder-modal-footer {
-  padding: 20px;
-  border-top: 1px solid #d5dce0;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
 /* Detail Panel Component (reusable across all pages) */
 .detail-panel {
   width: 100%;
@@ -4054,6 +3960,8 @@ textarea:focus-visible {
 
 /* Dialog (native <dialog>) */
 .ncrs-dialog {
+  /* The global reset zeroes margins, which would pin a modal dialog to the top left */
+  margin: auto;
   width: min(560px, calc(100% - 32px));
   max-height: calc(100% - 32px);
   padding: 0;
@@ -4083,30 +3991,35 @@ textarea:focus-visible {
   margin-top: 24px;
 }
 
-.reorder-list {
+.ncrs-reorder {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.reorder-list li {
+.ncrs-reorder li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin: 0;
   padding: 8px 0;
   border-bottom: 1px solid #d8dde0;
 }
 
-.reorder-buttons {
+.ncrs-reorder__buttons {
   display: flex;
   gap: 8px;
 }
 
-.reorder-buttons button {
+.ncrs-reorder__buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  font-size: 18px;
+  margin: 0;
+  padding: 0;
 }
 
 @media (forced-colors: active) {
@@ -5555,3 +5468,165 @@ button.systems-grid__item:hover {
 .callout__title { color: #212b32; }
 .callout--red .callout__title { color: #8a1a12; }
 .callout__source { color: #4c6272; }
+
+/* Expand in place: a plus that becomes a minus. Same circle as the row chevron, but a different symbol. */
+.row-toggle {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border-radius: 50%;
+  color: var(--nhs-colour-white);
+  background: var(--nhs-colour-blue);
+}
+
+.dash-list-row.interactive:hover .row-toggle,
+.dash-list-row.interactive[aria-expanded="true"] .row-toggle {
+  background: var(--nhs-colour-dark-blue);
+}
+
+/* Callout icon chip: a solid tone-coloured badge with a contrasting symbol, so the warning yellow stays yellow
+   (dark symbol on #ffb81c is 11:1) while red, blue and grey carry a white symbol (4.5:1 or better). */
+.callout--amber { --callout-colour: #ffb81c; --callout-icon: #212b32; }
+.callout--red, .callout--blue, .callout--grey { --callout-icon: #fff; }
+.callout .callout__icon {
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border-radius: 50%;
+  color: var(--callout-icon, #fff);
+  background: var(--callout-colour);
+}
+
+/* =========================================================================
+   Narrow screens: the NHS bar and patient name stay; everything else is in the Menu drawer.
+   ========================================================================= */
+.ncrs-drawer {
+  width: min(380px, 100%);
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-left: 4px solid var(--nhs-colour-dark-blue, #003087);
+  color: #212b32;
+  background: #fff;
+}
+
+.ncrs-drawer::backdrop {
+  background: rgb(33 43 50 / 60%);
+}
+
+.ncrs-drawer__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  color: #fff;
+  background: var(--nhs-colour-blue, #005eb8);
+}
+
+.ncrs-drawer__title {
+  margin: 0;
+  font-size: 20px;
+  color: inherit;
+}
+
+.ncrs-drawer__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  color: #fff;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ncrs-drawer__close:focus-visible,
+.ncrs-service__menu:focus-visible {
+  outline: 4px solid transparent;
+  color: #212b32;
+  background: #ffeb3b;
+  box-shadow: 0 -2px #ffeb3b, 0 4px #212b32;
+}
+
+.ncrs-drawer__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+}
+
+.ncrs-drawer__find { width: 100%; margin: 0 0 8px; }
+
+.ncrs-drawer__group {
+  padding: 12px 0;
+  border-top: 1px solid #d8dde0;
+}
+
+.ncrs-drawer__group h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+/* Menus open in place inside the drawer instead of floating over it */
+.ncrs-drawer .ncrs-menu,
+.ncrs-drawer .ncrs-menu__trigger {
+  width: 100%;
+}
+
+.ncrs-drawer .ncrs-menu__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--nhs-colour-dark-grey, #4c6272);
+  color: #212b32;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ncrs-drawer .ncrs-menu__list {
+  position: static;
+  min-width: 0;
+  margin-top: 4px;
+  box-shadow: none;
+}
+
+.ncrs-drawer .ncrs-options__group { padding: 0 0 8px; }
+
+@media (max-width: 767px) {
+  .ncrs-service__menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+  }
+
+  .ncrs-service__name { font-size: 18px; letter-spacing: 0.02em; }
+
+  /* Identity only, at a size that fits one or two lines */
+  .ncrs-patient--compact .ncrs-patient__row { padding-top: 8px; padding-bottom: 8px; gap: 2px 12px; }
+  .ncrs-patient--compact .ncrs-patient__name { font-size: 1.125em; }
+  .ncrs-patient--compact .ncrs-patient__facts { gap: 0 12px; font-size: 0.875em; }
+}
+
+@media (max-width: 767px) {
+  .ncrs-patient--compact .ncrs-patient__row { flex-direction: column; align-items: flex-start; }
+  .ncrs-patient--compact .ncrs-patient__facts { flex: none; }
+}

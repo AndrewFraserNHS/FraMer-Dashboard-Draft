@@ -1,46 +1,6 @@
-import {
-  createContext,
-  FormEvent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { BreadcrumbProvider, BreadcrumbNav } from "./BreadcrumbNav";
-import { DetailPanel as DetailPanelComponent } from "./DetailPanel";
-import { Dialog } from "./components/ui/Dialog";
-import { DisclosureGroup } from "./components/ui/DisclosureGroup";
-import { ServiceHeader } from "./components/shell/ServiceHeader";
-import { PatientBar } from "./components/shell/PatientBar";
-import { AlertsBand } from "./components/shell/AlertsBand";
-import { OptionsSidebar, TextSize } from "./components/shell/OptionsSidebar";
-import { MenuButton } from "./components/shell/MenuButton";
-import { defaultSectionOrder, SectionOrderContext } from "./components/ui/SectionOrder";
-import { risks } from "./data/patient";
-import { FrailtyFlagPanel, frailtyFlags } from "./frailty/FlagPanel";
-import { allViewLabels, recordViews, viewForPath } from "./views";
-
-export type DetailPanel = {
-  title: string;
-  eyebrow?: string;
-  status?: string;
-  tone?: "red" | "purple" | "blue" | "amber";
-  content: ReactNode;
-};
-
-const DetailPanelContext = createContext<((panel: DetailPanel) => void) | null>(null);
-
-export function useDetailPanel() {
-  const openPanel = useContext(DetailPanelContext);
-  if (!openPanel) {
-    throw new Error("useDetailPanel must be used within MaternityShell");
-  }
-  return openPanel;
-}
-
-
+import { ReactNode, useRef, useState } from "react";
+import { formatDate, risks } from "../../data/patient";
+import type { DetailPanel } from "../../hooks/useDetailPanel";
 type SafetyFlagKind =
   | "allergies"
   | "dnacpr"
@@ -64,7 +24,7 @@ const flagDetails: Record<string, { kind: SafetyFlagKind; status: string }> = {
   safeguarding: { kind: "safeguarding", status: "1 active concern" },
 };
 
-const safetyFlags: ReadonlyArray<{
+export const safetyFlags: ReadonlyArray<{
   id: string;
   level: (typeof risks)[number]["level"];
   label: string;
@@ -99,7 +59,7 @@ const allergyDocuments: SafetyDocument[] = [
     organisation: "Central City Practice",
     author: "Dr Anita Shah",
     specialty: "General practice",
-    date: "12 August 2026",
+    date: formatDate("2026-08-12"),
     content: (
       <>
         <p>
@@ -121,7 +81,7 @@ const allergyDocuments: SafetyDocument[] = [
     organisation: "Lancaster Women’s Hospital",
     author: "Dr Grace Patel",
     specialty: "Maternity",
-    date: "18 June 2026",
+    date: formatDate("2026-06-18"),
     content: (
       <p>
         Penicillin allergy noted on admission. No allergic reaction occurred
@@ -138,7 +98,7 @@ const adjustmentDocuments: SafetyDocument[] = [
     organisation: "Central City Practice",
     author: "Nadia Hussain",
     specialty: "General practice",
-    date: "20 February 2026",
+    date: formatDate("2026-02-20"),
     content: (
       <p>
         Urdu is the patient’s preferred language for complex clinical
@@ -157,7 +117,7 @@ const safeguardingDocuments: SafetyDocument[] = [
     organisation: "Lancaster Women’s Hospital",
     author: "Safeguarding maternity team",
     specialty: "Safeguarding",
-    date: "2 September 2026",
+    date: formatDate("2026-09-02"),
     restricted: true,
     content: null,
   },
@@ -167,7 +127,7 @@ const safeguardingDocuments: SafetyDocument[] = [
     organisation: "Lancaster Family Services",
     author: "Not supplied by source",
     specialty: "Children and families",
-    date: "8 September 2026",
+    date: formatDate("2026-09-08"),
     restricted: true,
     content: null,
   },
@@ -198,7 +158,7 @@ const clinicalRiskPanels: Partial<
     summary:
       "Diagnosed following an abnormal oral glucose tolerance test. Metformin and regular glucose monitoring are in place.",
     rows: [
-      ["Date diagnosed", "5 September 2026"],
+      ["Date diagnosed", formatDate("2026-09-05")],
       ["Current medicine", "Metformin 500 mg"],
       ["Monitoring", "Blood glucose four times daily"],
       ["Responsible service", "Diabetes antenatal clinic"],
@@ -213,10 +173,10 @@ const clinicalRiskPanels: Partial<
       organisation: "Diabetes Antenatal Clinic",
       system: "Lab results",
       identifier: "GDM-4857772910-2026",
-      recorded: "5 September 2026",
+      recorded: formatDate("2026-09-05"),
       recordedBy: "Diabetes antenatal team",
       role: "Maternity diabetes service",
-      updated: "12 September 2026 at 2:10pm",
+      updated: `${formatDate("2026-09-12")} at 2:10pm`,
     },
   },
   bodyMassIndex: {
@@ -226,7 +186,7 @@ const clinicalRiskPanels: Partial<
     rows: [
       ["Body mass index", "32"],
       ["Clinical status", "Active"],
-      ["Date recorded", "15 August 2026"],
+      ["Date recorded", formatDate("2026-08-15")],
       ["Applies to", "Current pregnancy"],
       ["Responsible service", "Community maternity team"],
     ],
@@ -238,10 +198,10 @@ const clinicalRiskPanels: Partial<
       organisation: "Lancaster Women’s Hospital",
       system: "BadgerNet Maternity",
       identifier: "BMI-4857772910-2026",
-      recorded: "15 August 2026",
+      recorded: formatDate("2026-08-15"),
       recordedBy: "Community maternity team",
       role: "Maternity service",
-      updated: "15 August 2026 at 11:20am",
+      updated: `${formatDate("2026-08-15")} at 11:20am`,
     },
   },
   mentalHealth: {
@@ -266,7 +226,7 @@ const clinicalRiskPanels: Partial<
       recorded: "2022",
       recordedBy: "Not supplied by source",
       role: "General practice",
-      updated: "5 October 2026 at 8:45am",
+      updated: `${formatDate("2026-10-05")} at 8:45am`,
     },
   },
   medicine: {
@@ -292,7 +252,7 @@ const clinicalRiskPanels: Partial<
       recorded: "Not supplied by source",
       recordedBy: "Dr Sarah Wilson",
       role: "General practitioner",
-      updated: "5 October 2026 at 8:45am",
+      updated: `${formatDate("2026-10-05")} at 8:45am`,
     },
   },
 };
@@ -353,7 +313,7 @@ function SourceInformation({
           ["Recorded by", recordedBy],
           ["Recorder role", role],
           ["Last updated by the source", updated],
-          ["Last refreshed by NCRS", "18 September 2026 at 9:42am"],
+          ["Last refreshed by NCRS", `${formatDate("2026-09-18")} at 9:42am`],
           ["Data-sharing status", sharing],
         ]}
       />
@@ -401,7 +361,7 @@ function LinkedDocuments({
   );
 }
 
-function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
+export function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
   const [document, setDocument] = useState<SafetyDocument | null>(null);
   const contentRoot = useRef<HTMLDivElement | null>(null);
   const savedScrollPosition = useRef(0);
@@ -509,7 +469,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
               ["Reaction", "Widespread raised rash"],
               ["Severity", "Moderate"],
               ["Clinical status", "Active and confirmed"],
-              ["Date first recorded", "4 March 2011"],
+              ["Date first recorded", formatDate("2011-03-04")],
               ["Source organisation", "Central City Practice"],
               ["Source system", "GP Connect"],
               ["Recording clinician", "Dr Anita Shah"],
@@ -531,7 +491,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
                 ["Reaction", "Widespread raised rash"],
                 ["Severity", "Moderate"],
                 ["Clinician", "Dr Anita Shah"],
-                ["Date recorded", "12 August 2026"],
+                ["Date recorded", formatDate("2026-08-12")],
                 ["Notes", "Patient recalled reaction occurring in childhood"],
               ]}
             />
@@ -544,7 +504,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
                 ["Reaction", "Rash"],
                 ["Severity", "Not supplied by source"],
                 ["Clinician", "Dr Grace Patel"],
-                ["Date recorded", "18 June 2026"],
+                ["Date recorded", formatDate("2026-06-18")],
                 ["Notes", "Copied from patient-reported admission history"],
               ]}
             />
@@ -553,7 +513,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
         <section className="safety-panel-section">
           <h3>Contextual medicine exposure</h3>
           <div className="safety-callout warning">
-            <strong>Cefalexin was prescribed on 22 June 2026.</strong> No reaction
+            <strong>Cefalexin was prescribed on {formatDate("2026-06-22")}.</strong> No reaction
             was recorded, but absence of a recorded reaction does not establish
             tolerance or invalidate the penicillin allergy.
           </div>
@@ -570,10 +530,10 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
           organisation="Central City Practice"
           system="GP Connect"
           identifier="ALG-4857772910-01"
-          recorded="4 March 2011"
+          recorded={formatDate("2011-03-04")}
           recordedBy="Dr Anita Shah"
           role="General practitioner"
-          updated="12 August 2026 at 3:18pm"
+          updated={`${formatDate("2026-08-12")} at 3:18pm`}
         />
       </div>
     );
@@ -659,10 +619,10 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
           organisation="Central City Practice"
           system="GP Connect"
           identifier="RA-4857772910-02"
-          recorded="20 February 2026"
+          recorded={formatDate("2026-02-20")}
           recordedBy="Nadia Hussain"
           role="Practice nurse"
-          updated="20 February 2026 at 11:06am"
+          updated={`${formatDate("2026-02-20")} at 11:06am`}
         />
       </div>
     );
@@ -694,7 +654,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
             <StructuredDetails
               rows={[
                 ["Responsible organisation", "Lancaster Women’s Hospital"],
-                ["Concern date", "2 September 2026"],
+                ["Concern date", formatDate("2026-09-02")],
                 ["End date", "Ongoing"],
                 ["Named team", "Safeguarding maternity team"],
                 ["Contact", "Via hospital switchboard"],
@@ -710,8 +670,8 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
             <StructuredDetails
               rows={[
                 ["Responsible organisation", "Lancaster Family Services"],
-                ["Concern date", "10 January 2025"],
-                ["End date", "28 May 2025"],
+                ["Concern date", formatDate("2025-01-10")],
+                ["End date", formatDate("2025-05-28")],
                 ["Named team", "Early help service"],
                 ["Summary", "Temporary accommodation support"],
                 ["Outcome", "Closed following stable accommodation"],
@@ -723,8 +683,8 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
             <StructuredDetails
               rows={[
                 ["Responsible organisation", "Central City Practice"],
-                ["Concern date", "4 November 2024"],
-                ["End date", "12 February 2025"],
+                ["Concern date", formatDate("2024-11-04")],
+                ["End date", formatDate("2025-02-12")],
                 ["Named team", "Social prescribing team"],
                 ["Summary", "Referral for benefits and debt advice"],
                 ["Outcome", "Support completed"],
@@ -737,10 +697,10 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
           organisation="Lancaster Women’s Hospital"
           system="Maternity EPR"
           identifier="SG-4857772910-2026"
-          recorded="2 September 2026"
+          recorded={formatDate("2026-09-02")}
           recordedBy="Safeguarding maternity team"
           role="Specialist safeguarding service"
-          updated="16 September 2026 at 4:30pm"
+          updated={`${formatDate("2026-09-16")} at 4:30pm`}
           sharing="Restricted — direct care team only"
         />
       </div>
@@ -753,7 +713,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
         <h3>Current status</h3>
         <div className="safety-status-card pregnancy">
           <strong>Pregnant — 34 weeks and 1 day</strong>
-          <span>Estimated date of delivery: 15 November 2026</span>
+          <span>Estimated date of delivery: {formatDate("2026-11-15")}</span>
         </div>
       </section>
       <section className="safety-panel-section">
@@ -762,7 +722,7 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
           rows={[
             ["Pregnancy status", "Ongoing"],
             ["Gestation", "34 weeks and 1 day"],
-            ["Estimated date of delivery", "15 November 2026"],
+            ["Estimated date of delivery", formatDate("2026-11-15")],
             ["Lead organisation", "Lancaster Women’s Hospital"],
             ["Named team", "Community maternity team"],
             ["Current risk", "Gestational diabetes requiring glucose monitoring"],
@@ -781,565 +741,11 @@ function SafetyFlagPanel({ kind }: { kind: SafetyFlagKind }) {
         organisation="Lancaster Women’s Hospital"
         system="Maternity EPR"
         identifier="MAT-4857772910-2026"
-        recorded="12 March 2026"
+        recorded={formatDate("2026-03-12")}
         recordedBy="Community maternity team"
         role="Maternity service"
-        updated="18 September 2026 at 8:55am"
+        updated={`${formatDate("2026-09-18")} at 8:55am`}
       />
     </div>
-  );
-}
-
-function PatientSearchScreen({
-  onFound,
-  onCancel,
-}: {
-  onFound: () => void;
-  onCancel: () => void;
-}) {
-  const [mode, setMode] = useState<"NHS number" | "Demographics">("NHS number");
-  const [nhsNumber, setNhsNumber] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [dob, setDob] = useState("");
-  const [error, setError] = useState("");
-  const [searching, setSearching] = useState(false);
-
-  function search(event: FormEvent) {
-    event.preventDefault();
-    const valid =
-      mode === "NHS number"
-        ? nhsNumber.replace(/\s/g, "") === "4857772910"
-        : fullName.trim().toLowerCase().includes("leila") &&
-          dob === "1995-06-14";
-    if (!valid) {
-      setError(
-        mode === "NHS number"
-          ? "Enter the fictional NHS number 485 777 2910."
-          : "Enter Leila Khan and 14 June 1995.",
-      );
-      return;
-    }
-    setError("");
-    setSearching(true);
-    window.setTimeout(() => {
-      setSearching(false);
-      onFound();
-    }, 450);
-  }
-
-  return (
-    <div className="patient-search-screen">
-      <header>
-        <span className="record-nhs-logo">NHS</span>
-        <strong>National Care Records Service</strong>
-      </header>
-      <main>
-        <button className="back-link" onClick={onCancel}>
-          Back to patient record
-        </button>
-        <div className="patient-search-card">
-          <h1>Find a patient</h1>
-          <p>Search for a patient before accessing their national care record.</p>
-          <div
-            className="search-methods"
-            role="group"
-            aria-label="Search method"
-          >
-            {(["NHS number", "Demographics"] as const).map((item) => (
-              <button
-                key={item}
-                aria-pressed={mode === item}
-                onClick={() => {
-                  setMode(item);
-                  setError("");
-                }}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-          <form onSubmit={search}>
-            {mode === "NHS number" ? (
-              <label>
-                NHS number <span aria-label="required">*</span>
-                <input
-                  inputMode="numeric"
-                  autoComplete="off"
-                  value={nhsNumber}
-                  onChange={(event) => setNhsNumber(event.target.value)}
-                  placeholder="For example, 485 777 2910"
-                />
-              </label>
-            ) : (
-              <>
-                <label>
-                  Full name <span aria-label="required">*</span>
-                  <input
-                    autoComplete="off"
-                    value={fullName}
-                    onChange={(event) => setFullName(event.target.value)}
-                    placeholder="For example, Leila Khan"
-                  />
-                </label>
-                <label>
-                  Date of birth <span aria-label="required">*</span>
-                  <input
-                    type="date"
-                    value={dob}
-                    onChange={(event) => setDob(event.target.value)}
-                  />
-                </label>
-              </>
-            )}
-            {error && (
-              <div className="search-error" role="alert">
-                <strong>There is a problem</strong>
-                <span>{error}</span>
-              </div>
-            )}
-            <button className="record-primary-button" disabled={searching}>
-              {searching ? "Searching…" : "Search"}
-            </button>
-          </form>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-function PatientConfirmScreen({
-  onConfirm,
-  onBack,
-}: {
-  onConfirm: () => void;
-  onBack: () => void;
-}) {
-  return (
-    <div className="patient-search-screen">
-      <header>
-        <span className="record-nhs-logo">NHS</span>
-        <strong>National Care Records Service</strong>
-      </header>
-      <main>
-        <button className="back-link" onClick={onBack}>
-          Back to search
-        </button>
-        <div className="patient-search-card patient-confirm-card">
-          <p className="confirm-eyebrow">Patient found</p>
-          <h1>Confirm patient details</h1>
-          <dl>
-            <div>
-              <dt>Name</dt>
-              <dd>Leila KHAN</dd>
-            </div>
-            <div>
-              <dt>Date of birth</dt>
-              <dd>14 June 1995 (31 years)</dd>
-            </div>
-            <div>
-              <dt>NHS number</dt>
-              <dd>485 777 2910</dd>
-            </div>
-            <div>
-              <dt>Address</dt>
-              <dd>14 Ryelands Crescent, Lancaster, LA1 3PQ</dd>
-            </div>
-          </dl>
-          <div className="confirm-warning">
-            Only access this record when you have a legitimate relationship
-            with the patient. Access will be recorded in the audit log.
-          </div>
-          <div className="record-panel-actions">
-            <button className="record-primary-button" onClick={onConfirm}>
-              Confirm and open record
-            </button>
-            <button onClick={onBack}>Back</button>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-function ReorderModal({
-  isOpen,
-  onClose,
-  cards,
-  onReorder,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  cards: readonly string[];
-  onReorder: (newOrder: string[]) => void;
-}) {
-  return (
-    <Dialog open={isOpen} title="Reorder sections" onClose={onClose}>
-      {/* Mounted only while open, so the working order resets each time */}
-      <ReorderList cards={cards} onApply={(order) => { onReorder(order); onClose(); }} onCancel={onClose} />
-    </Dialog>
-  );
-}
-
-function ReorderList({
-  cards,
-  onApply,
-  onCancel,
-}: {
-  cards: readonly string[];
-  onApply: (order: string[]) => void;
-  onCancel: () => void;
-}) {
-  const [order, setOrder] = useState<string[]>([...cards]);
-  const [announcement, setAnnouncement] = useState("");
-  const list = useRef<HTMLUListElement | null>(null);
-  const refocus = useRef<{ card: string; direction: "up" | "down" } | null>(null);
-
-  useEffect(() => {
-    const target = refocus.current;
-    if (!target) return;
-    refocus.current = null;
-    const row = list.current?.querySelector<HTMLElement>(`[data-card="${CSS.escape(target.card)}"]`);
-    const buttons = row?.querySelectorAll<HTMLButtonElement>("button");
-    if (!buttons) return;
-    const [up, down] = [buttons[0], buttons[1]];
-    // Keep focus on the button that was pressed; if it is now disabled, use the other one
-    const preferred = target.direction === "up" ? up : down;
-    (preferred.disabled ? (target.direction === "up" ? down : up) : preferred).focus();
-  }, [order]);
-
-  function move(index: number, direction: "up" | "down") {
-    const next = [...order];
-    const target = direction === "up" ? index - 1 : index + 1;
-    if (target < 0 || target >= next.length) return;
-    [next[index], next[target]] = [next[target], next[index]];
-    refocus.current = { card: order[index], direction };
-    setOrder(next);
-    setAnnouncement(`${order[index]} moved to position ${target + 1} of ${next.length}`);
-  }
-
-  return (
-    <>
-      <p>Use the arrow buttons to change the order of the sections on the Summary page.</p>
-      <ul className="reorder-list" ref={list}>
-        {order.map((card, index) => (
-          <li key={card} data-card={card}>
-            <span>{card}</span>
-            <div className="reorder-buttons">
-              <button
-                type="button"
-                className="nhsuk-button nhsuk-button--secondary"
-                onClick={() => move(index, "up")}
-                disabled={index === 0}
-                aria-label={`Move ${card} up`}
-              >
-                <span aria-hidden="true">↑</span>
-              </button>
-              <button
-                type="button"
-                className="nhsuk-button nhsuk-button--secondary"
-                onClick={() => move(index, "down")}
-                disabled={index === order.length - 1}
-                aria-label={`Move ${card} down`}
-              >
-                <span aria-hidden="true">↓</span>
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <p role="status" className="nhs-visually-hidden">{announcement}</p>
-      <div className="ncrs-dialog__footer">
-        <button type="button" className="nhsuk-button nhsuk-button--secondary" onClick={onCancel}>
-          Cancel
-        </button>
-        <button type="button" className="nhsuk-button" onClick={() => onApply(order)}>
-          Apply
-        </button>
-      </div>
-    </>
-  );
-}
-
-export default function MaternityShell({ children }: { children: ReactNode }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const view = recordViews[viewForPath(location.pathname)];
-  const tabs = view.tabs;
-  const currentTabLabel =
-    tabs.find(([, path]) => path === location.pathname)?.[0] ?? tabs[0][0];
-  const [viewAnnouncement, setViewAnnouncement] = useState("");
-  const previousView = useRef(view.key);
-  const [appView, setAppView] = useState<"search" | "confirm" | "record">(
-    "record",
-  );
-  const [accessToastVisible, setAccessToastVisible] = useState(false);
-  const [textSize, setTextSize] = useState<TextSize>(
-    "small",
-  );
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [optionsOpen, setOptionsOpen] = useState(
-    () => typeof window === "undefined" || window.innerWidth >= 1200,
-  );
-  const [showReorderModal, setShowReorderModal] = useState(false);
-  const [cardOrder, setCardOrder] = useState<string[]>([...defaultSectionOrder]);
-  const [panel, setPanel] = useState<DetailPanel | null>(null);
-  const panelTrigger = useRef<HTMLElement | null>(null);
-  const savedScrollPosition = useRef(0);
-
-  function openPanel(nextPanel: DetailPanel) {
-    panelTrigger.current = document.activeElement as HTMLElement;
-    savedScrollPosition.current =
-      document.querySelector<HTMLElement>(".maternity-content")?.scrollTop ?? 0;
-    setPanel(nextPanel);
-  }
-
-  function closePanel() {
-    setPanel(null);
-    requestAnimationFrame(() => {
-      const content =
-        document.querySelector<HTMLElement>(".maternity-content");
-      if (content) content.scrollTop = savedScrollPosition.current;
-      panelTrigger.current?.focus();
-    });
-  }
-
-  useEffect(() => {
-    document.title = `${currentTabLabel} — ${view.patient.name} — NHS National Care Records Service`;
-    setPanel(null);
-  }, [location.pathname, currentTabLabel, view]);
-
-  // Changing view changes the patient on screen, so say so, and move focus to the new content.
-  useEffect(() => {
-    if (previousView.current === view.key) return;
-    previousView.current = view.key;
-    setViewAnnouncement(`Now viewing ${view.patient.name}, ${view.label} record.`);
-    requestAnimationFrame(() => document.getElementById("main-content")?.focus());
-  }, [view]);
-
-  const patientMenu = (
-    <MenuButton
-      label={<>Patient: {view.patient.name.split(" ")[0]}</>}
-      items={Object.values(recordViews).map((item) => ({
-        label: item.patient.name,
-        hint: `${item.label} record`,
-        current: item.key === view.key,
-        onSelect: () => item.key !== view.key && navigate(item.home),
-      }))}
-    />
-  );
-
-  const viewMenu = (
-    <MenuButton
-      label={<>Record view: {view.label}</>}
-      items={allViewLabels.map((label) => ({
-        label,
-        current: label === view.label,
-        disabled: label !== view.label,
-        hint: label === view.label ? undefined : `No ${label.toLowerCase()} data for this patient`,
-        onSelect: () => {},
-      }))}
-    />
-  );
-
-  const flags =
-    view.key === "frailty"
-      ? frailtyFlags.map((flag) => ({
-          id: flag.id,
-          label: flag.label,
-          level: flag.level,
-          onOpen: () =>
-            openPanel({
-              eyebrow: "Clinical alert",
-              title: flag.label,
-              status: flag.status,
-              tone: flag.level === "high" ? "red" : "amber",
-              content: <FrailtyFlagPanel flag={flag} />,
-            }),
-        }))
-      : safetyFlags.map((flag) => ({
-          id: flag.id,
-          label: flag.label,
-          level: flag.level,
-          onOpen: () =>
-            openPanel({
-              eyebrow: "Clinical alert",
-              title: flag.title,
-              status: flag.status,
-              tone: flag.tone,
-              content: <SafetyFlagPanel kind={flag.kind} />,
-            }),
-        }));
-
-  if (appView === "search") {
-    return (
-      <PatientSearchScreen
-        onFound={() => setAppView("confirm")}
-        onCancel={() => setAppView("record")}
-      />
-    );
-  }
-
-  if (appView === "confirm") {
-    return (
-      <PatientConfirmScreen
-        onBack={() => setAppView("search")}
-        onConfirm={() => {
-          setAppView("record");
-          setAccessToastVisible(true);
-          window.setTimeout(() => setAccessToastVisible(false), 4000);
-        }}
-      />
-    );
-  }
-
-  return (
-    <BreadcrumbProvider>
-      <DisclosureGroup>
-        <SectionOrderContext.Provider value={cardOrder}>
-          <div className={`record-shell text-${textSize}`}>
-            <a className="record-skip-link" href="#main-content">
-              Skip to main content
-            </a>
-
-            <div className="record-frame">
-              {accessToastVisible && (
-                <div className="access-toast" role="status" aria-live="polite">
-                  Access logged — this record access has been recorded for audit
-                </div>
-              )}
-              <ServiceHeader
-                onFindPatient={() => setAppView("search")}
-                patientMenu={patientMenu}
-              />
-              <PatientBar
-                key={view.key}
-                patient={view.patient}
-                viewMenu={viewMenu}
-              />
-              <AlertsBand key={`alerts-${view.key}`} flags={flags} />
-              <p role="status" className="nhs-visually-hidden">
-                {viewAnnouncement}
-              </p>
-              <nav aria-label="Patient record sections" className="ncrs-tabs">
-                <ul>
-                  {tabs.map(([label, path]) => (
-                    <li key={path}>
-                      <NavLink to={path} end={path === "/"}>
-                        {label}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              {view.hasFilters && filtersOpen && (
-                <section
-                  className="record-filterbar"
-                  aria-label="Record filters"
-                >
-                  <label>
-                    Care setting
-                    <select defaultValue="all">
-                      <option value="all">All care settings</option>
-                      <option>Community maternity</option>
-                      <option>Antenatal clinic</option>
-                      <option>Outpatient</option>
-                      <option>Inpatient</option>
-                    </select>
-                  </label>
-                  <label>
-                    Event type
-                    <select defaultValue="all">
-                      <option value="all">All event types</option>
-                      <option>Appointments</option>
-                      <option>Scans</option>
-                      <option>Investigations</option>
-                      <option>Reviews</option>
-                    </select>
-                  </label>
-                  <label>
-                    Organisation
-                    <select defaultValue="all">
-                      <option value="all">All organisations</option>
-                      <option>BadgerNet Maternity</option>
-                      <option>Central City Practice</option>
-                      <option>Community Perinatal Service</option>
-                      <option>Diabetes Antenatal Clinic</option>
-                    </select>
-                  </label>
-                  <label>
-                    Specialty
-                    <select defaultValue="all">
-                      <option value="all">All specialties</option>
-                      <option>Maternity</option>
-                      <option>Diabetes</option>
-                      <option>Perinatal mental health</option>
-                      <option>Ultrasound</option>
-                    </select>
-                  </label>
-                  <label>
-                    Date range
-                    <select defaultValue="all">
-                      <option value="all">All time</option>
-                      <option>Last 7 days</option>
-                      <option>Last 30 days</option>
-                      <option>This pregnancy</option>
-                    </select>
-                  </label>
-                </section>
-              )}
-
-              <div className="record-workspace">
-                <OptionsSidebar
-                  open={optionsOpen}
-                  onOpenChange={setOptionsOpen}
-                  textSize={textSize}
-                  onTextSize={setTextSize}
-                  filtersOpen={filtersOpen}
-                  onToggleFilters={
-                    view.hasFilters
-                      ? () => setFiltersOpen((value) => !value)
-                      : undefined
-                  }
-                  onReorder={
-                    view.canReorder
-                      ? () => setShowReorderModal(true)
-                      : undefined
-                  }
-                />
-                <main
-                  id="main-content"
-                  className="maternity-content"
-                  tabIndex={-1}
-                >
-                  <DetailPanelContext.Provider value={openPanel}>
-                    <BreadcrumbNav />
-                    <div style={{ display: panel ? "none" : "block" }}>
-                      {children}
-                    </div>
-                    <DetailPanelComponent
-                      isOpen={!!panel}
-                      title={panel?.title || ""}
-                      eyebrow={panel?.eyebrow}
-                      status={panel?.status}
-                      tone={panel?.tone}
-                      content={panel?.content}
-                      onClose={closePanel}
-                      backLabel={`Back`}
-                    />
-                  </DetailPanelContext.Provider>
-                </main>
-              </div>
-              <ReorderModal
-                isOpen={showReorderModal}
-                onClose={() => setShowReorderModal(false)}
-                cards={cardOrder}
-                onReorder={setCardOrder}
-              />
-            </div>
-          </div>
-        </SectionOrderContext.Provider>
-      </DisclosureGroup>
-    </BreadcrumbProvider>
   );
 }

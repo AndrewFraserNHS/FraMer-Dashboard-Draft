@@ -1,6 +1,6 @@
 import { ReactNode, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
-import { RowChevron } from "./ExpandableRow";
+import { RowChevron } from "./RowChevron";
 
 export type SortKey = string | number | null;
 

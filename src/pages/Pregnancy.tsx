@@ -1,19 +1,21 @@
-import { Callout } from "./components/ui/Callout";
-import { DataSection } from "./components/ui/DataSection";
-import { DataTable } from "./components/ui/DataTable";
-import { FactsGrid } from "./components/ui/DetailList";
-import { RecordPage } from "./components/ui/RecordPage";
-import { SourceTag, StatusTag } from "./components/ui/StatusTag";
-import { Subsection } from "./components/ui/Subsection";
-import { dateKey } from "./utils/sort";
+import { RecordCard, RecordCardList } from "../components/ui/RecordCardList";
+import { formatDate } from "../data/patient";
+import { Callout } from "../components/ui/Callout";
+import { DataSection } from "../components/ui/DataSection";
+import { DataTable } from "../components/ui/DataTable";
+import { FactsGrid } from "../components/ui/DetailList";
+import { RecordPage } from "../components/ui/RecordPage";
+import { SourceTag, StatusTag } from "../components/ui/StatusTag";
+import { Subsection } from "../components/ui/Subsection";
+import { dateKey } from "../utils/sort";
 
 const currentPregnancy = [
   ["Gestation", "34 weeks and 1 day"],
-  ["Estimated due date", "15 November 2026"],
+  ["Estimated due date", formatDate("2026-11-15")],
   ["Parity", "Third pregnancy, 1 previous birth · no previous caesarean birth"],
   ["Blood group", "A+"],
   ["Body mass index", "32"],
-  ["Booking", "9w (15 August 2026)"],
+  ["Booking", `9w (${formatDate("2026-08-15")})`],
 ] as const;
 
 const obstetricHistory = [
@@ -37,14 +39,14 @@ const healthHistory = [
 ] as const;
 
 const diagnoses = [
-  { name: "Gestational diabetes mellitus (O24.4)", meta: "Active · 5 September 2026 · Lab results" },
-  { name: "Obesity (body mass index 32) (E66.0)", meta: "Active · 15 August 2026 · BadgerNet Maternity" },
+  { name: "Gestational diabetes mellitus (O24.4)", meta: `Active · ${formatDate("2026-09-05")} · Lab results` },
+  { name: "Obesity (body mass index 32) (E66.0)", meta: `Active · ${formatDate("2026-08-15")} · BadgerNet Maternity` },
   { name: "Depression and anxiety — History (F41.9)", meta: "Currently managed · 2022 · GP record" },
 ] as const;
 
 const referrals = [
-  { service: "Diabetes Antenatal Clinic", reason: "Gestational diabetes mellitus confirmed — management plan", date: "12 September 2026", status: "Referral reviewed", tone: "green" as const },
-  { service: "Perinatal mental health", reason: "Wellbeing assessment and support plan", date: "15 September 2026", status: "Referral reviewed", tone: "green" as const },
+  { service: "Diabetes Antenatal Clinic", reason: "Gestational diabetes mellitus confirmed — management plan", date: formatDate("2026-09-12"), status: "Referral reviewed", tone: "green" as const },
+  { service: "Perinatal mental health", reason: "Wellbeing assessment and support plan", date: formatDate("2026-09-15"), status: "Referral reviewed", tone: "green" as const },
   { service: "Dietitian", reason: "Weight management and gestational diabetes mellitus dietary advice", date: "", status: "Pending", tone: "yellow" as const },
 ] as const;
 
@@ -58,14 +60,14 @@ const plan = [
 ];
 
 const screening = [
-  { test: "Growth scan (36w)", date: "16 October 2026", gestation: "36 weeks", accepted: false, result: "Booked — upcoming", source: "Ultrasound department" },
-  { test: "Growth scan (28w)", date: "25 September 2026", gestation: "28 weeks", accepted: true, result: "Growth appropriate. Amniotic fluid index normal. Presentation cephalic.", source: "Ultrasound department" },
-  { test: "Oral glucose tolerance test (75 g)", date: "5 September 2026", gestation: "28 weeks", accepted: true, result: "Abnormal — gestational diabetes mellitus confirmed", source: "Lab results" },
-  { test: "Anomaly scan (20w)", date: "2 September 2026", gestation: "20 weeks and 1 day", accepted: true, result: "No structural anomalies detected. Growth appropriate.", source: "Ultrasound department" },
-  { test: "HIV, hepatitis B and syphilis", date: "15 August 2026", gestation: "9 weeks", accepted: true, result: "Negative", source: "Lab results" },
-  { test: "Sickle cell and thalassaemia", date: "15 August 2026", gestation: "9 weeks", accepted: true, result: "Low risk — no further action", source: "Lab results" },
-  { test: "Combined screening (T21/T18/T13)", date: "2 August 2026", gestation: "12 weeks and 4 days", accepted: true, result: "Low risk (1:5400 T21, 1:12000 T18)", source: "Screening service" },
-  { test: "Dating scan", date: "2 August 2026", gestation: "9 weeks", accepted: true, result: "CRL consistent with dates. Singleton.", source: "Ultrasound department" },
+  { test: "Growth scan (36w)", date: formatDate("2026-10-16"), gestation: "36 weeks", accepted: false, result: "Booked — upcoming", source: "Ultrasound department" },
+  { test: "Growth scan (28w)", date: formatDate("2026-09-25"), gestation: "28 weeks", accepted: true, result: "Growth appropriate. Amniotic fluid index normal. Presentation cephalic.", source: "Ultrasound department" },
+  { test: "Oral glucose tolerance test (75 g)", date: formatDate("2026-09-05"), gestation: "28 weeks", accepted: true, result: "Abnormal — gestational diabetes mellitus confirmed", source: "Lab results" },
+  { test: "Anomaly scan (20w)", date: formatDate("2026-09-02"), gestation: "20 weeks and 1 day", accepted: true, result: "No structural anomalies detected. Growth appropriate.", source: "Ultrasound department" },
+  { test: "HIV, hepatitis B and syphilis", date: formatDate("2026-08-15"), gestation: "9 weeks", accepted: true, result: "Negative", source: "Lab results" },
+  { test: "Sickle cell and thalassaemia", date: formatDate("2026-08-15"), gestation: "9 weeks", accepted: true, result: "Low risk — no further action", source: "Lab results" },
+  { test: "Combined screening (T21/T18/T13)", date: formatDate("2026-08-02"), gestation: "12 weeks and 4 days", accepted: true, result: "Low risk (1:5400 T21, 1:12000 T18)", source: "Screening service" },
+  { test: "Dating scan", date: formatDate("2026-08-02"), gestation: "9 weeks", accepted: true, result: "CRL consistent with dates. Singleton.", source: "Ultrasound department" },
   { test: "Group B Strep", date: "—", gestation: "Not recorded", accepted: false, result: "Declined", source: "BadgerNet Maternity" },
 ] as const;
 
@@ -130,7 +132,7 @@ export default function Pregnancy() {
         <div className="callout-stack">
           <Callout tone="red" title="Gestational diabetes — confirmed" source="Lab results">
             <p>
-              The oral glucose tolerance test was abnormal on 5 September 2026. The diabetes
+              The oral glucose tolerance test was abnormal on {formatDate("2026-09-05")}. The diabetes
               clinic is providing care. Glucose is monitored 4 times a day and metformin 500mg
               has started.
             </p>
@@ -192,31 +194,26 @@ export default function Pregnancy() {
         defaultOpen={false}
       >
         <Subsection title="Diagnoses">
-          <ul className="record-card-list">
+          <RecordCardList>
             {diagnoses.map((diagnosis) => (
-              <li key={diagnosis.name} className="record-card">
-                <p className="record-card__heading">{diagnosis.name}</p>
-                <small>{diagnosis.meta}</small>
-              </li>
+              <RecordCard key={diagnosis.name} heading={diagnosis.name} meta={diagnosis.meta} />
             ))}
-          </ul>
+          </RecordCardList>
         </Subsection>
 
         <Subsection title="Previous referrals">
-          <ul className="record-card-list">
+          <RecordCardList>
             {referrals.map((referral) => (
-              <li key={referral.service} className="record-card">
-                <p className="record-card__heading">
-                  {referral.service}
-                  <span className="record-card__status">
-                    <StatusTag tone={referral.tone}>{referral.status}</StatusTag>
-                  </span>
-                </p>
-                <p>{referral.reason}</p>
-                <small>{referral.date || "Date pending"}</small>
-              </li>
+              <RecordCard
+                key={referral.service}
+                heading={referral.service}
+                status={<StatusTag tone={referral.tone}>{referral.status}</StatusTag>}
+                meta={referral.date || "Date pending"}
+              >
+                {referral.reason}
+              </RecordCard>
             ))}
-          </ul>
+          </RecordCardList>
         </Subsection>
 
         <Subsection title="Tokophobia">

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useBreadcrumb } from "./BreadcrumbNav";
+import { useBreadcrumb } from "../shell/BreadcrumbNav";
 import { ChevronLeft } from "lucide-react";
 
 export type DetailPageConfig = {

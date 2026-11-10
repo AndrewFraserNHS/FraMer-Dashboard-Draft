@@ -1,12 +1,14 @@
+import { RecordCard, RecordCardList } from "../components/ui/RecordCardList";
+import { formatDate } from "../data/patient";
 import { Link } from "react-router-dom";
-import { DataSection } from "./components/ui/DataSection";
-import { DataTable } from "./components/ui/DataTable";
-import { DetailList } from "./components/ui/DetailList";
-import { Callout } from "./components/ui/Callout";
-import { RecordPage } from "./components/ui/RecordPage";
-import { SourceTag, StatusTag } from "./components/ui/StatusTag";
-import { Subsection } from "./components/ui/Subsection";
-import { dateKey } from "./utils/sort";
+import { DataSection } from "../components/ui/DataSection";
+import { DataTable } from "../components/ui/DataTable";
+import { DetailList } from "../components/ui/DetailList";
+import { Callout } from "../components/ui/Callout";
+import { RecordPage } from "../components/ui/RecordPage";
+import { SourceTag, StatusTag } from "../components/ui/StatusTag";
+import { Subsection } from "../components/ui/Subsection";
+import { dateKey } from "../utils/sort";
 
 const riskFactors = [
   { factor: "Ethnicity", detail: "Asian / Asian British — Pakistani", note: "South Asian ethnicity is classified as high-risk for gestational diabetes mellitus per NICE NG3", source: "Demographics", flagged: true },
@@ -16,19 +18,19 @@ const riskFactors = [
 ] as const;
 
 const glucoseResults = [
-  { test: "Fasting glucose (pre-pregnancy)", result: "5.2 mmol/L", range: "< 5.6 mmol/L", date: "14 August 2024", source: "GP record" },
-  { test: "HbA1c (pre-pregnancy)", result: "37 mmol/mol", range: "< 42 mmol/mol", date: "14 August 2024", source: "GP record" },
+  { test: "Fasting glucose (pre-pregnancy)", result: "5.2 mmol/L", range: "< 5.6 mmol/L", date: formatDate("2024-08-14"), source: "GP record" },
+  { test: "HbA1c (pre-pregnancy)", result: "37 mmol/mol", range: "< 42 mmol/mol", date: formatDate("2024-08-14"), source: "GP record" },
 ] as const;
 
 const assessments = [
-  { date: "15 August 2026", tool: "Edinburgh Postnatal Depression Scale", score: "11/30", risk: "Borderline – follow up", clinician: "Booking", notes: "Patient reports low mood and poor sleep. Denies self-harm." },
-  { date: "15 September 2026", tool: "GAD-7", score: "9/21", risk: "Moderate anxiety", clinician: "Perinatal mental health team", notes: "Anxiety related to health + language barrier." },
-  { date: "15 September 2026", tool: "Risk review", score: "N/A", risk: "No immediate risk disclosed", clinician: "Perinatal mental health team", notes: "Safety plan reviewed; emergency contacts confirmed." },
+  { date: formatDate("2026-08-15"), tool: "Edinburgh Postnatal Depression Scale", score: "11/30", risk: "Borderline – follow up", clinician: "Booking", notes: "Patient reports low mood and poor sleep. Denies self-harm." },
+  { date: formatDate("2026-09-15"), tool: "GAD-7", score: "9/21", risk: "Moderate anxiety", clinician: "Perinatal mental health team", notes: "Anxiety related to health + language barrier." },
+  { date: formatDate("2026-09-15"), tool: "Risk review", score: "N/A", risk: "No immediate risk disclosed", clinician: "Perinatal mental health team", notes: "Safety plan reviewed; emergency contacts confirmed." },
 ] as const;
 
 const contacts = [
-  { date: "15 September 2026", service: "Perinatal mental health", type: "Telephone assessment", clinician: "Perinatal mental health practitioner", interpreter: "Urdu (Booked)", outcome: "Wellbeing assessment completed. Safety plan reviewed. Follow-up offered in 2–4 weeks." },
-  { date: "22 September 2026", service: "Perinatal mental health", type: "Advice to midwifery", clinician: "Perinatal mental health team", interpreter: "N/A", outcome: "Shared key points for booking: private discussion recommended; confirm support network; review Sertraline continuation." },
+  { date: formatDate("2026-09-15"), service: "Perinatal mental health", type: "Telephone assessment", clinician: "Perinatal mental health practitioner", interpreter: "Urdu (Booked)", outcome: "Wellbeing assessment completed. Safety plan reviewed. Follow-up offered in 2–4 weeks." },
+  { date: formatDate("2026-09-22"), service: "Perinatal mental health", type: "Advice to midwifery", clinician: "Perinatal mental health team", interpreter: "N/A", outcome: "Shared key points for booking: private discussion recommended; confirm support network; review Sertraline continuation." },
 ] as const;
 
 const mentalHealthHistory = [
@@ -267,7 +269,7 @@ export default function Comorbidities() {
           title="Wellbeing support plan (summary)"
           aside={
             <>
-              Last updated: 15 September 2026 ·{" "}
+              Last updated: {formatDate("2026-09-15")} ·{" "}
               <Link className="nhsuk-link" to="/care-plans">
                 View care plans
               </Link>
@@ -315,34 +317,31 @@ export default function Comorbidities() {
         </Callout>
 
         <Subsection title="Suggested actions (connected record)">
-          <ul className="record-card-list">
+          <RecordCardList>
             {suggestedActions.map((action) => (
-              <li key={action.title} className="record-card">
-                <p className="record-card__heading">
-                  {action.title}
-                  <span className="record-card__status">
-                    <StatusTag
-                      tone={action.priority === "High" ? "red" : "blue"}
-                    >
-                      {action.priority} priority
-                    </StatusTag>
-                  </span>
-                </p>
-                <small>
-                  Category: {action.category}
-                  {"link" in action && action.link && (
-                    <>
-                      {" "}
-                      ·{" "}
-                      <Link className="nhsuk-link" to={action.link.to}>
-                        {action.link.label}
-                      </Link>
-                    </>
-                  )}
-                </small>
-              </li>
+              <RecordCard
+                key={action.title}
+                heading={action.title}
+                status={
+                  <StatusTag tone={action.priority === "High" ? "red" : "blue"}>{action.priority} priority</StatusTag>
+                }
+                meta={
+                  <>
+                    Category: {action.category}
+                    {"link" in action && action.link && (
+                      <>
+                        {" "}
+                        ·{" "}
+                        <Link className="nhsuk-link" to={action.link.to}>
+                          {action.link.label}
+                        </Link>
+                      </>
+                    )}
+                  </>
+                }
+              />
             ))}
-          </ul>
+          </RecordCardList>
         </Subsection>
       </DataSection>
 

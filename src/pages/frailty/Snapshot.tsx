@@ -1,15 +1,17 @@
+import { formatFrailtyDate } from "../../data/frailty";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Callout } from "../components/ui/Callout";
-import { DataSection } from "../components/ui/DataSection";
-import { DataTable } from "../components/ui/DataTable";
-import { DetailList, FactsGrid } from "../components/ui/DetailList";
-import { Dialog } from "../components/ui/Dialog";
-import { KeyFigure } from "../components/ui/KeyFigure";
-import { RecordPage } from "../components/ui/RecordPage";
-import { StatusTag } from "../components/ui/StatusTag";
-import { Subsection } from "../components/ui/Subsection";
-import { ToggleGroup } from "../components/ui/ToggleGroup";
+import { Callout } from "../../components/ui/Callout";
+import { DataSection } from "../../components/ui/DataSection";
+import { DataTable } from "../../components/ui/DataTable";
+import { DetailList, FactsGrid } from "../../components/ui/DetailList";
+import { Dialog } from "../../components/ui/Dialog";
+import { Button } from "../../components/ui/Button";
+import { KeyFigure } from "../../components/ui/KeyFigure";
+import { RecordPage } from "../../components/ui/RecordPage";
+import { StatusTag } from "../../components/ui/StatusTag";
+import { Subsection } from "../../components/ui/Subsection";
+import { ToggleGroup } from "../../components/ui/ToggleGroup";
 import {
   frailtyAppointments,
   frailtyConnectedSystems,
@@ -28,10 +30,10 @@ import {
   vitals,
   type SnapshotPanel,
   type Vital,
-} from "../data/frailty";
-import { priorityLabel } from "../data/patient";
-import { dateKey } from "../utils/sort";
-import { Source, SourceRow } from "./Source";
+} from "../../data/frailty";
+import { priorityLabel } from "../../data/patient";
+import { dateKey } from "../../utils/sort";
+import { Source, SourceRow } from "../../components/record/Source";
 
 type TrendPeriod = "latest" | "6m" | "1y";
 
@@ -116,7 +118,7 @@ export default function FrailtySnapshot() {
         source={provenanceLine(prov.gpPatel("5 days ago"))}
       >
         <p>
-          Recorded 14 November 2025. Outcome of decision: <strong>Do not attempt CPR.</strong>
+          Recorded {formatFrailtyDate("2025-11-14")}. Outcome of decision: <strong>Do not attempt CPR.</strong>
         </p>
         <p>
           <Link to="/frailty/care-plan">View the advance care plan</Link> for the full context and rationale.
@@ -175,7 +177,7 @@ export default function FrailtySnapshot() {
           <FactsGrid
             facts={[
               ["Falls in the last 3 months", "4"],
-              ["Most recent", "22 January 2026, ED attendance"],
+              ["Most recent", `${formatFrailtyDate("2026-01-22")}, ED attendance`],
             ]}
           />
           <SourceRow of={[prov.mdt, prov.acute()]} />
@@ -349,9 +351,9 @@ export default function FrailtySnapshot() {
         title={vitalOpen ? `${vitalOpen.label}: history` : ""}
         onClose={() => setVitalOpen(null)}
         footer={
-          <button type="button" className="nhsuk-button nhsuk-button--secondary" onClick={() => setVitalOpen(null)}>
+          <Button variant="secondary" onClick={() => setVitalOpen(null)}>
             Close
-          </button>
+          </Button>
         }
       >
         {vitalOpen && (

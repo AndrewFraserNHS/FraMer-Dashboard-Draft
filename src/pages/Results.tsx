@@ -1,14 +1,15 @@
+import { formatDate } from "../data/patient";
 import { useState } from "react";
-import { DataSection } from "./components/ui/DataSection";
-import { DataTable } from "./components/ui/DataTable";
-import { FactsGrid } from "./components/ui/DetailList";
-import { RecordPage } from "./components/ui/RecordPage";
-import { SourceTag, StatusTag, TagTone } from "./components/ui/StatusTag";
-import { Subsection } from "./components/ui/Subsection";
-import { ToggleGroup } from "./components/ui/ToggleGroup";
-import { dateKey } from "./utils/sort";
+import { DataSection } from "../components/ui/DataSection";
+import { DataTable } from "../components/ui/DataTable";
+import { FactsGrid } from "../components/ui/DetailList";
+import { RecordPage } from "../components/ui/RecordPage";
+import { SourceTag, StatusTag, TagTone } from "../components/ui/StatusTag";
+import { Subsection } from "../components/ui/Subsection";
+import { ToggleGroup } from "../components/ui/ToggleGroup";
+import { dateKey } from "../utils/sort";
 
-type Status = "Normal" | "Abnormal" | "Borderline" | "Declined" | "Awaiting";
+type Status = "Normal" | "Abnormal" | "Borderline" | "Declined" | "Awaiting" | "Reported";
 
 const statusTone: Record<Status, TagTone> = {
   Normal: "green",
@@ -16,6 +17,7 @@ const statusTone: Record<Status, TagTone> = {
   Borderline: "yellow",
   Declined: "grey",
   Awaiting: "blue",
+  Reported: "grey",
 };
 
 /** One status mapping for every table, so a value can never be shown with the wrong status. */
@@ -95,41 +97,41 @@ function LabGroups({ caption, groups }: { caption: string; groups: readonly LabG
 }
 
 const attention = [
-  { name: "Fasting glucose from oral glucose tolerance test", value: "5.6 mmol/L (reference range below 5.1)", date: "5 September 2026", note: "Gestational diabetes mellitus confirmed. Referred to the Diabetes Antenatal Clinic.", status: "Abnormal" as const },
-  { name: "2-hour glucose from oral glucose tolerance test", value: "8.7 mmol/L (reference range below 7.8)", date: "5 September 2026", note: "Glucose monitoring started 4 times a day.", status: "Abnormal" as const },
-  { name: "HbA1c", value: "41 mmol/mol (reference range below 42)", date: "5 September 2026", note: "Borderline elevated. Continue monitoring via diabetes clinic.", status: "Borderline" as const },
-  { name: "Urine dipstick glucose", value: "+1", date: "12 September 2026", note: "Consistent with gestational diabetes mellitus. Continue glucose monitoring.", status: "Borderline" as const },
+  { name: "Fasting glucose from oral glucose tolerance test", value: "5.6 mmol/L (reference range below 5.1)", date: formatDate("2026-09-05"), note: "Gestational diabetes mellitus confirmed. Referred to the Diabetes Antenatal Clinic.", status: "Abnormal" as const },
+  { name: "2-hour glucose from oral glucose tolerance test", value: "8.7 mmol/L (reference range below 7.8)", date: formatDate("2026-09-05"), note: "Glucose monitoring started 4 times a day.", status: "Abnormal" as const },
+  { name: "HbA1c", value: "41 mmol/mol (reference range below 42)", date: formatDate("2026-09-05"), note: "Borderline elevated. Continue monitoring via diabetes clinic.", status: "Borderline" as const },
+  { name: "Urine dipstick glucose", value: "+1", date: formatDate("2026-09-12"), note: "Consistent with gestational diabetes mellitus. Continue glucose monitoring.", status: "Borderline" as const },
 ];
 
 const antenatal = [
-  { test: "Combined first trimester screening", detail: "T21: 1:5400 · T18: 1:12000 · T13: < 1:20000", date: "2 August 2026", result: "Low risk", source: "Screening Service", status: "Normal" as const },
+  { test: "Combined first trimester screening", detail: "T21: 1:5400 · T18: 1:12000 · T13: < 1:20000", date: formatDate("2026-08-02"), result: "Low risk", source: "Screening Service", status: "Normal" as const },
   { test: "NIPT (cfDNA)", detail: "Not requested — combined screening low risk", date: "—", result: "Not performed", source: "—", status: "Normal" as const },
   { test: "Quadruple test", detail: "Not applicable — combined screening completed", date: "—", result: "Not performed", source: "—", status: "Normal" as const },
-  { test: "Oral glucose tolerance test (75 g)", detail: "Fasting 5.6 mmol/L (reference below 5.1) · 2-hour 8.7 mmol/L (reference below 7.8). Gestational diabetes mellitus confirmed.", date: "5 September 2026", result: "Abnormal", source: "UHMB Biochemistry", status: "Abnormal" as const },
+  { test: "Oral glucose tolerance test (75 g)", detail: "Fasting 5.6 mmol/L (reference below 5.1) · 2-hour 8.7 mmol/L (reference below 7.8). Gestational diabetes mellitus confirmed.", date: formatDate("2026-09-05"), result: "Abnormal", source: "UHMB Biochemistry", status: "Abnormal" as const },
   { test: "Group B Strep (GBS)", detail: "Patient declined GBS screening", date: "—", result: "Declined", source: "BadgerNet Maternity", status: "Declined" as const },
 ];
 
 const dipstick = [
-  { date: "15 August 2026", protein: "Negative", glucose: "Negative", leucocytes: "Negative", nitrites: "Negative", clinician: "Midwife J. Davies", raised: "" },
-  { date: "5 September 2026", protein: "Negative", glucose: "Trace", leucocytes: "Negative", nitrites: "Negative", clinician: "Phlebotomy Team", raised: "yellow" },
-  { date: "12 September 2026", protein: "Negative", glucose: "+1", leucocytes: "Negative", nitrites: "Negative", clinician: "Dr James Chen", raised: "red" },
+  { date: formatDate("2026-08-15"), protein: "Negative", glucose: "Negative", leucocytes: "Negative", nitrites: "Negative", clinician: "Midwife J. Davies", raised: "" },
+  { date: formatDate("2026-09-05"), protein: "Negative", glucose: "Trace", leucocytes: "Negative", nitrites: "Negative", clinician: "Phlebotomy Team", raised: "yellow" },
+  { date: formatDate("2026-09-12"), protein: "Negative", glucose: "+1", leucocytes: "Negative", nitrites: "Negative", clinician: "Dr James Chen", raised: "red" },
 ] as const;
 
 const scans = [
-  { title: "Dating scan", dept: "Ultrasound department", status: "", date: "2 August 2026", gestation: "9 weeks and 0 days", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "Single intrauterine pregnancy. CRL consistent with dates. FH seen.", measurements: ["CRL: 23.4 mm"] },
-  { title: "Nuchal translucency", dept: "Screening Service", status: "", date: "2 August 2026", gestation: "12 weeks and 4 days", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "NT measurement within normal limits. Nasal bone present.", measurements: ["CRL: 61 mm", "NT: 1.5 mm"] },
-  { title: "Anomaly scan (20w)", dept: "Ultrasound department", status: "Awaiting", date: "2 September 2026", gestation: "20 weeks and 1 day", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "Booked — awaiting", measurements: [] as string[] },
-  { title: "Growth scan (28w)", dept: "Ultrasound department", status: "Awaiting", date: "25 September 2026", gestation: "28 weeks and 0 days", centre: "UHMB Ultrasound department", reporter: "Sonographer M. Hussain", findings: "Scheduled (gestational diabetes mellitus pathway)", measurements: [] as string[] },
+  { title: "Dating scan", dept: "Ultrasound department", status: "Reported" as const, date: formatDate("2026-08-02"), gestation: "9 weeks and 0 days", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "Single intrauterine pregnancy. CRL consistent with dates. FH seen.", measurements: ["CRL: 23.4 mm"] },
+  { title: "Nuchal translucency", dept: "Screening Service", status: "Reported" as const, date: formatDate("2026-08-02"), gestation: "12 weeks and 4 days", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "NT measurement within normal limits. Nasal bone present.", measurements: ["CRL: 61 mm", "NT: 1.5 mm"] },
+  { title: "Anomaly scan (20w)", dept: "Ultrasound department", status: "Awaiting", date: formatDate("2026-09-02"), gestation: "20 weeks and 1 day", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "Booked — awaiting", measurements: [] as string[] },
+  { title: "Growth scan (28w)", dept: "Ultrasound department", status: "Awaiting", date: formatDate("2026-09-25"), gestation: "28 weeks and 0 days", centre: "UHMB Ultrasound department", reporter: "Sonographer M. Hussain", findings: "Scheduled (gestational diabetes mellitus pathway)", measurements: [] as string[] },
 ];
 
 const awaiting = [
-  { test: "Growth scan (36w)", due: "16 October 2026", requested: "25 September 2026", by: "Midwife J. Davies", source: "Ultrasound department" },
-  { test: "Repeat full blood count (34w)", due: "5 October 2026", requested: "15 August 2026", by: "Midwife J. Davies", source: "UHMB Haematology" },
-  { test: "Antibody re-screen (34w)", due: "5 October 2026", requested: "15 August 2026", by: "Midwife J. Davies", source: "UHMB Blood Bank" },
+  { test: "Growth scan (36w)", due: formatDate("2026-10-16"), requested: formatDate("2026-09-25"), by: "Midwife J. Davies", source: "Ultrasound department" },
+  { test: "Repeat full blood count (34w)", due: formatDate("2026-10-05"), requested: formatDate("2026-08-15"), by: "Midwife J. Davies", source: "UHMB Haematology" },
+  { test: "Antibody re-screen (34w)", due: formatDate("2026-10-05"), requested: formatDate("2026-08-15"), by: "Midwife J. Davies", source: "UHMB Blood Bank" },
 ];
 
 const cervical = [
-  { item: "Most recent smear", result: "Normal (negative cytology) (22 June 2024)", source: "GP record" },
+  { item: "Most recent smear", result: `Normal (negative cytology) (${formatDate("2024-06-22")})`, source: "GP record" },
   { item: "HPV status", result: "HPV not detected", source: "GP record" },
   { item: "Colposcopy referral", result: "Not referred", source: "GP record" },
 ] as const;
@@ -167,19 +169,26 @@ export default function Results() {
           badge={<StatusTag tone="red">Action needed</StatusTag>}
           summary="2 abnormal · 2 borderline"
         >
-          <ul className="record-card-list">
-            {attention.map((item) => (
-              <li key={item.name} className="record-card">
-                <p className="record-card__heading">
-                  {item.name}
-                  <span className="record-card__status"><ResultStatus status={item.status} /></span>
-                </p>
-                <p>{item.value}</p>
-                <p>{item.note}</p>
-                <small>{item.date}</small>
-              </li>
-            ))}
-          </ul>
+          <DataTable
+            caption="Results requiring attention"
+            rows={attention}
+            rowKey={(row) => row.name}
+            columns={[
+              {
+                header: "Result",
+                sort: (r) => r.name,
+                cell: (r) => (
+                  <>
+                    <strong>{r.name}</strong>
+                    <small>{r.note}</small>
+                  </>
+                ),
+              },
+              { header: "Value", cell: (r) => r.value },
+              { header: "Status", cell: (r) => <ResultStatus status={r.status} />, sort: (r) => r.status },
+              { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
+            ]}
+          />
         </DataSection>
       )}
 
@@ -228,7 +237,7 @@ export default function Results() {
 
           <DataSection title="Urinalysis" summary={`${dipstick.length} dipstick entries`} defaultOpen={false}>
             <Subsection title="Urine culture">
-              <FactsGrid facts={[["No growth", "15 August 2026"]]} />
+              <FactsGrid facts={[["No growth", formatDate("2026-08-15")]]} />
             </Subsection>
             <Subsection title="Dipstick history">
               <DataTable
@@ -256,28 +265,37 @@ export default function Results() {
           </DataSection>
 
           <DataSection title="Imaging" summary={`${scans.length} scans`} defaultOpen={false}>
-            {scans.map((scan) => (
-              <Subsection
-                key={scan.title}
-                title={scan.title}
-                aside={
-                  <>
-                    {scan.status && <ResultStatus status={scan.status as Status} />} {scan.dept}
-                  </>
-                }
-              >
-                <FactsGrid
-                  facts={[
-                    ["Date", scan.date],
-                    ["Gestation at scan", scan.gestation],
-                    ["Centre", scan.centre],
-                    ["Reporter", scan.reporter],
-                    ["Findings", scan.findings],
-                    ["Measurements", scan.measurements.length ? scan.measurements.join(" · ") : undefined],
-                  ]}
-                />
-              </Subsection>
-            ))}
+            <DataTable
+              caption="Imaging"
+              rows={scans}
+              rowKey={(row) => row.title}
+              columns={[
+                {
+                  header: "Scan",
+                  sort: (r) => r.title,
+                  cell: (r) => (
+                    <>
+                      <strong>{r.title}</strong>
+                      <small>{r.dept}</small>
+                    </>
+                  ),
+                },
+                { header: "Status", cell: (r) => <ResultStatus status={r.status as Status} />, sort: (r) => r.status },
+                { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
+                { header: "Gestation", cell: (r) => r.gestation, sort: (r) => r.gestation },
+                {
+                  header: "Findings",
+                  cell: (r) => (
+                    <>
+                      {r.findings}
+                      {r.measurements.length > 0 && <small>{r.measurements.join(" · ")}</small>}
+                    </>
+                  ),
+                },
+                { header: "Reporter", cell: (r) => r.reporter, sort: (r) => r.reporter },
+              ]}
+              defaultSort={{ header: "Date", direction: "descending" }}
+            />
           </DataSection>
 
           <DataSection title="Cervical screening" defaultOpen={false}>

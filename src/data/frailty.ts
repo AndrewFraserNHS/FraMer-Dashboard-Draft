@@ -1,4 +1,10 @@
 import type { Priority } from "./patient";
+import { createScenarioClock } from "../utils/dates";
+
+/** The scenario treats 7 February 2026 as today (see the "N days ago" provenance labels). */
+export const frailtyClock = createScenarioClock("2026-02-07");
+export const formatFrailtyDate = frailtyClock.long;
+export const formatFrailtyShortDate = frailtyClock.short;
 
 /** Frailty record view: Harold Bennett. Single source for every frailty page, flag and banner. */
 
@@ -65,7 +71,7 @@ export const frailtyScale = {
   score: 6,
   previous: 5,
   label: "Moderately frail",
-  updated: "6 February 2026, 14:23",
+  updated: `${formatFrailtyDate("2026-02-06")}, 14:23`,
   provenance: prov.mdt,
 } as const;
 
@@ -101,10 +107,10 @@ export const frailtyRisks: readonly FrailtyRisk[] = [
     status: "Elevated",
     detail: "2 LAS calls in 3 months · Known to frailty team",
     explanation:
-      "London Ambulance Service calls: 2 in the last 3 months. Known to frailty team: yes. Recent hospital contact: ED attendance 22 January 2026 (fall, no fracture). Recent change in care package: yes, increased to 3 visits a day.",
+      `London Ambulance Service calls: 2 in the last 3 months. Known to frailty team: yes. Recent hospital contact: ED attendance ${formatFrailtyDate("2026-01-22")} (fall, no fracture). Recent change in care package: yes, increased to 3 visits a day.`,
     provenance: prov.acute(),
   },
-  { id: "delirium", level: "medium", title: "Delirium risk", status: "Moderate", detail: "4AT score 2 (possible cognitive impairment), 28 January 2026", provenance: prov.acute() },
+  { id: "delirium", level: "medium", title: "Delirium risk", status: "Moderate", detail: `4AT score 2 (possible cognitive impairment), ${formatFrailtyDate("2026-01-28")}`, provenance: prov.acute() },
   {
     id: "carer",
     level: "medium",
@@ -163,54 +169,54 @@ export type Vital = {
 export const vitals: readonly Vital[] = [
   {
     key: "bp", label: "Blood pressure", value: "148/90", unit: "mmHg", trend: "up", trendNote: "Trending up over 6 months",
-    updated: "22 January 2026", provenance: prov.districtNurse(),
+    updated: formatFrailtyDate("2026-01-22"), provenance: prov.districtNurse(),
     summary6m: "Systolic risen by about 12 mmHg over 6 months", summary1y: "Sustained upward trend over the past year",
     readings: [
-      { date: "22 Jan 2026", value: "148/90 mmHg", by: "District nurse", system: "EMIS Community" },
-      { date: "08 Jan 2026", value: "145/88 mmHg", by: "District nurse", system: "EMIS Community" },
-      { date: "15 Dec 2025", value: "143/86 mmHg", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Dec 2025", value: "140/85 mmHg", by: "Practice nurse", system: "EMIS GP" },
-      { date: "15 Nov 2025", value: "138/84 mmHg", by: "GP", system: "EMIS GP" },
-      { date: "01 Nov 2025", value: "136/82 mmHg", by: "GP", system: "EMIS GP" },
-      { date: "22 Jan 2025", value: "136/82 mmHg", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2026-01-22"), value: "148/90 mmHg", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2026-01-08"), value: "145/88 mmHg", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2025-12-15"), value: "143/86 mmHg", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-12-01"), value: "140/85 mmHg", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-11-15"), value: "138/84 mmHg", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-11-01"), value: "136/82 mmHg", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-01-22"), value: "136/82 mmHg", by: "GP", system: "EMIS GP" },
     ],
   },
   {
     key: "pulse", label: "Pulse", value: "62", unit: "bpm", trend: "stable", trendNote: "Stable, 60 to 68 bpm range",
-    updated: "22 January 2026", provenance: prov.districtNurse(),
+    updated: formatFrailtyDate("2026-01-22"), provenance: prov.districtNurse(),
     summary6m: "Pulse stable, 60 to 68 bpm range", summary1y: "No significant change over 1 year",
     readings: [
-      { date: "22 Jan 2026", value: "62 bpm", by: "District nurse", system: "EMIS Community" },
-      { date: "08 Jan 2026", value: "65 bpm", by: "District nurse", system: "EMIS Community" },
-      { date: "15 Dec 2025", value: "68 bpm", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Dec 2025", value: "66 bpm", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Nov 2025", value: "63 bpm", by: "GP", system: "EMIS GP" },
-      { date: "22 Jan 2025", value: "64 bpm", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2026-01-22"), value: "62 bpm", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2026-01-08"), value: "65 bpm", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2025-12-15"), value: "68 bpm", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-12-01"), value: "66 bpm", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-11-01"), value: "63 bpm", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-01-22"), value: "64 bpm", by: "GP", system: "EMIS GP" },
     ],
   },
   {
     key: "weight", label: "Weight", value: "54", unit: "kg", trend: "down", trendNote: "Lost about 3 kg over 6 months",
-    updated: "22 January 2026", provenance: prov.gpNurse,
+    updated: formatFrailtyDate("2026-01-22"), provenance: prov.gpNurse,
     summary6m: "Lost about 3 kg over 6 months", summary1y: "Progressive weight loss over the past year",
     readings: [
-      { date: "22 Jan 2026", value: "54 kg", by: "District nurse", system: "EMIS Community" },
-      { date: "01 Dec 2025", value: "55 kg", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Oct 2025", value: "56 kg", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Aug 2025", value: "57 kg", by: "GP", system: "EMIS GP" },
-      { date: "22 Jan 2025", value: "57 kg", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2026-01-22"), value: "54 kg", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2025-12-01"), value: "55 kg", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-10-01"), value: "56 kg", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-08-01"), value: "57 kg", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-01-22"), value: "57 kg", by: "GP", system: "EMIS GP" },
     ],
   },
   {
     key: "glucose", label: "Blood glucose", value: "7.2", unit: "mmol/L", trend: "up", trendNote: "Risen from about 6.4 to 7.2 mmol/L",
-    updated: "22 January 2026", provenance: prov.gpNurse,
+    updated: formatFrailtyDate("2026-01-22"), provenance: prov.gpNurse,
     summary6m: "Glucose risen from about 6.4 to 7.2 mmol/L", summary1y: "Upward trend, approaching the diabetic threshold",
     readings: [
-      { date: "22 Jan 2026", value: "7.2 mmol/L", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Dec 2025", value: "7.0 mmol/L", by: "Practice nurse", system: "EMIS GP" },
-      { date: "01 Oct 2025", value: "6.8 mmol/L", by: "GP", system: "EMIS GP" },
-      { date: "01 Aug 2025", value: "6.6 mmol/L", by: "GP", system: "EMIS GP" },
-      { date: "01 Jun 2025", value: "6.4 mmol/L", by: "GP", system: "EMIS GP" },
-      { date: "22 Jan 2025", value: "6.3 mmol/L", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2026-01-22"), value: "7.2 mmol/L", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-12-01"), value: "7.0 mmol/L", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-10-01"), value: "6.8 mmol/L", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-08-01"), value: "6.6 mmol/L", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-06-01"), value: "6.4 mmol/L", by: "GP", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-01-22"), value: "6.3 mmol/L", by: "GP", system: "EMIS GP" },
     ],
   },
 ];
@@ -234,23 +240,23 @@ export type FrailtyMedicine = {
 };
 
 export const frailtyMedicines: readonly FrailtyMedicine[] = [
-  { name: "Amlodipine 5mg", status: "Optimised", frequency: "Once daily", reviewed: "10 December 2025", provenance: prov.gpPharmacist },
-  { name: "Atorvastatin 20mg", status: "Optimised", frequency: "Once daily at night", reviewed: "10 December 2025", provenance: prov.gpPatel() },
+  { name: "Amlodipine 5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyDate("2025-12-10"), provenance: prov.gpPharmacist },
+  { name: "Atorvastatin 20mg", status: "Optimised", frequency: "Once daily at night", reviewed: formatFrailtyDate("2025-12-10"), provenance: prov.gpPatel() },
   { name: "Aspirin 75mg", status: "Review needed", frequency: "Once daily", provenance: prov.gpPatel() },
-  { name: "Ramipril 2.5mg", status: "Optimised", frequency: "Once daily", reviewed: "10 December 2025", provenance: prov.gpPatel() },
+  { name: "Ramipril 2.5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyDate("2025-12-10"), provenance: prov.gpPatel() },
   { name: "Bisoprolol 2.5mg", status: "Review needed", frequency: "Once daily", provenance: prov.acute() },
 ];
 
 export type TimelineEvent = { date: string; title: string; description: string; provenance: Provenance };
 
 export const timeline: readonly TimelineEvent[] = [
-  { date: "05 Feb 2026", title: "Virtual ward", description: "Remote monitoring via virtual ward for 3 days following increased breathlessness and fall risk.", provenance: { ...prov.mdt, pulled: "2 days ago", by: "Claire Hobbs (Virtual ward nurse)" } },
-  { date: "04 Feb 2026", title: "Community visit", description: "District nurse wound care review.", provenance: prov.districtNurse("EMIS Community", "3 days ago") },
-  { date: "02 Feb 2026", title: "Social work involvement", description: "Social worker reviewed care package and logged safeguarding concern.", provenance: prov.socialWorker("5 days ago") },
-  { date: "31 Jan 2026", title: "Carer change", description: "Son (Nick Bennett) availability reduced (work commitments). Review requested.", provenance: prov.socialWorker("7 days ago") },
-  { date: "29 Jan 2026", title: "111 call", description: "Patient called about increased breathlessness.", provenance: prov.urgent },
-  { date: "22 Jan 2026", title: "ED visit", description: "Fall at home, no fracture.", provenance: prov.acute() },
-  { date: "18 Jan 2026", title: "Therapy appointment", description: "Physiotherapy mobility assessment.", provenance: prov.physio },
+  { date: formatFrailtyShortDate("2026-02-05"), title: "Virtual ward", description: "Remote monitoring via virtual ward for 3 days following increased breathlessness and fall risk.", provenance: { ...prov.mdt, pulled: "2 days ago", by: "Claire Hobbs (Virtual ward nurse)" } },
+  { date: formatFrailtyShortDate("2026-02-04"), title: "Community visit", description: "District nurse wound care review.", provenance: prov.districtNurse("EMIS Community", "3 days ago") },
+  { date: formatFrailtyShortDate("2026-02-02"), title: "Social work involvement", description: "Social worker reviewed care package and logged safeguarding concern.", provenance: prov.socialWorker("5 days ago") },
+  { date: formatFrailtyShortDate("2026-01-31"), title: "Carer change", description: "Son (Nick Bennett) availability reduced (work commitments). Review requested.", provenance: prov.socialWorker("7 days ago") },
+  { date: formatFrailtyShortDate("2026-01-29"), title: "111 call", description: "Patient called about increased breathlessness.", provenance: prov.urgent },
+  { date: formatFrailtyShortDate("2026-01-22"), title: "ED visit", description: "Fall at home, no fracture.", provenance: prov.acute() },
+  { date: formatFrailtyShortDate("2026-01-18"), title: "Therapy appointment", description: "Physiotherapy mobility assessment.", provenance: prov.physio },
 ];
 
 export type FrailtyAppointment = {
@@ -266,15 +272,15 @@ export type FrailtyAppointment = {
 
 export const frailtyAppointments: readonly FrailtyAppointment[] = [
   {
-    title: "OT home assessment", service: "OT / Community therapy", date: "20 February 2026", time: "10:30", location: "Patient's home",
+    title: "OT home assessment", service: "OT / Community therapy", date: formatFrailtyDate("2026-02-20"), time: "10:30", location: "Patient's home",
     description: "Home assessment for equipment review and environmental hazard reduction following recurrent falls.",
-    booked: "Booked 6 February 2026 by Sarah Linton (OT co-ordinator)",
+    booked: `Booked ${formatFrailtyDate("2026-02-06")} by Sarah Linton (OT co-ordinator)`,
     provenance: { ...prov.physio, pulled: "1 day ago", by: "Sarah Linton (OT co-ordinator)" },
   },
   {
-    title: "Frailty MDT review", service: "Frailty team", date: "5 March 2026", time: "14:00", location: "Virtual (MS Teams)",
+    title: "Frailty MDT review", service: "Frailty team", date: formatFrailtyDate("2026-03-05"), time: "14:00", location: "Virtual (MS Teams)",
     description: "Follow-up multi-disciplinary review to reassess CFS score, medication optimisation and the falls prevention plan.",
-    booked: "Booked 7 February 2026 by Laura Chen (Frailty co-ordinator)",
+    booked: `Booked ${formatFrailtyDate("2026-02-07")} by Laura Chen (Frailty co-ordinator)`,
     provenance: { ...prov.mdt, pulled: "1 day ago", by: "Laura Chen (Frailty co-ordinator)" },
   },
 ];
@@ -372,7 +378,7 @@ export const cgaDomains: readonly CgaDomain[] = [
     fields: [
       { id: "cfs", title: "Clinical Frailty Scale", kind: "choice", options: cfsOptions, initialChoice: "6", provenance: prov.mdt },
       p("active-conditions", "Active conditions", "Type 2 diabetes (2012), hypertension (2008), chronic heart failure (2019), CKD stage 3a (2020), dementia, mixed type (2024)", prov.gpPatel()),
-      p("history-presenting", "History of presenting condition", "80-year-old male with moderate frailty (CFS 6). 4 falls in the last 3 months, most recent 22 January 2026 resulting in ED attendance (no fracture). Episode of increased breathlessness 29 January 2026, contact via 111 and subsequent virtual ward monitoring. Background of dementia (mixed type, 2024), chronic heart failure and type 2 diabetes. Carer strain noted; son's availability has recently reduced.", prov.mdt),
+      p("history-presenting", "History of presenting condition", `80-year-old male with moderate frailty (CFS 6). 4 falls in the last 3 months, most recent ${formatFrailtyDate("2026-01-22")} resulting in ED attendance (no fracture). Episode of increased breathlessness ${formatFrailtyDate("2026-01-29")}, contact via 111 and subsequent virtual ward monitoring. Background of dementia (mixed type, 2024), chronic heart failure and type 2 diabetes. Carer strain noted; son's availability has recently reduced.`, prov.mdt),
       p("current-diagnosis", "Current diagnosis", "Type 2 diabetes mellitus (2012) · Hypertension (2008) · Chronic heart failure (2019) · Chronic kidney disease stage 3a (2020) · Dementia, mixed type (2024)", prov.gpPatel(), undefined, { editable: false }),
       t("past-medical", "Other significant past medical history", "Anything not captured in active conditions."),
       t("medication-review", "Medication review", "Document medication review findings here.", { risk: true }),
@@ -381,7 +387,7 @@ export const cgaDomains: readonly CgaDomain[] = [
       t("ecg", "ECG", "ECG findings and interpretation."),
       p("weight-bmi", "Weight, height and BMI", "Weight: 54 kg (lost about 3 kg over 6 months). Height: not recorded. BMI: unable to calculate.", prov.districtNurse(), undefined, { editable: false }),
       p("bloods", "Bloods of note", "HbA1c: 68 mmol/mol (raised, reviewed by GP). eGFR: reduced, consistent with CKD stage 3a. No recent full blood count on record.", prov.gpPatel(), undefined, { editable: false }),
-      p("falls-history", "Falls history", "4 falls in the last 3 months. Most recent: 22 January 2026, ED attendance, no fracture. Previous falls on record via community and acute. Multifactorial falls intervention in place. Physiotherapy strength and balance programme ongoing (fortnightly).", prov.acute(), "Add further detail here.", { risk: true, editable: false }),
+      p("falls-history", "Falls history", `4 falls in the last 3 months. Most recent: ${formatFrailtyDate("2026-01-22")}, ED attendance, no fracture. Previous falls on record via community and acute. Multifactorial falls intervention in place. Physiotherapy strength and balance programme ongoing (fortnightly).`, prov.acute(), "Add further detail here.", { risk: true, editable: false }),
       t("pain", "Pain", "Describe pain location, type and severity. Consider a pain scale such as PAINAD, Abbey or visual analogue scale."),
       t("pain-expression", "Differences expressing pain", "Any difficulties or differences in how the patient expresses pain."),
       t("eating-drinking", "Eating and drinking", "Eating and drinking habits, independence, any concerns."),
@@ -413,7 +419,7 @@ export const cgaDomains: readonly CgaDomain[] = [
     ],
     fields: [
       p("cognitive", "Cognitive assessment", "Dementia (mixed type) diagnosed 2024. Cognitive impairment noted by GP and community team. Formal cognitive testing to be completed during assessment.", prov.gpPatel(), "Add further detail here."),
-      p("mood", "Mood and mental health", "Previously under community mental health for low mood following bereavement (wife Dorothy, deceased 2022). Discharged from CMHT with advice and a self-management plan (December 2025). No current mental health input. Carer strain from son may be contributing to low mood. Further assessment required.", prov.cmht, "Add further detail here."),
+      p("mood", "Mood and mental health", `Previously under community mental health for low mood following bereavement (wife Dorothy, deceased 2022). Discharged from CMHT with advice and a self-management plan (${frailtyClock.month("2025-12-10")}). No current mental health input. Carer strain from son may be contributing to low mood. Further assessment required.`, prov.cmht, "Add further detail here."),
       t("bpsd", "Behavioural and psychological symptoms", "To be completed during assessment."),
     ],
   },
@@ -424,7 +430,7 @@ export const cgaDomains: readonly CgaDomain[] = [
       { id: "ai-func-1", text: "Barthel Index score declining over the past 3 assessments. OT home assessment overdue, scheduled for 20 February but not yet completed." },
     ],
     fields: [
-      p("mobility", "Mobility and transfers", "Indoors: walking stick. Outdoors: wheeled zimmer frame. Transfers: requires assistance of 1. Physio mobility assessment completed 18 January 2026 by Tom Edwards (physiotherapist).", prov.physio, "Add further detail here."),
+      p("mobility", "Mobility and transfers", `Indoors: walking stick. Outdoors: wheeled zimmer frame. Transfers: requires assistance of 1. Physio mobility assessment completed ${formatFrailtyDate("2026-01-18")} by Tom Edwards (physiotherapist).`, prov.physio, "Add further detail here."),
       t("adls", "Activities of daily living (ADLs)", "To be completed during assessment."),
       t("ot-home", "OT home assessment", "To be completed during assessment."),
     ],
@@ -439,7 +445,7 @@ export const cgaDomains: readonly CgaDomain[] = [
     ],
     fields: [
       p("carer-insights", "Carer insights", "Primary carer: son Nick Bennett (07700 900 123), lives locally. Contingency carer: daughter Rachel Bennett (07700 900 456), lives in Manchester. Formal: no. Informal: yes. Carer strain: moderate; son reporting reduced availability due to work commitments. Care package in place: 3 visits a day.", prov.socialWorker(), "Add further detail here.", { risk: true }),
-      p("safeguarding", "Safeguarding", "Self-neglect risk flagged. Concern logged 2 February 2026 by Aisha Khan (social worker) following care package review. Patient declining some care visits. Safeguarding referral made to Croydon Council Adult Social Care. Status: under review.", prov.safeguarding, "Add further detail here.", { risk: true }),
+      p("safeguarding", "Safeguarding", `Self-neglect risk flagged. Concern logged ${formatFrailtyDate("2026-02-02")} by Aisha Khan (social worker) following care package review. Patient declining some care visits. Safeguarding referral made to Croydon Council Adult Social Care. Status: under review.`, prov.safeguarding, "Add further detail here.", { risk: true }),
       p("isolation", "Social isolation and support networks", "Lives alone. Wife deceased (2022). Limited social contact noted. Son visits when work allows; daughter in Manchester. No voluntary sector input currently in place. Warm referral to Age UK suggested for social isolation support (status: pending).", prov.socialWorker("5 days ago"), "Add further detail here."),
     ],
   },
@@ -476,7 +482,7 @@ export const cgaDomains: readonly CgaDomain[] = [
     id: "wishes",
     title: "Future wishes",
     fields: [
-      p("dnacpr", "DNACPR", "DNACPR in place. Decision made 14 November 2025 by Dr Patel (GP) following discussion with patient and family. Documented in EMIS GP. Copy held at Woodside Health Centre.", prov.gpPatel("5 days ago")),
+      p("dnacpr", "DNACPR", `DNACPR in place. Decision made ${formatFrailtyDate("2025-11-14")} by Dr Patel (GP) following discussion with patient and family. Documented in EMIS GP. Copy held at Woodside Health Centre.`, prov.gpPatel("5 days ago")),
       t("place-of-care", "Preferred place of care and death", "To be completed during assessment."),
       p("lpa", "Lasting power of attorney", "LPA status: not confirmed on record. To be verified with patient and family during assessment. Son Nick Bennett (07700 900 123) may hold authority.", prov.gpPatel()),
     ],
@@ -558,7 +564,7 @@ export const carePlanDomains: readonly CarePlanDomain[] = [
     id: "functional", title: "Functional independence",
     text: "Functional independence support plan:\n• Rollator with seat in use; environmental modifications completed\n• Ongoing physiotherapy strength and balance programme (fortnightly)\n• ADL support from home carer 3 times a day: personal care, dressing, meal preparation\n• Raised toilet seat ordered; installation pending\n• Monthly OT check-in to monitor home safety and equipment needs",
     actions: [
-      { title: "OT home assessment", status: "Completed", owner: "Community OT", timescale: "Completed 24 February 2026", service: "Community OT" },
+      { title: "OT home assessment", status: "Completed", owner: "Community OT", timescale: `Completed ${formatFrailtyDate("2026-02-24")}`, service: "Community OT" },
       { title: "Physiotherapy: ongoing mobility programme", status: "Active", owner: "Community physio", timescale: "Fortnightly", service: "Community physio" },
     ],
   },
@@ -597,10 +603,10 @@ export type PlanVersion = {
 };
 
 export const planHistory: readonly PlanVersion[] = [
-  { title: "Personalised care plan (current)", status: "Active", date: "6 February 2026", description: "Auto-generated from CGA. Pending MDT sign-off.", files: ["CGA_Summary_060226.pdf", "Frailty_Snapshot_060226.pdf"] },
-  { title: "Falls prevention plan", status: "Completed", date: "12 December 2025", description: "", files: ["Physio_Report_121225.pdf"] },
-  { title: "Social care support plan", status: "Superseded", date: "3 October 2025", description: "Care package increased to 3 visits a day; carer review requested.", files: ["Social_Care_Review_031025.pdf", "Carer_Assessment_031025.pdf"] },
-  { title: "Mental health support plan", status: "Discharged", date: "15 December 2025", description: "CMHT involvement ended; advice and self-management plan.", files: ["CMHT_Discharge_151225.pdf"] },
+  { title: "Personalised care plan (current)", status: "Active", date: formatFrailtyDate("2026-02-06"), description: "Auto-generated from CGA. Pending MDT sign-off.", files: ["CGA_Summary_060226.pdf", "Frailty_Snapshot_060226.pdf"] },
+  { title: "Falls prevention plan", status: "Completed", date: formatFrailtyDate("2025-12-12"), description: "", files: ["Physio_Report_121225.pdf"] },
+  { title: "Social care support plan", status: "Superseded", date: formatFrailtyDate("2025-10-03"), description: "Care package increased to 3 visits a day; carer review requested.", files: ["Social_Care_Review_031025.pdf", "Carer_Assessment_031025.pdf"] },
+  { title: "Mental health support plan", status: "Discharged", date: formatFrailtyDate("2025-12-15"), description: "CMHT involvement ended; advice and self-management plan.", files: ["CMHT_Discharge_151225.pdf"] },
 ];
 
 export const planStatusTone: Record<PlanVersion["status"], "green" | "grey"> = {
@@ -608,12 +614,12 @@ export const planStatusTone: Record<PlanVersion["status"], "green" | "grey"> = {
 };
 
 export const frailtyConnectedSystems = [
-  { name: "EMIS GP (Woodside Health Centre)", updated: "6 February 2026, 9:12am", status: "primary" },
-  { name: "EMIS Community", updated: "5 February 2026, 4:20pm", status: "connected" },
-  { name: "Frailty MDT notes", updated: "6 February 2026, 2:23pm", status: "connected" },
-  { name: "Community therapy notes", updated: "5 February 2026, 11:40am", status: "connected" },
-  { name: "Oracle Health (Croydon University Hospital)", updated: "31 January 2026, 8:05am", status: "connected" },
-  { name: "Liquidlogic (Adult Social Care)", updated: "2 February 2026, 3:30pm", status: "connected" },
-  { name: "NHS Pathways (111)", updated: "29 January 2026, 10:15am", status: "connected" },
-  { name: "Mental health (ePJS)", updated: "30 January 2026, 9:00am", status: "partial" },
+  { name: "EMIS GP (Woodside Health Centre)", updated: `${formatFrailtyDate("2026-02-06")}, 9:12am`, status: "primary" },
+  { name: "EMIS Community", updated: `${formatFrailtyDate("2026-02-05")}, 4:20pm`, status: "connected" },
+  { name: "Frailty MDT notes", updated: `${formatFrailtyDate("2026-02-06")}, 2:23pm`, status: "connected" },
+  { name: "Community therapy notes", updated: `${formatFrailtyDate("2026-02-05")}, 11:40am`, status: "connected" },
+  { name: "Oracle Health (Croydon University Hospital)", updated: `${formatFrailtyDate("2026-01-31")}, 8:05am`, status: "connected" },
+  { name: "Liquidlogic (Adult Social Care)", updated: `${formatFrailtyDate("2026-02-02")}, 3:30pm`, status: "connected" },
+  { name: "NHS Pathways (111)", updated: `${formatFrailtyDate("2026-01-29")}, 10:15am`, status: "connected" },
+  { name: "Mental health (ePJS)", updated: `${formatFrailtyDate("2026-01-30")}, 9:00am`, status: "partial" },
 ] as const;

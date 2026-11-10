@@ -1,6 +1,6 @@
-import { DetailList } from "../components/ui/DetailList";
-import { frailtyRisks, prov, provenanceLine, type FrailtyRisk } from "../data/frailty";
-import type { Priority } from "../data/patient";
+import { DetailList } from "../ui/DetailList";
+import { formatFrailtyDate, frailtyRisks, prov, provenanceLine, type FrailtyRisk } from "../../data/frailty";
+import type { Priority } from "../../data/patient";
 
 export type FrailtyFlag = {
   id: string;
@@ -17,7 +17,7 @@ const dnacpr: FrailtyFlag = {
   status: "In place",
   rows: [
     ["Decision", "Do not attempt CPR"],
-    ["Recorded", "14 November 2025"],
+    ["Recorded", formatFrailtyDate("2025-11-14")],
     ["Made by", "Dr Patel (GP), following discussion with the patient and family"],
     ["Source", provenanceLine(prov.gpPatel("5 days ago"))],
   ],

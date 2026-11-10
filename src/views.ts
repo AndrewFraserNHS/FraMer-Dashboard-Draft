@@ -1,5 +1,6 @@
 import { patient as maternityPatient } from "./data/patient";
 import { frailtyPatient } from "./data/frailty";
+import type { FilterDefinition } from "./components/shell/RecordFilterBar";
 
 /**
  * Record views. Each view is configuration: who the patient is, which tabs it has, and which
@@ -31,7 +32,8 @@ export type RecordViewConfig = {
   patient: PatientSummary;
   /** Section reordering is only meaningful where the Summary page is a list of reorderable cards */
   canReorder: boolean;
-  hasFilters: boolean;
+  /** Filter bar contents. Omit when the view has no filters. */
+  filters?: readonly FilterDefinition[];
 };
 
 export const recordViews: Record<ViewKey, RecordViewConfig> = {
@@ -41,7 +43,13 @@ export const recordViews: Record<ViewKey, RecordViewConfig> = {
     home: "/",
     patient: maternityPatient,
     canReorder: true,
-    hasFilters: true,
+    filters: [
+      { label: "Care setting", options: ["All care settings", "Community maternity", "Antenatal clinic", "Outpatient", "Inpatient"] },
+      { label: "Event type", options: ["All event types", "Appointments", "Scans", "Investigations", "Reviews"] },
+      { label: "Organisation", options: ["All organisations", "BadgerNet Maternity", "Central City Practice", "Community Perinatal Service", "Diabetes Antenatal Clinic"] },
+      { label: "Specialty", options: ["All specialties", "Maternity", "Diabetes", "Perinatal mental health", "Ultrasound"] },
+      { label: "Date range", options: ["All time", "Last 7 days", "Last 30 days", "This pregnancy"] },
+    ],
     tabs: [
       ["Summary", "/"],
       ["Pregnancy", "/pregnancy"],
@@ -59,7 +67,6 @@ export const recordViews: Record<ViewKey, RecordViewConfig> = {
     home: "/frailty",
     patient: frailtyPatient,
     canReorder: false,
-    hasFilters: false,
     tabs: [
       ["Frailty snapshot", "/frailty"],
       ["CGA", "/frailty/cga"],

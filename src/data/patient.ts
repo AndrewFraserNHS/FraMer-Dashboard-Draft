@@ -2,6 +2,13 @@
 // Risks feed the alert banners, the "Clinical risks and alerts" card and the safety-flag strip,
 // so they can never disagree with each other.
 
+import { createScenarioClock } from "../utils/dates";
+
+/** The scenario treats 5 October 2026 as today: every date below is shifted so it stays that far from the real today. */
+export const maternityClock = createScenarioClock("2026-10-05");
+/** Long display form, e.g. "5 September 2026". Takes an authored ISO date. */
+export const formatDate = maternityClock.long;
+
 export type Priority = "high" | "medium" | "low";
 
 export type Risk = {
@@ -17,9 +24,9 @@ export type Risk = {
 };
 
 export const risks: readonly Risk[] = [
-  { id: "gestational-diabetes", level: "high", title: "Gestational diabetes", detail: "Diagnosed 5 September 2026 · Lab results", source: "Lab results", banner: "Diagnosed 5 September 2026" },
+  { id: "gestational-diabetes", level: "high", title: "Gestational diabetes", detail: `Diagnosed ${formatDate("2026-09-05")} · Lab results`, source: "Lab results", banner: `Diagnosed ${formatDate("2026-09-05")}` },
   { id: "penicillin-allergy", level: "high", title: "Penicillin allergy", detail: "Reaction: rash · GP record", source: "GP record", banner: "Reaction: rash" },
-  { id: "body-mass-index", level: "medium", title: "High body mass index (32)", detail: "Added to record 15 August 2026 · BadgerNet Maternity", source: "BadgerNet Maternity", banner: "BMI 32 - requires monitoring" },
+  { id: "body-mass-index", level: "medium", title: "High body mass index (32)", detail: `Added to record ${formatDate("2026-08-15")} · BadgerNet Maternity`, source: "BadgerNet Maternity", banner: "BMI 32 - requires monitoring" },
   { id: "mental-health", level: "medium", title: "Depression and anxiety (history)", detail: "Currently managed by Perinatal mental health team", source: "Maternity record", banner: "Currently managed by Perinatal mental health team" },
   { id: "sertraline", level: "medium", title: "Sertraline in pregnancy", detail: "50mg once daily · GP record", source: "GP record" },
   { id: "language", level: "medium", title: "Language need", detail: "Urdu interpreter required", source: "Maternity record" },
@@ -41,9 +48,9 @@ export type Condition = {
 };
 
 export const conditions: readonly Condition[] = [
-  { name: "Gestational diabetes mellitus", status: "Active · Diagnosed 5 September 2026", source: "Lab results", recorded: "5 September 2026", recorder: "Maternity clinical team" },
-  { name: "Depression and anxiety (history)", status: "Currently managed · Since 2022", source: "GP record", recorded: "15 August 2026", recorder: "Dr Sarah Wilson" },
-  { name: "Obesity (body mass index 32)", status: "Active · Since 15 August 2026", source: "BadgerNet Maternity", recorded: "15 August 2026", recorder: "Maternity clinical team" },
+  { name: "Gestational diabetes mellitus", status: `Active · Diagnosed ${formatDate("2026-09-05")}`, source: "Lab results", recorded: formatDate("2026-09-05"), recorder: "Maternity clinical team" },
+  { name: "Depression and anxiety (history)", status: "Currently managed · Since 2022", source: "GP record", recorded: formatDate("2026-08-15"), recorder: "Dr Sarah Wilson" },
+  { name: "Obesity (body mass index 32)", status: `Active · Since ${formatDate("2026-08-15")}`, source: "BadgerNet Maternity", recorded: formatDate("2026-08-15"), recorder: "Maternity clinical team" },
 ];
 
 export type Medicine = {
@@ -92,26 +99,26 @@ export type CarePlan = {
 export const carePlans: readonly CarePlan[] = [
   {
     title: "Wellbeing Support Plan",
-    updated: "15 September 2026",
+    updated: formatDate("2026-09-15"),
     service: "Perinatal mental health team",
     summary: "Regular contact; safety plan in place; partner involved; social services aware and supportive.",
     planText: "Safety plan in place; partner involved; social services aware and supportive.",
     rows: [
       ["Status", "Active"],
-      ["Last updated", "15 September 2026"],
+      ["Last updated", formatDate("2026-09-15")],
       ["Responsible service", "Perinatal mental health team"],
       ["Review frequency", "Regular contact"],
     ],
   },
   {
     title: "Gestational diabetes management",
-    updated: "12 September 2026",
+    updated: formatDate("2026-09-12"),
     service: "Diabetes service",
     summary: "Metformin 500mg; glucose monitoring 4 times a day; dietitian referral requested.",
     planText: "Metformin 500mg; glucose monitoring four times daily; dietitian referral requested.",
     rows: [
       ["Status", "Active"],
-      ["Last updated", "12 September 2026"],
+      ["Last updated", formatDate("2026-09-12")],
       ["Responsible service", "Diabetes service"],
       ["Lead clinician", "Dr James Chen"],
     ],
@@ -129,10 +136,10 @@ export type ClinicalEvent = {
 };
 
 export const events: readonly ClinicalEvent[] = [
-  { date: "15 September 2026", setting: "Community", event: "Perinatal mental health assessment", reason: "Wellbeing assessment completed. Safety plan reviewed.", organisation: "Community Perinatal Service", clinician: "Perinatal mental health team", source: "Perinatal mental health" },
-  { date: "12 September 2026", setting: "Outpatient", event: "Gestational diabetes management", reason: "Metformin commenced. Glucose monitoring 4 times a day.", organisation: "Diabetes Antenatal Clinic", clinician: "Dr James Chen", source: "Diabetes service" },
-  { date: "5 September 2026", setting: "Antenatal clinic", event: "Glucose tolerance test", reason: "Gestational diabetes mellitus confirmed following an abnormal oral glucose tolerance test.", organisation: "Antenatal Clinic", clinician: "Phlebotomy", source: "Lab results" },
-  { date: "15 August 2026", setting: "Community", event: "Antenatal booking", reason: "Baseline observations and risk assessment completed.", organisation: "Community Midwifery - Central", clinician: "Midwife J. Davies", source: "BadgerNet Maternity" },
+  { date: formatDate("2026-09-15"), setting: "Community", event: "Perinatal mental health assessment", reason: "Wellbeing assessment completed. Safety plan reviewed.", organisation: "Community Perinatal Service", clinician: "Perinatal mental health team", source: "Perinatal mental health" },
+  { date: formatDate("2026-09-12"), setting: "Outpatient", event: "Gestational diabetes management", reason: "Metformin commenced. Glucose monitoring 4 times a day.", organisation: "Diabetes Antenatal Clinic", clinician: "Dr James Chen", source: "Diabetes service" },
+  { date: formatDate("2026-09-05"), setting: "Antenatal clinic", event: "Glucose tolerance test", reason: "Gestational diabetes mellitus confirmed following an abnormal oral glucose tolerance test.", organisation: "Antenatal Clinic", clinician: "Phlebotomy", source: "Lab results" },
+  { date: formatDate("2026-08-15"), setting: "Community", event: "Antenatal booking", reason: "Baseline observations and risk assessment completed.", organisation: "Community Midwifery - Central", clinician: "Midwife J. Davies", source: "BadgerNet Maternity" },
 ];
 
 export type ClinicalDocument = {
@@ -145,15 +152,15 @@ export type ClinicalDocument = {
 };
 
 export const documents: readonly ClinicalDocument[] = [
-  { name: "Structured referral (GP)", type: "GP structured referral", date: "25 July 2026", source: "GP Referral", status: "Received", confidentiality: "Clinical" },
-  { name: "Booking appointment summary", type: "Booking summary", date: "15 August 2026", source: "BadgerNet", status: "Document filed", confidentiality: "Clinical" },
-  { name: "Diabetes clinic letter", type: "Clinic letter", date: "12 September 2026", source: "Diabetes service", status: "Document filed", confidentiality: "Clinical" },
-  { name: "Wellbeing support plan", type: "Care plan", date: "15 September 2026", source: "Perinatal mental health team", status: "Document filed", confidentiality: "Clinical" },
-  { name: "Interpreter booking confirmation", type: "Admin note", date: "20 September 2026", source: "Booking Office", status: "Document filed", confidentiality: "Admin" },
+  { name: "Structured referral (GP)", type: "GP structured referral", date: formatDate("2026-07-25"), source: "GP Referral", status: "Received", confidentiality: "Clinical" },
+  { name: "Booking appointment summary", type: "Booking summary", date: formatDate("2026-08-15"), source: "BadgerNet", status: "Document filed", confidentiality: "Clinical" },
+  { name: "Diabetes clinic letter", type: "Clinic letter", date: formatDate("2026-09-12"), source: "Diabetes service", status: "Document filed", confidentiality: "Clinical" },
+  { name: "Wellbeing support plan", type: "Care plan", date: formatDate("2026-09-15"), source: "Perinatal mental health team", status: "Document filed", confidentiality: "Clinical" },
+  { name: "Interpreter booking confirmation", type: "Admin note", date: formatDate("2026-09-20"), source: "Booking Office", status: "Document filed", confidentiality: "Admin" },
 ];
 
 export const socialContext: ReadonlyArray<readonly [string, string]> = [
-  ["Pregnancy", "Third pregnancy, 1 previous birth · 34 weeks and 1 day · estimated due date 15 November 2026"],
+  ["Pregnancy", `Third pregnancy, 1 previous birth · 34 weeks and 1 day · estimated due date ${formatDate("2026-11-15")}`],
   ["Language", "Urdu · Interpreter required"],
   ["Living situation", "Lives with partner, Imran Khan"],
   ["Employment", "Retail assistant (part-time)"],
@@ -179,10 +186,10 @@ export type UpcomingCare = {
 export const upcomingCare: readonly UpcomingCare[] = [
   {
     title: "34-week routine review",
-    when: "5 October 2026, 9am",
+    when: `${formatDate("2026-10-05")}, 9am`,
     summary: "Community Midwifery - Central · Urdu interpreter booked",
     rows: [
-      ["Date and time", "5 October 2026, 9am"],
+      ["Date and time", `${formatDate("2026-10-05")}, 9am`],
       ["Care setting", "Community"],
       ["Organisation", "Community Midwifery - Central"],
       ["Clinician", "Midwife J. Davies"],
@@ -192,10 +199,10 @@ export const upcomingCare: readonly UpcomingCare[] = [
   },
   {
     title: "36-week growth scan",
-    when: "16 October 2026, 11:10am",
+    when: `${formatDate("2026-10-16")}, 11:10am`,
     summary: "Ultrasound department · Scheduled due to gestational diabetes mellitus pathway",
     rows: [
-      ["Date and time", "16 October 2026, 11:10am"],
+      ["Date and time", `${formatDate("2026-10-16")}, 11:10am`],
       ["Care setting", "Outpatient"],
       ["Organisation", "Ultrasound Department"],
       ["Reason", "Scheduled due to gestational diabetes mellitus pathway"],
@@ -206,20 +213,14 @@ export const upcomingCare: readonly UpcomingCare[] = [
 ];
 
 export const careTeam: ReadonlyArray<readonly [name: string, service: string, detail: string]> = [
-  ["Midwife J. Davies", "Community Midwifery - Central", "Last contact: 15 August 2026"],
-  ["Dr James Chen", "Diabetes Antenatal Clinic", "Last contact: 12 September 2026"],
-  ["Dr Sarah Wilson", "Central City Practice · GP", "Record updated: 5 October 2026"],
-  ["Perinatal mental health team", "Community Perinatal Service", "Last contact: 15 September 2026"],
-  ["Social services", "Supportive involvement", "Last update: 2 October 2026"],
+  ["Midwife J. Davies", "Community Midwifery - Central", `Last contact: ${formatDate("2026-08-15")}`],
+  ["Dr James Chen", "Diabetes Antenatal Clinic", `Last contact: ${formatDate("2026-09-12")}`],
+  ["Dr Sarah Wilson", "Central City Practice · GP", `Record updated: ${formatDate("2026-10-05")}`],
+  ["Perinatal mental health team", "Community Perinatal Service", `Last contact: ${formatDate("2026-09-15")}`],
+  ["Social services", "Supportive involvement", `Last update: ${formatDate("2026-10-02")}`],
   ["University Hospitals of Morecambe Bay", "Maternity hospital service", "Active service"],
 ];
 
-const longDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
-
-/** Format an ISO date (yyyy-mm-dd) for display, e.g. "5 September 2026". */
-export function formatDate(iso: string): string {
-  return longDate.format(new Date(`${iso}T00:00:00`));
-}
 
 export const patient = {
   name: "Leila KHAN",

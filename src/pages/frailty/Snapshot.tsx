@@ -167,29 +167,52 @@ export default function FrailtySnapshot() {
         </p>
       </div>
 
-      {show("falls") && (
-        <DataSection title="Falls history" summary="4 falls in the last 3 months">
-          <FactsGrid
-            facts={[
-              ["Falls in the last 3 months", "4"],
-              ["Most recent", `${formatFrailtyDate("2026-01-22")}, ED attendance`],
-            ]}
-          />
-          <SourceRow of={[prov.mdt, prov.acute()]} />
-        </DataSection>
-      )}
+      {(show("falls") || show("mobility") || show("carer")) && (
+        <section className="frailty-insight-group" aria-labelledby="frailty-insights-heading">
+          <h2 id="frailty-insights-heading" className="subsection__title">Functional and carer insights</h2>
+          <div className="frailty-insight-cards">
+            {show("falls") && (
+              <article className="frailty-insight-card">
+                <h3>Falls history</h3>
+                <FactsGrid
+                  facts={[
+                    ["Falls in the last 3 months", "4"],
+                    ["Most recent", `${formatFrailtyDate("2026-01-22")}, ED attendance`],
+                  ]}
+                />
+                <SourceRow of={[prov.mdt, prov.acute()]} />
+              </article>
+            )}
 
-      {show("mobility") && (
-        <DataSection title="Baseline mobility">
-          <FactsGrid
-            facts={[
-              ["Indoors", "Walking stick"],
-              ["Outdoors", "Wheeled zimmer frame"],
-              ["Transfers", "Requires assistance of 1"],
-            ]}
-          />
-          <SourceRow of={[prov.physio]} />
-        </DataSection>
+            {show("mobility") && (
+              <article className="frailty-insight-card">
+                <h3>Baseline mobility</h3>
+                <FactsGrid
+                  facts={[
+                    ["Indoors", "Walking stick"],
+                    ["Outdoors", "Wheeled zimmer frame"],
+                    ["Transfers", "Requires assistance of 1"],
+                  ]}
+                />
+                <SourceRow of={[prov.physio]} />
+              </article>
+            )}
+
+            {show("carer") && (
+              <article className="frailty-insight-card">
+                <h3>Carer insights</h3>
+                <DetailList
+                  rows={[
+                    ["Primary carer", "Son (Nick Bennett) · 07700 900 123"],
+                    ["Contingency carer", "Daughter (Rachel Bennett) · 07700 900 456"],
+                    ["Carer strain", "Moderate (reported struggling)"],
+                  ]}
+                />
+                <SourceRow of={[prov.socialWorker()]} />
+              </article>
+            )}
+          </div>
+        </section>
       )}
 
       {show("household") && (
@@ -202,19 +225,6 @@ export default function FrailtySnapshot() {
               ["Family", "Wife: Dorothy Bennett (deceased, 2022). Son: Nick Bennett (primary carer, lives locally). Daughter: Rachel Bennett (lives in Manchester)."],
               ["Care package", "3 visits a day"],
               ["Transport", "Support required"],
-            ]}
-          />
-          <SourceRow of={[prov.socialWorker()]} />
-        </DataSection>
-      )}
-
-      {show("carer") && (
-        <DataSection title="Carer insights" summary="Moderate strain">
-          <DetailList
-            rows={[
-              ["Primary carer", "Son (Nick Bennett) · 07700 900 123"],
-              ["Contingency carer", "Daughter (Rachel Bennett) · 07700 900 456"],
-              ["Carer strain", "Moderate (reported struggling)"],
             ]}
           />
           <SourceRow of={[prov.socialWorker()]} />

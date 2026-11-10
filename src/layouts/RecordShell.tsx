@@ -34,7 +34,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
   );
   const [accessToastVisible, setAccessToastVisible] = useState(false);
   const [textSize, setTextSize] = useState<TextSize>(
-    "small",
+    "medium",
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);

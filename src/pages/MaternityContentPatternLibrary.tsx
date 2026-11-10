@@ -6,7 +6,7 @@ import { StatusTag } from "../components/ui/StatusTag";
 import { ProvenanceTag } from "../components/ui/ProvenanceTag";
 import { ExpandableRow } from "../components/ui/ExpandableRow";
 
-const nhsLogoSrc = "/assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg";
+const nhsLogoSrc = `${import.meta.env.BASE_URL}assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg`;
 
 const sectionLinks = [
   ["section-headings", "Section headings"],

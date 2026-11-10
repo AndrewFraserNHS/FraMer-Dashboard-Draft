@@ -2,7 +2,7 @@ import { Bell, HelpCircle, LogOut, Menu, MessageSquare, Search, Settings, Baby }
 import { MenuButton } from "./MenuButton";
 
 const noop = () => {};
-const nhsLogoSrc = "/assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg";
+const nhsLogoSrc = `${import.meta.env.BASE_URL}assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg`;
 
 /** The signed-in clinician's menu. Shown in the header on wide screens and in the menu drawer on narrow ones. */
 export function AccountMenu() {

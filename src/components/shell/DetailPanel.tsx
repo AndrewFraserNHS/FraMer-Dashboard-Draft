@@ -47,7 +47,7 @@ export function DetailPanel({
   if (!isOpen) return null;
 
   return (
-    <section className="detail-panel" aria-labelledby="detail-panel-title">
+    <section className={`detail-panel tone-${tone}`} aria-labelledby="detail-panel-title">
       <div className={`detail-panel-header tone-${tone}`}>
         {/* No aria-label: the visible text is the accessible name */}
         <button

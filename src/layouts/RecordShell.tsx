@@ -37,9 +37,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
     "small",
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [optionsOpen, setOptionsOpen] = useState(
-    () => typeof window === "undefined" || window.innerWidth >= 1200,
-  );
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const [showReorderModal, setShowReorderModal] = useState(false);
   const isNarrow = useMediaQuery(NARROW_QUERY);
   const [menuOpen, setMenuOpen] = useState(false);

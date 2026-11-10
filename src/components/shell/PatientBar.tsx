@@ -18,6 +18,7 @@ export function PatientDetails({ patient }: { patient: PatientSummary }) {
           ["Occupation", patient.occupation ?? "Not recorded"],
           ["Next of kin", patient.nextOfKin],
           ["Home visit flags", patient.homeVisitFlags ?? "No home visit concerns recorded"],
+          ["Communication preference", patient.communicationPreference ?? "No communication preference recorded"],
         ]}
       />
       {isCrossBoundary(patient) && (
@@ -45,7 +46,11 @@ type PatientBarProps = {
 export function PatientBar({ patient, viewMenu, compact = false }: PatientBarProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [gravidaOpen, setGravidaOpen] = useState(false);
+  const [parityOpen, setParityOpen] = useState(false);
   const id = useId();
+  const gravidaDetailId = `${id}-gravida-detail`;
+  const parityDetailId = `${id}-parity-detail`;
 
   const copyNhsNumber = async () => {
     try {
@@ -81,6 +86,68 @@ export function PatientBar({ patient, viewMenu, compact = false }: PatientBarPro
               </span>
             </dd>
           </div>
+          {patient.estimatedDueDate && (
+            <div>
+              <dt>Estimated due date</dt>
+              <dd><strong>{patient.estimatedDueDate}</strong></dd>
+            </div>
+          )}
+          {patient.gravida && (
+            <div>
+              <dt>Gravida</dt>
+              <dd>
+                <strong>{patient.gravida}</strong>
+                {patient.gravidaDetail && (
+                  <>
+                    {" "}
+                    <button
+                      type="button"
+                      className="ncrs-patient__fact-link"
+                      aria-expanded={gravidaOpen}
+                      aria-controls={gravidaDetailId}
+                      onClick={() => setGravidaOpen((value) => !value)}
+                    >
+                      View detail
+                    </button>
+                    <span id={gravidaDetailId} className="ncrs-patient__fact-detail" hidden={!gravidaOpen}>
+                      {patient.gravidaDetail}
+                    </span>
+                  </>
+                )}
+              </dd>
+            </div>
+          )}
+          {patient.parity && (
+            <div>
+              <dt>Parity</dt>
+              <dd>
+                <strong>{patient.parity}</strong>
+                {patient.parityDetail && (
+                  <>
+                    {" "}
+                    <button
+                      type="button"
+                      className="ncrs-patient__fact-link"
+                      aria-expanded={parityOpen}
+                      aria-controls={parityDetailId}
+                      onClick={() => setParityOpen((value) => !value)}
+                    >
+                      View detail
+                    </button>
+                    <span id={parityDetailId} className="ncrs-patient__fact-detail" hidden={!parityOpen}>
+                      {patient.parityDetail}
+                    </span>
+                  </>
+                )}
+              </dd>
+            </div>
+          )}
+          {patient.cSection && (
+            <div>
+              <dt>C-section</dt>
+              <dd><strong>{patient.cSection}</strong></dd>
+            </div>
+          )}
         </dl>
         {!compact && viewMenu}
         {!compact && isCrossBoundary(patient) && <StatusTag tone="blue">Cross-boundary</StatusTag>}

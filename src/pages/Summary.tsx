@@ -9,7 +9,7 @@ import { RowChevron } from "../components/ui/RowChevron";
 import { DataTable } from "../components/ui/DataTable";
 import { dateKey } from "../utils/sort";
 import { SortSelect, SortValue } from "../components/ui/SortSelect";
-import { PriorityTag, ResultTag } from "../components/ui/StatusTag";
+import { PriorityTag, ResultTag, SourceTag, StatusTag } from "../components/ui/StatusTag";
 import { SectionName, useSectionOrder } from "../components/ui/SectionOrder";
 import { DocumentDetail } from "../components/record/DocumentDetail";
 import {
@@ -53,6 +53,9 @@ function sortRecords<T>(
 
 const activeCount = (count: number, noun = "active") =>
   `Showing ${count} of ${count} ${noun}`;
+
+const documentStatusTone = (status: string) =>
+  status === "Received" ? "blue" as const : "green" as const;
 
 export default function Summary() {
   const openPanel = useDetailPanel();
@@ -299,7 +302,7 @@ export default function Summary() {
             <div>
               <strong>{item.event}</strong>
               <small>{item.date} · {item.setting}</small>
-              <span className="event-type-tag">{item.source}</span>
+              <SourceTag>{item.source}</SourceTag>
             </div>
           </ExpandableRow>
         ))}
@@ -331,10 +334,10 @@ export default function Summary() {
               ),
               sort: (d) => d.name,
             },
-            { header: "Type", cell: (d) => <span className="outline-tag">{d.type}</span>, sort: (d) => d.type },
+            { header: "Type", cell: (d) => <StatusTag tone="grey">{d.type}</StatusTag>, sort: (d) => d.type },
             { header: "Date", cell: (d) => d.date, sort: (d) => dateKey(d.date) },
-            { header: "Source", cell: (d) => <span className="source-tag">{d.source}</span>, sort: (d) => d.source },
-            { header: "Status", cell: (d) => d.status, sort: (d) => d.status },
+            { header: "Source", cell: (d) => <SourceTag>{d.source}</SourceTag>, sort: (d) => d.source },
+            { header: "Status", cell: (d) => <StatusTag tone={documentStatusTone(d.status)}>{d.status}</StatusTag>, sort: (d) => d.status },
           ]}
           defaultSort={{ header: "Date", direction: "descending" }}
         />

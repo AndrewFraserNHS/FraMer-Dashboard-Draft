@@ -2,13 +2,14 @@ import { useDetailPanel } from "../hooks/useDetailPanel";
 import { DataSection } from "../components/ui/DataSection";
 import { DataTable } from "../components/ui/DataTable";
 import { RecordPage } from "../components/ui/RecordPage";
-import { SourceTag } from "../components/ui/StatusTag";
+import { SourceTag, StatusTag } from "../components/ui/StatusTag";
 import { DocumentDetail } from "../components/record/DocumentDetail";
 import { ClinicalDocument, documents } from "../data/patient";
 import { dateKey } from "../utils/sort";
 
 export default function Documents() {
   const openPanel = useDetailPanel();
+  const statusTone = (status: string) => (status === "Received" ? "blue" as const : "green" as const);
 
   function view(document: ClinicalDocument) {
     openPanel({
@@ -29,10 +30,10 @@ export default function Documents() {
           viewLabel={(document) => `View ${document.name}`}
           columns={[
             { header: "Date", cell: (d) => d.date, sort: (d) => dateKey(d.date) },
-            { header: "Type", cell: (d) => d.type, sort: (d) => d.type },
+            { header: "Type", cell: (d) => <StatusTag tone="grey">{d.type}</StatusTag>, sort: (d) => d.type },
             { header: "Name", cell: (d) => <strong>{d.name}</strong>, sort: (d) => d.name },
             { header: "Source", cell: (d) => <SourceTag>{d.source}</SourceTag>, sort: (d) => d.source },
-            { header: "Status", cell: (d) => d.status, sort: (d) => d.status },
+            { header: "Status", cell: (d) => <StatusTag tone={statusTone(d.status)}>{d.status}</StatusTag>, sort: (d) => d.status },
             { header: "Confidentiality", cell: (d) => d.confidentiality, sort: (d) => d.confidentiality },
           ]}
           defaultSort={{ header: "Date", direction: "descending" }}

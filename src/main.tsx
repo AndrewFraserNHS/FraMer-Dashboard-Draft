@@ -9,6 +9,7 @@ import Comorbidities from "./pages/Comorbidities";
 import CarePlans from "./pages/CarePlans";
 import Documents from "./pages/Documents";
 import Audit from "./pages/Audit";
+import MaternityContentPatternLibrary from "./pages/MaternityContentPatternLibrary";
 import RecordShell from "./layouts/RecordShell";
 import FrailtySnapshot from "./pages/frailty/Snapshot";
 import FrailtyCga from "./pages/frailty/Cga";
@@ -74,6 +75,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/care-plans" element={<CarePlans />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/audit" element={<Audit />} />
+          <Route path="/maternity-content-pattern-library" element={<MaternityContentPatternLibrary />} />
           <Route path="/frailty" element={<FrailtyRoute element={<FrailtySnapshot />} />} />
           <Route path="/frailty/cga" element={<FrailtyRoute element={<FrailtyCga />} />} />
           <Route path="/frailty/care-plan" element={<FrailtyRoute element={<FrailtyCarePlan />} />} />

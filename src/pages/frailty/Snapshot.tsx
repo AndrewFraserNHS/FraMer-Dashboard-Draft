@@ -40,7 +40,13 @@ type TrendPeriod = "latest" | "6m" | "1y";
 function VitalHistory({ vital }: { vital: Vital }) {
   return (
     <>
-      <KeyFigure label={vital.label} value={vital.value} unit={vital.unit} size="large" note={`Updated ${vital.updated}`}>
+      <KeyFigure
+        label={vital.label}
+        value={vital.value}
+        unit={vital.unit}
+        size="large"
+        note={`Updated ${vital.updated}`}
+      >
         <Source of={vital.provenance} />
       </KeyFigure>
       <dl className="facts-grid">
@@ -58,6 +64,12 @@ function VitalHistory({ vital }: { vital: Vital }) {
         columns={[
           { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
           { header: "Reading", cell: (r) => <strong>{r.value}</strong> },
+          ...(vital.readings.some((r) => r.weight)
+            ? [{ header: "Weight", cell: (r) => <strong>{r.weight}</strong> }]
+            : []),
+          ...(vital.readings.some((r) => r.height)
+            ? [{ header: "Height", cell: (r) => <strong>{r.height}</strong> }]
+            : []),
           { header: "Recorded by", cell: (r) => r.by, sort: (r) => r.by },
           { header: "System", cell: (r) => r.system, sort: (r) => r.system },
         ]}

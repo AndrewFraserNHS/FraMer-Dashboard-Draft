@@ -18,13 +18,14 @@
 html,
 body,
 #root {
-  min-height: 100%;
+  height: 100%;
   margin: 0;
   font-family: 'Frutiger W01', Arial, sans-serif;
   font-size: 16px;
   color: #212b32;
   background: #f0f4f5;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
 }
 
 * {
@@ -451,8 +452,10 @@ button {
 
 .maternity-content {
   min-width: 0;
+  min-height: 0;
   flex: 1;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -1667,8 +1670,10 @@ button {
 }
 
 .source-tag {
-  color: #005eb8;
-  border-color: #0072ce;
+  color: #212b32;
+  border-color: #212b32;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .upcoming-list > button {
@@ -4788,6 +4793,28 @@ button.systems-grid__item:hover {
 .ncrs-patient__facts dd {
   margin: 0;
   font-variant-numeric: tabular-nums;
+}
+
+.ncrs-patient__fact-link {
+  border: 0;
+  padding: 0;
+  margin-left: 6px;
+  color: #005eb8;
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ncrs-patient__fact-link:hover {
+  color: #7c2855;
+}
+
+.ncrs-patient__fact-detail {
+  display: block;
+  margin-top: 4px;
+  color: #4c6272;
+  font-size: 0.9em;
 }
 
 .ncrs-patient__toggle,

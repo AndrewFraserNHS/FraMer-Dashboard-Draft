@@ -14,11 +14,18 @@ export type PatientSummary = {
   sex: string;
   dob: string;
   nhsNumber: string;
+  estimatedDueDate?: string;
+  gravida?: string;
+  gravidaDetail?: string;
+  parity?: string;
+  parityDetail?: string;
+  cSection?: string;
   address: string;
   gp: string;
   occupation?: string;
   nextOfKin: string;
   homeVisitFlags?: string;
+  communicationPreference?: string;
   /** When both are set and differ, the patient bar shows the cross-boundary notice */
   registeredIcb?: string;
   viewingIcb?: string;

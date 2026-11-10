@@ -6,7 +6,7 @@ import { DataTable } from "../components/ui/DataTable";
 import { DetailList } from "../components/ui/DetailList";
 import { Callout } from "../components/ui/Callout";
 import { RecordPage } from "../components/ui/RecordPage";
-import { SourceTag, StatusTag } from "../components/ui/StatusTag";
+import { SourceTag, StatusTag, TagTone } from "../components/ui/StatusTag";
 import { Subsection } from "../components/ui/Subsection";
 import { dateKey } from "../utils/sort";
 
@@ -65,15 +65,22 @@ const suggestedActions = [
 ];
 
 const socialFacts = [
-  { label: "Previous children's services involvement", value: "Unknown", tone: "yellow" as const },
+  { label: "Previous children's services involvement", value: "Unknown", tone: "orange" as const },
   { label: "Current children's services involvement", value: "No", tone: "green" as const },
-  { label: "Previous domestic violence", value: "Unknown", tone: "yellow" as const },
+  { label: "Previous domestic violence", value: "Unknown", tone: "orange" as const },
 ];
 
 const medicines = [
   { name: "Sertraline", dose: "50 mg", frequency: "Once daily", prescriber: "Dr Sarah Wilson (GP)", source: "GP record" },
   { name: "Prenatal Vitamins", dose: "Standard", frequency: "Once daily", prescriber: "Midwife", source: "BadgerNet" },
 ] as const;
+
+const mentalHealthRiskTone = (risk: string): TagTone => {
+  if (risk.includes("No immediate")) return "green";
+  if (risk.includes("Moderate")) return "orange";
+  if (risk.includes("Borderline")) return "yellow";
+  return "grey";
+};
 
 export default function Comorbidities() {
   return (
@@ -175,7 +182,7 @@ export default function Comorbidities() {
 
       <DataSection
         title="Mental health"
-        badge={<StatusTag tone="yellow">Screening due</StatusTag>}
+        badge={<StatusTag tone="orange">Screening due</StatusTag>}
         defaultOpen={false}
       >
         <Callout
@@ -224,7 +231,7 @@ export default function Comorbidities() {
               { header: "Score", cell: (r) => r.score },
               {
                 header: "Risk level",
-                cell: (r) => r.risk,
+                cell: (r) => <StatusTag tone={mentalHealthRiskTone(r.risk)}>{r.risk}</StatusTag>,
                 sort: (r) => r.risk,
               },
               {
@@ -323,7 +330,7 @@ export default function Comorbidities() {
                 key={action.title}
                 heading={action.title}
                 status={
-                  <StatusTag tone={action.priority === "High" ? "red" : "blue"}>{action.priority} priority</StatusTag>
+                  <StatusTag tone={action.priority === "High" ? "red" : "orange"}>{action.priority} priority</StatusTag>
                 }
                 meta={
                   <>

@@ -47,7 +47,7 @@ const diagnoses = [
 const referrals = [
   { service: "Diabetes Antenatal Clinic", reason: "Gestational diabetes mellitus confirmed — management plan", date: formatDate("2026-09-12"), status: "Referral reviewed", tone: "green" as const },
   { service: "Perinatal mental health", reason: "Wellbeing assessment and support plan", date: formatDate("2026-09-15"), status: "Referral reviewed", tone: "green" as const },
-  { service: "Dietitian", reason: "Weight management and gestational diabetes mellitus dietary advice", date: "", status: "Pending", tone: "yellow" as const },
+  { service: "Dietitian", reason: "Weight management and gestational diabetes mellitus dietary advice", date: "", status: "Pending", tone: "orange" as const },
 ] as const;
 
 const plan = [

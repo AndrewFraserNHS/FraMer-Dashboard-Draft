@@ -2,11 +2,15 @@ import { ProvenanceTag } from "../ui/ProvenanceTag";
 import { Provenance, sourceMeta } from "../../data/frailty";
 
 /** Source tag for a frailty data point. Opens to show the organisation, system, date and author. */
+function sourceDisplayLabel(of: Provenance) {
+  return of.by.replace(/\s*\([^)]*\)\s*$/, "").trim() || sourceMeta[of.source].label;
+}
+
 export function Source({ of }: { of: Provenance }) {
   const meta = sourceMeta[of.source];
   return (
     <ProvenanceTag
-      label={meta.label}
+      label={sourceDisplayLabel(of)}
       tone={meta.tone}
       details={[
         ["Organisation", of.org],

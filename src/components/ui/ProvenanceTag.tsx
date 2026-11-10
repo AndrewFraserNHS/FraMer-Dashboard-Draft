@@ -39,7 +39,7 @@ export function ProvenanceTag({ label, tone, details }: ProvenanceTagProps) {
       <button
         ref={trigger}
         type="button"
-        className={`provenance-tag nhsuk-tag nhsuk-tag--${tone}`}
+        className="provenance-tag nhsuk-tag nhsuk-tag--white"
         popoverTarget={panelId}
         aria-expanded={open}
         aria-controls={panelId}

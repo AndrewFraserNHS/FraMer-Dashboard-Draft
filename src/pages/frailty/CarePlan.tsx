@@ -190,9 +190,10 @@ export default function FrailtyCarePlan() {
 
   return (
     <RecordPage
-      title="Personalised care plan"
+      title="Care Plan"
       intro="Generated from the CGA. Each domain pairs the written plan with the actions that deliver it."
       systems={frailtyConnectedSystems}
+      showSystems={false}
     >
       <DataSection title="Care plan history and attachments" summary={`${planHistory.length} plans`}>
         <DataTable
@@ -209,13 +210,16 @@ export default function FrailtyCarePlan() {
               sort: (p) => p.title,
             },
             { header: "Status", cell: (p) => <StatusTag tone={planStatusTone[p.status]}>{p.status}</StatusTag>, sort: (p) => p.status },
-            { header: "Date", cell: (p) => p.date, sort: (p) => dateKey(p.date) },
+            { header: "Last updated", cell: (p) => p.date, sort: (p) => dateKey(p.date) },
             {
               header: "Attachments",
               cell: (p) => (
                 <ul className="plain-list">
                   {p.files.map((file) => (
-                    <li key={file}>{file}</li>
+                    <li key={file}>
+                      <span className="source-tag">Attachment</span>{" "}
+                      <a href="#" onClick={(event) => event.preventDefault()}>{file}</a>
+                    </li>
                   ))}
                 </ul>
               ),
@@ -223,7 +227,7 @@ export default function FrailtyCarePlan() {
           ]}
           rows={planHistory}
           rowKey={(p) => p.title}
-          defaultSort={{ header: "Date", direction: "descending" }}
+          defaultSort={{ header: "Last updated", direction: "descending" }}
         />
       </DataSection>
 

@@ -73,6 +73,7 @@ export default function FrailtySnapshot() {
   const [filter, setFilter] = useState<string>("all");
   const [period, setPeriod] = useState<TrendPeriod>("6m");
   const [vitalOpen, setVitalOpen] = useState<Vital | null>(null);
+  const [cfsOpen, setCfsOpen] = useState(false);
 
   const active = snapshotFilters.find((f) => f.value === filter) ?? snapshotFilters[0];
   const show = (panel: SnapshotPanel) => active.panels === null || (active.panels as readonly string[]).includes(panel);
@@ -86,6 +87,7 @@ export default function FrailtySnapshot() {
       title="Frailty snapshot"
       intro="Assembled from GP, community, acute, social care and urgent care records. Select a source tag to see where a fact came from."
       systems={frailtyConnectedSystems}
+      showSystems={false}
     >
       <DataSection title="Frailty overview">
         <div className="frailty-overview">
@@ -96,6 +98,7 @@ export default function FrailtySnapshot() {
             size="large"
             trend="up"
             note={`Up from ${frailtyScale.previous}. ${frailtyScale.label}.`}
+            onClick={() => setCfsOpen(true)}
           >
             <p className="key-figure__note">Last updated {frailtyScale.updated}</p>
             <Source of={frailtyScale.provenance} />
@@ -126,28 +129,8 @@ export default function FrailtySnapshot() {
       </Callout>
 
       <DataSection
-        title="Key clinical risk indicators"
-        summary={`${high.length} high · ${medium.length} moderate`}
-      >
-        <div className="frailty-risk-grid">
-          {[...high, ...medium].map((risk) => (
-            <Callout
-              key={risk.id}
-              tone={risk.level === "high" ? "red" : "amber"}
-              label={`${priorityLabel[risk.level]}: `}
-              title={`${risk.title}: ${risk.status}`}
-              source={provenanceLine(risk.provenance)}
-            >
-              {risk.detail && <p>{risk.detail}</p>}
-              {risk.explanation && <p>{risk.explanation}</p>}
-            </Callout>
-          ))}
-        </div>
-      </DataSection>
-
-      <DataSection
         title="Services involved"
-        summary={`${counts("Active")} active · ${counts("Referral pending")} referral pending · ${counts("Recently discharged")} recently discharged`}
+        summary={`${counts("Active care")} active · ${counts("Referral pending — awaiting further detail")} referral pending · ${counts("Recently discharged")} recently discharged`}
       >
         <DataTable
           caption="Services involved in this patient's care"
@@ -302,12 +285,12 @@ export default function FrailtySnapshot() {
       )}
 
       {show("timeline") && (
-        <DataSection title="Timeline of events" summary={`${timeline.length} events`}>
+        <DataSection title="Timeline of encounters" summary={`${timeline.length} encounters`}>
           <DataTable
-            caption="Timeline of events, most recent first"
+            caption="Timeline of encounters, most recent first"
             columns={[
               { header: "Date", cell: (e) => e.date, sort: (e) => dateKey(e.date) },
-              { header: "Event", cell: (e) => <strong>{e.title}</strong>, sort: (e) => e.title },
+              { header: "Encounter", cell: (e) => <strong>{e.title}</strong>, sort: (e) => e.title },
               { header: "Details", cell: (e) => e.description },
               { header: "Source", cell: (e) => <Source of={e.provenance} /> },
             ]}
@@ -345,6 +328,29 @@ export default function FrailtySnapshot() {
           />
         </DataSection>
       )}
+
+      <Dialog
+        open={cfsOpen}
+        title="Clinical Frailty Scale"
+        onClose={() => setCfsOpen(false)}
+        footer={
+          <Button variant="secondary" onClick={() => setCfsOpen(false)}>
+            Close
+          </Button>
+        }
+      >
+        <p>
+          The Clinical Frailty Scale is a nine-point summary of frailty, with higher scores indicating greater frailty and a need for more support.
+        </p>
+        <ul className="bullet-list">
+          <li><strong>6:</strong> Moderately frail — needs help with outdoor activities and keeping the house running.</li>
+          <li><strong>7:</strong> Severely frail — completely dependent for personal care.</li>
+          <li><strong>8:</strong> Very severely frail — completely dependent and nearing end of life.</li>
+        </ul>
+        <p>
+          <strong>Current score:</strong> {frailtyScale.score} ({frailtyScale.label})
+        </p>
+      </Dialog>
 
       <Dialog
         open={vitalOpen !== null}

@@ -45,7 +45,7 @@ const riskDetails: Record<string, any> = {
     eyebrow: "Clinical Risk Detail",
     rows: [
       ["BMI", "32 kg/m²"],
-      ["Priority", "Medium priority"],
+      ["Priority", "Moderate priority"],
       ["Classification", "Obese (class I)"],
       ["Date recorded", formatDate("2026-08-15")],
       ["Clinical detail", "BMI 32 requires monitoring and increased screening during pregnancy"],

@@ -13,10 +13,12 @@ export const frailtyPatient = {
   age: 80,
   sex: "Male",
   dob: "15 June 1945",
-  nhsNumber: "485 726 2193",
+  nhsNumber: "485 777 2910",
   address: "14 Elm Grove, Bromley, BR1 3PQ",
-  gp: "Dr Patel · Woodside Health Centre",
+  gp: "Dr Sarah Wilson · Central City Practice",
+  occupation: "Retired warehouse supervisor",
   nextOfKin: "Nick Bennett (son) · 07700 900 123",
+  homeVisitFlags: "Animals in home: 2 dogs. Behavioural concern: wary of strangers. Firearms: no known firearm access.",
 } as const;
 
 // ── Provenance ───────────────────────────────────────────────────────────────
@@ -71,7 +73,7 @@ export const frailtyScale = {
   score: 6,
   previous: 5,
   label: "Moderately frail",
-  updated: `${formatFrailtyDate("2026-02-06")}, 14:23`,
+  updated: `${formatFrailtyShortDate("2026-02-06")}, 14:23`,
   provenance: prov.mdt,
 } as const;
 
@@ -132,21 +134,21 @@ export const frailtyRisks: readonly FrailtyRisk[] = [
   },
 ];
 
-export type ServiceStatus = "Active" | "Referral pending" | "Recently discharged";
+export type ServiceStatus = "Active care" | "Referral pending — awaiting further detail" | "Recently discharged";
 
 export const services: readonly { name: string; status: ServiceStatus }[] = [
-  { name: "Primary care", status: "Active" },
-  { name: "Social care", status: "Active" },
-  { name: "Community nursing", status: "Active" },
-  { name: "Community frailty service", status: "Active" },
-  { name: "Community therapy (OT/PT)", status: "Referral pending" },
-  { name: "Falls service", status: "Referral pending" },
+  { name: "Primary care", status: "Active care" },
+  { name: "Social care", status: "Active care" },
+  { name: "Community nursing", status: "Active care" },
+  { name: "Community frailty service", status: "Active care" },
+  { name: "Community therapy (OT/PT)", status: "Referral pending — awaiting further detail" },
+  { name: "Falls service", status: "Referral pending — awaiting further detail" },
   { name: "Mental health services", status: "Recently discharged" },
 ];
 
 export const serviceTone: Record<ServiceStatus, "green" | "orange" | "grey"> = {
-  Active: "green",
-  "Referral pending": "orange",
+  "Active care": "green",
+  "Referral pending — awaiting further detail": "orange",
   "Recently discharged": "grey",
 };
 
@@ -169,7 +171,7 @@ export type Vital = {
 export const vitals: readonly Vital[] = [
   {
     key: "bp", label: "Blood pressure", value: "148/90", unit: "mmHg", trend: "up", trendNote: "Trending up over 6 months",
-    updated: formatFrailtyDate("2026-01-22"), provenance: prov.districtNurse(),
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.districtNurse(),
     summary6m: "Systolic risen by about 12 mmHg over 6 months", summary1y: "Sustained upward trend over the past year",
     readings: [
       { date: formatFrailtyShortDate("2026-01-22"), value: "148/90 mmHg", by: "District nurse", system: "EMIS Community" },
@@ -182,8 +184,28 @@ export const vitals: readonly Vital[] = [
     ],
   },
   {
+    key: "postural-bp", label: "Postural blood pressure", value: "116/72", unit: "mmHg", trend: "down", trendNote: "Orthostatic drop when standing from 136/82",
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.districtNurse(),
+    summary6m: "Orthostatic drop recorded when standing", summary1y: "Postural hypotension risk persists and is being monitored",
+    readings: [
+      { date: formatFrailtyShortDate("2026-01-22"), value: "116/72 mmHg", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2025-12-15"), value: "120/74 mmHg", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-11-15"), value: "128/78 mmHg", by: "GP", system: "EMIS GP" },
+    ],
+  },
+  {
+    key: "ecg-bp", label: "ECG blood pressure", value: "132/80", unit: "mmHg", trend: "up", trendNote: "Mildly elevated compared with previous ECG readings",
+    updated: formatFrailtyShortDate("2026-01-15"), provenance: prov.acute(),
+    summary6m: "Slightly elevated compared with earlier ECG readings", summary1y: "ECG trend remains slightly above baseline",
+    readings: [
+      { date: formatFrailtyShortDate("2026-01-15"), value: "132/80 mmHg", by: "Cardiology nurse", system: "Oracle Health" },
+      { date: formatFrailtyShortDate("2025-09-21"), value: "127/76 mmHg", by: "Cardiology team", system: "Oracle Health" },
+      { date: formatFrailtyShortDate("2025-05-10"), value: "124/74 mmHg", by: "Cardiology team", system: "Oracle Health" },
+    ],
+  },
+  {
     key: "pulse", label: "Pulse", value: "62", unit: "bpm", trend: "stable", trendNote: "Stable, 60 to 68 bpm range",
-    updated: formatFrailtyDate("2026-01-22"), provenance: prov.districtNurse(),
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.districtNurse(),
     summary6m: "Pulse stable, 60 to 68 bpm range", summary1y: "No significant change over 1 year",
     readings: [
       { date: formatFrailtyShortDate("2026-01-22"), value: "62 bpm", by: "District nurse", system: "EMIS Community" },
@@ -196,7 +218,7 @@ export const vitals: readonly Vital[] = [
   },
   {
     key: "weight", label: "Weight", value: "54", unit: "kg", trend: "down", trendNote: "Lost about 3 kg over 6 months",
-    updated: formatFrailtyDate("2026-01-22"), provenance: prov.gpNurse,
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.gpNurse,
     summary6m: "Lost about 3 kg over 6 months", summary1y: "Progressive weight loss over the past year",
     readings: [
       { date: formatFrailtyShortDate("2026-01-22"), value: "54 kg", by: "District nurse", system: "EMIS Community" },
@@ -207,8 +229,28 @@ export const vitals: readonly Vital[] = [
     ],
   },
   {
+    key: "bmi", label: "BMI", value: "24.7", unit: "kg/m²", trend: "stable", trendNote: "Stable and within healthy range",
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.gpNurse,
+    summary6m: "BMI stable and in the healthy range", summary1y: "No significant change in BMI over the past year",
+    readings: [
+      { date: formatFrailtyShortDate("2026-01-22"), value: "24.7 kg/m²", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-12-01"), value: "25.1 kg/m²", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-10-01"), value: "25.4 kg/m²", by: "GP", system: "EMIS GP" },
+    ],
+  },
+  {
+    key: "skin-integrity", label: "Skin integrity", value: "Grade 1", unit: "pressure damage", trend: "down", trendNote: "Skin remains intact with no new breakdown",
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.districtNurse(),
+    summary6m: "No new pressure damage or skin breakdown", summary1y: "Skin integrity has remained stable over the last year",
+    readings: [
+      { date: formatFrailtyShortDate("2026-01-22"), value: "Grade 1 pressure damage", by: "District nurse", system: "EMIS Community" },
+      { date: formatFrailtyShortDate("2025-12-15"), value: "Grade 1 pressure damage", by: "Practice nurse", system: "EMIS GP" },
+      { date: formatFrailtyShortDate("2025-10-01"), value: "Intact skin", by: "District nurse", system: "EMIS Community" },
+    ],
+  },
+  {
     key: "glucose", label: "Blood glucose", value: "7.2", unit: "mmol/L", trend: "up", trendNote: "Risen from about 6.4 to 7.2 mmol/L",
-    updated: formatFrailtyDate("2026-01-22"), provenance: prov.gpNurse,
+    updated: formatFrailtyShortDate("2026-01-22"), provenance: prov.gpNurse,
     summary6m: "Glucose risen from about 6.4 to 7.2 mmol/L", summary1y: "Upward trend, approaching the diabetic threshold",
     readings: [
       { date: formatFrailtyShortDate("2026-01-22"), value: "7.2 mmol/L", by: "Practice nurse", system: "EMIS GP" },
@@ -240,10 +282,10 @@ export type FrailtyMedicine = {
 };
 
 export const frailtyMedicines: readonly FrailtyMedicine[] = [
-  { name: "Amlodipine 5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyDate("2025-12-10"), provenance: prov.gpPharmacist },
-  { name: "Atorvastatin 20mg", status: "Optimised", frequency: "Once daily at night", reviewed: formatFrailtyDate("2025-12-10"), provenance: prov.gpPatel() },
+  { name: "Amlodipine 5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyShortDate("2025-12-10"), provenance: prov.gpPharmacist },
+  { name: "Atorvastatin 20mg", status: "Optimised", frequency: "Once daily at night", reviewed: formatFrailtyShortDate("2025-12-10"), provenance: prov.gpPatel() },
   { name: "Aspirin 75mg", status: "Review needed", frequency: "Once daily", provenance: prov.gpPatel() },
-  { name: "Ramipril 2.5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyDate("2025-12-10"), provenance: prov.gpPatel() },
+  { name: "Ramipril 2.5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyShortDate("2025-12-10"), provenance: prov.gpPatel() },
   { name: "Bisoprolol 2.5mg", status: "Review needed", frequency: "Once daily", provenance: prov.acute() },
 ];
 
@@ -272,15 +314,15 @@ export type FrailtyAppointment = {
 
 export const frailtyAppointments: readonly FrailtyAppointment[] = [
   {
-    title: "OT home assessment", service: "OT / Community therapy", date: formatFrailtyDate("2026-02-20"), time: "10:30", location: "Patient's home",
+    title: "OT home assessment", service: "OT / Community therapy", date: formatFrailtyShortDate("2026-02-20"), time: "10:30", location: "Patient's home",
     description: "Home assessment for equipment review and environmental hazard reduction following recurrent falls.",
-    booked: `Booked ${formatFrailtyDate("2026-02-06")} by Sarah Linton (OT co-ordinator)`,
+    booked: `Booked ${formatFrailtyShortDate("2026-02-06")} by Sarah Linton (OT co-ordinator)`,
     provenance: { ...prov.physio, pulled: "1 day ago", by: "Sarah Linton (OT co-ordinator)" },
   },
   {
-    title: "Frailty MDT review", service: "Frailty team", date: formatFrailtyDate("2026-03-05"), time: "14:00", location: "Virtual (MS Teams)",
+    title: "Frailty MDT review", service: "Frailty team", date: formatFrailtyShortDate("2026-03-05"), time: "14:00", location: "Virtual (MS Teams)",
     description: "Follow-up multi-disciplinary review to reassess CFS score, medication optimisation and the falls prevention plan.",
-    booked: `Booked ${formatFrailtyDate("2026-02-07")} by Laura Chen (Frailty co-ordinator)`,
+    booked: `Booked ${formatFrailtyShortDate("2026-02-07")} by Laura Chen (Frailty co-ordinator)`,
     provenance: { ...prov.mdt, pulled: "1 day ago", by: "Laura Chen (Frailty co-ordinator)" },
   },
 ];
@@ -316,7 +358,7 @@ export const cfsOptions = [
 
 export const mustOptions = [
   { value: "0", label: "0: Low risk" },
-  { value: "1", label: "1: Medium risk" },
+  { value: "1", label: "1: Moderate risk" },
   { value: "2", label: "2 or more: High risk" },
 ] as const;
 
@@ -588,7 +630,7 @@ export const carePlanDomains: readonly CarePlanDomain[] = [
 ];
 
 export const riskTone: Record<Priority, "red" | "orange" | "green"> = { high: "red", medium: "orange", low: "green" };
-export const riskLabel: Record<Priority, string> = { high: "High risk", medium: "Medium risk", low: "Low risk" };
+export const riskLabel: Record<Priority, string> = { high: "High risk", medium: "Moderate risk", low: "Low risk" };
 
 export const ownerOptions = ["GP", "GP / pharmacist", "District nurse", "Community OT", "Community physio", "Social worker", "Frailty co-ordinator"] as const;
 export const serviceOptions = ["Primary care", "Community nursing", "Community OT", "Community physio", "Adult social care", "Frailty team", "Voluntary sector"] as const;
@@ -603,10 +645,10 @@ export type PlanVersion = {
 };
 
 export const planHistory: readonly PlanVersion[] = [
-  { title: "Personalised care plan (current)", status: "Active", date: formatFrailtyDate("2026-02-06"), description: "Auto-generated from CGA. Pending MDT sign-off.", files: ["CGA_Summary_060226.pdf", "Frailty_Snapshot_060226.pdf"] },
-  { title: "Falls prevention plan", status: "Completed", date: formatFrailtyDate("2025-12-12"), description: "", files: ["Physio_Report_121225.pdf"] },
-  { title: "Social care support plan", status: "Superseded", date: formatFrailtyDate("2025-10-03"), description: "Care package increased to 3 visits a day; carer review requested.", files: ["Social_Care_Review_031025.pdf", "Carer_Assessment_031025.pdf"] },
-  { title: "Mental health support plan", status: "Discharged", date: formatFrailtyDate("2025-12-15"), description: "CMHT involvement ended; advice and self-management plan.", files: ["CMHT_Discharge_151225.pdf"] },
+  { title: `Care plan (${formatFrailtyShortDate("2026-02-06")})`, status: "Active", date: `Last updated ${formatFrailtyShortDate("2026-02-06")}`, description: "Auto-generated from CGA. Pending MDT sign-off.", files: ["CGA_Summary_060226.pdf", "Frailty_Snapshot_060226.pdf"] },
+  { title: `Falls prevention plan (${formatFrailtyShortDate("2025-12-12")})`, status: "Completed", date: `Last updated ${formatFrailtyShortDate("2025-12-12")}`, description: "", files: ["Physio_Report_121225.pdf"] },
+  { title: `Social care support plan (${formatFrailtyShortDate("2025-10-03")})`, status: "Superseded", date: `Last updated ${formatFrailtyShortDate("2025-10-03")}`, description: "Care package increased to 3 visits a day; carer review requested.", files: ["Social_Care_Review_031025.pdf", "Carer_Assessment_031025.pdf"] },
+  { title: `Mental health support plan (${formatFrailtyShortDate("2025-12-15")})`, status: "Discharged", date: `Last updated ${formatFrailtyShortDate("2025-12-15")}`, description: "CMHT involvement ended; advice and self-management plan.", files: ["CMHT_Discharge_151225.pdf"] },
 ];
 
 export const planStatusTone: Record<PlanVersion["status"], "green" | "grey"> = {

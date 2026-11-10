@@ -34,7 +34,7 @@ const contacts = [
 ] as const;
 
 const mentalHealthHistory = [
-  { item: "Anxiety history", detail: "Previous anxiety leading to panic attacks — recorded in GP/Rio", source: "GP and Rio (connected system)" },
+  { item: "Anxiety history", detail: "Previous anxiety leading to panic attacks — recorded in GP/Rio", source: "GP and Rio" },
   { item: "CMHT involvement", detail: "No current CMHT involvement recorded", source: "Connected record" },
   { item: "Current psychiatric medications", detail: "No current psychiatric medications recorded", source: "Connected record" },
   { item: "To confirm", detail: "Has the patient been prescribed anxiolytics or antidepressants previously?", source: "" },
@@ -60,8 +60,8 @@ const safetyPlanActions = [
 
 const suggestedActions = [
   { title: "Complete private wellbeing discussion with interpreter (incl. safety questions)", category: "Booking", priority: "High" as const },
-  { title: "Confirm Sertraline plan in pregnancy and document shared decision", category: "Medication", priority: "Medium" as const, link: { to: "/care-plans", label: "View care plans" } },
-  { title: "Book a follow-up mental health check-in with the routine appointment", category: "Follow-up", priority: "Medium" as const, link: { to: "/appointments", label: "View in Appointments" } },
+  { title: "Confirm Sertraline plan in pregnancy and document shared decision", category: "Medication", priority: "Moderate" as const, link: { to: "/care-plans", label: "View care plans" } },
+  { title: "Book a follow-up mental health check-in with the routine appointment", category: "Follow-up", priority: "Moderate" as const, link: { to: "/appointments", label: "View in Appointments" } },
 ];
 
 const socialFacts = [

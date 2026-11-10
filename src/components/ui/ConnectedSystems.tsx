@@ -12,7 +12,7 @@ export type ConnectedSystem = {
 };
 
 const statusDisplay: Record<SystemStatus, { label: string; tone: TagTone }> = {
-  primary: { label: "Primary record system", tone: "blue" },
+  primary: { label: "Primary Record", tone: "blue" },
   connected: { label: "Connected", tone: "green" },
   partial: { label: "Partially connected", tone: "yellow" },
   offline: { label: "Not connected", tone: "grey" },

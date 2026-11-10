@@ -35,7 +35,7 @@ export const risks: readonly Risk[] = [
 
 export const priorityLabel: Record<Priority, string> = {
   high: "High priority",
-  medium: "Medium priority",
+  medium: "Moderate priority",
   low: "Low priority",
 };
 

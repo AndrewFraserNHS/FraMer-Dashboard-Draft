@@ -21,9 +21,10 @@ export default function FrailtyCga() {
 
   return (
     <RecordPage
-      title="Comprehensive Geriatric Assessment (CGA)"
+      title="Comprehensive Geriatric Assessment"
       intro="Review and confirm pre-populated data, complete the assessment domains and record new findings."
       systems={frailtyConnectedSystems}
+      showSystems={false}
     >
       <p className="cga-progress" role="status">
         {totalReviewed} of {totalFields} items reviewed

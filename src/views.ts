@@ -16,7 +16,9 @@ export type PatientSummary = {
   nhsNumber: string;
   address: string;
   gp: string;
+  occupation?: string;
   nextOfKin: string;
+  homeVisitFlags?: string;
   /** When both are set and differ, the patient bar shows the cross-boundary notice */
   registeredIcb?: string;
   viewingIcb?: string;
@@ -69,8 +71,8 @@ export const recordViews: Record<ViewKey, RecordViewConfig> = {
     canReorder: false,
     tabs: [
       ["Frailty snapshot", "/frailty"],
-      ["CGA", "/frailty/cga"],
-      ["Care plan", "/frailty/care-plan"],
+      ["Comprehensive Geriatric Assessment", "/frailty/cga"],
+      ["Care Plan", "/frailty/care-plan"],
     ],
   },
 };

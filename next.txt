@@ -1,9 +1,26 @@
-1. Move dates to be dynamic from 2 weeks ago, so the app doesn't slowly age
-2. Content in Imaging card, resulting requiring attention, tables like “full blood count” 
-3. Reorder sections modal should be centralized and not off to the left, the iconography should also come from 
-4. Locate any other items we are hand-cranking styles/components for and validate they are in the components folder like they would in an external component library. 
-5. Cards like "Gestational diabetes
-Diagnosed 5 September 2026 · Lab results" have a fake component with a right arrow that doesn't showcase when it opens, we're going to make a variation of the expander component, replace the right arrow with the plus icon which changes to minus icon when open. Note this is different for cards that open the "modal" instead of the dropdown.
-6. Top header needs to move to the side nav on mobile sized view with an open and close functionality. The only thing that would remain at top would be NHS blue and patient name rows ( but text size should be adjusted). Main culprit is "Record view: maternity" button 
-7. Colour on "Medium priority:High body mass index (32)" looks to be brown now instead of the warning yellow?
-8. Title National Core Record Service can shorten to NCRS on Mobile
+1. Some tags like "Primary Record system" are a little too long on one line and likely need to rename to "Primary Record"
+2. Some tags aren't valid like "GP and Rio (connected system)" should be nhsuk-tag--white or nhsuk-tag--blue
+3. Copy NHS number button, needs the copy icon next to it to copy to clipboard
+2. Safety flags may need to rename to “Key clinical risk indicators”
+3. Remove key clinical risk indicator section
+4. Moderate vs Medium needs aligning, Medium needs to change to Moderate.
+5. Certain components have a "last updated last week" etc, this would need to move to on a source system basis.
+8. Default to medium size text
+10. Clinician name should be used instead of "GP" "Social" "Community" for Source in frailty overview and other areas, lose the background colour but give black border, e.g. nhsuk-tag--white
+11. Card for "Clinical Frailty Score", should be clickable with inline modal shown to give more detail as to what the scale entails
+12. Referral pending, further detail - Pending further detail referral page
+13. Falls in the last 3 months card to make it easier to view those statistics
+14. Modals still exist for blood pressure: history
+15. Postural vs ECG on blood pressure results + BMI + skin integrity/pressure damage, with weight, in vitals section.
+16. Source link on timeline, make date column wide enough to line break just before year
+17. Encounter instead of event on timeline
+18. CGA spike out to be a question page https://service-manual.nhs.uk/design-system/patterns/question-pages
+19. Attachments in care pan need to be clearly labelled as link and attachment name
+20. Status tag needs to be more descriptive
+21. Date on Care plan should be short month, also be more specific with what the date is “Last updated”
+22. Care plan title scale should be date.
+23. Remove connected systems section
+24. Rename from “Personalised care plan” to “Care Plan”
+25. Below next of kin needs “Occupation” in patient details, notional gp number shown after gp name. New row needed for "Home visit flags" to call out concerns about animals, behaviours or firearms.
+26. Rename CGA to Comprehensive Geriatric Assessment in tab but acronym on mobile drop Assessment on to new line.
+27. Block access to the page by password "@lpha"

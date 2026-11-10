@@ -16,16 +16,19 @@ type KeyFigureProps = {
   note?: string;
   /** Extra content under the figure: a source tag, an action, an updated date */
   children?: ReactNode;
+  onClick?: () => void;
 };
 
 /**
  * One measurement or score, shown big. The trend is an icon plus words, so direction
  * never depends on colour. Used for vitals and for the Clinical Frailty Scale.
  */
-export function KeyFigure({ label, value, unit, size = "default", trend, note, children }: KeyFigureProps) {
+export function KeyFigure({ label, value, unit, size = "default", trend, note, children, onClick }: KeyFigureProps) {
   const Icon = trend ? trendIcon[trend] : null;
-  return (
-    <div className={`key-figure key-figure--${size}`}>
+  const className = `key-figure key-figure--${size}${onClick ? " key-figure--clickable" : ""}`;
+
+  const content = (
+    <>
       <p className="key-figure__label">{label}</p>
       <p className="key-figure__value">
         {value}
@@ -41,6 +44,16 @@ export function KeyFigure({ label, value, unit, size = "default", trend, note, c
       )}
       {!trend && note && <p className="key-figure__note">{note}</p>}
       {children && <div className="key-figure__footer">{children}</div>}
-    </div>
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button type="button" className={className} onClick={onClick} aria-label={`Open details for ${label}`}>
+        {content}
+      </button>
+    );
+  }
+
+  return <div className={className}>{content}</div>;
 }

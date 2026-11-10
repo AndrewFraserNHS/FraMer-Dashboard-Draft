@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Copy, Check } from "lucide-react";
 import type { PatientSummary } from "../../views";
 import { DetailList } from "../ui/DetailList";
 import { StatusTag } from "../ui/StatusTag";
@@ -15,7 +15,9 @@ export function PatientDetails({ patient }: { patient: PatientSummary }) {
         rows={[
           ["Address", patient.address],
           ["Registered GP", patient.gp],
+          ["Occupation", patient.occupation ?? "Not recorded"],
           ["Next of kin", patient.nextOfKin],
+          ["Home visit flags", patient.homeVisitFlags ?? "No home visit concerns recorded"],
         ]}
       />
       {isCrossBoundary(patient) && (
@@ -42,7 +44,18 @@ type PatientBarProps = {
  */
 export function PatientBar({ patient, viewMenu, compact = false }: PatientBarProps) {
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const id = useId();
+
+  const copyNhsNumber = async () => {
+    try {
+      await navigator.clipboard.writeText(patient.nhsNumber.replace(/\s+/g, ""));
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <section className={`ncrs-patient${compact ? " ncrs-patient--compact" : ""}`} aria-label="Patient identity">
@@ -51,7 +64,23 @@ export function PatientBar({ patient, viewMenu, compact = false }: PatientBarPro
         <dl className="ncrs-patient__facts">
           <div><dt className="nhs-visually-hidden">Age and sex</dt><dd>{patient.age} years · {patient.sex}</dd></div>
           <div><dt>Date of birth</dt><dd><strong>{patient.dob}</strong></dd></div>
-          <div><dt>NHS number</dt><dd><strong>{patient.nhsNumber}</strong></dd></div>
+          <div>
+            <dt>NHS number</dt>
+            <dd>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <strong>{patient.nhsNumber}</strong>
+                <button
+                  type="button"
+                  className="ncrs-patient__copy"
+                  onClick={copyNhsNumber}
+                  aria-label={copied ? "NHS number copied to clipboard" : "Copy NHS number to clipboard"}
+                  title="Copy NHS number"
+                >
+                  {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+                </button>
+              </span>
+            </dd>
+          </div>
         </dl>
         {!compact && viewMenu}
         {!compact && isCrossBoundary(patient) && <StatusTag tone="blue">Cross-boundary</StatusTag>}

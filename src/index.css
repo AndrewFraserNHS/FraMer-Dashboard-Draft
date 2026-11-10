@@ -21,6 +21,7 @@ body,
   min-height: 100%;
   margin: 0;
   font-family: 'Frutiger W01', Arial, sans-serif;
+  font-size: 16px;
   color: #212b32;
   background: #f0f4f5;
   -webkit-font-smoothing: antialiased;
@@ -1647,6 +1648,13 @@ button {
 
 .documents-table td:first-child {
   min-width: 180px;
+}
+
+.data-table th:first-child,
+.data-table td:first-child {
+  min-width: 150px;
+  width: 180px;
+  white-space: normal;
 }
 
 .outline-tag,
@@ -4808,6 +4816,27 @@ button.systems-grid__item:hover {
   text-underline-offset: 3px;
 }
 
+.ncrs-patient__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #005eb8;
+  cursor: pointer;
+}
+
+.ncrs-patient__copy:hover,
+.ncrs-patient__copy:focus-visible {
+  background: #f0f4f5;
+  outline: 2px solid #005eb8;
+  outline-offset: 2px;
+}
+
 .ncrs-patient__toggle:hover {
   color: #7c2855;
   text-decoration: none;
@@ -4954,6 +4983,7 @@ button.systems-grid__item:hover {
   border-bottom: 4px solid transparent;
   color: #005eb8;
   text-decoration: none;
+  word-break: break-word;
 }
 
 .ncrs-tabs a:hover {
@@ -5293,7 +5323,9 @@ button.systems-grid__item:hover {
 /* Source tag you can open (native popover, so it is never clipped by a scrolling table) */
 .provenance-tag {
   cursor: pointer;
-  border: 0;
+  border: 2px solid var(--nhs-colour-black);
+  background: var(--nhs-colour-white);
+  color: var(--nhs-colour-black);
   font: inherit;
   font-size: 12px;
   line-height: 1.4;
@@ -5339,6 +5371,16 @@ button.systems-grid__item:hover {
   border-left: 4px solid var(--nhs-colour-blue);
   min-width: 0;
 }
+.key-figure--clickable {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+.key-figure--clickable:hover {
+  border-color: var(--nhs-colour-dark-blue);
+  box-shadow: 0 0 0 3px rgba(0, 94, 184, 0.08);
+}
 .key-figure p { margin: 0; }
 .key-figure__label { font-size: 14px; font-weight: 700; color: var(--nhs-colour-dark-grey); }
 .key-figure__value { font-size: 28px; font-weight: 700; line-height: 1.1; color: var(--nhs-colour-black); }
@@ -5362,7 +5404,16 @@ button.systems-grid__item:hover {
 .frailty-overview__text p { margin: 0 0 10px; font-size: 16px; }
 .frailty-overview__text .subsection__title { margin: 0 0 8px; }
 .frailty-risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 12px; }
-.frailty-vitals { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px; }
+.frailty-vitals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.frailty-vitals .key-figure { display: flex; flex-direction: column; height: 100%; }
+.frailty-vitals .key-figure__footer {
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.frailty-vitals .key-figure__footer > :first-child { min-width: 0; }
+.frailty-vitals .key-figure__footer .link-button { flex: none; }
 .frailty-filter { display: grid; gap: 4px; }
 .cell-note { display: block; color: var(--nhs-colour-dark-grey); font-size: 14px; margin-top: 2px; font-weight: 400; }
 .plain-list { list-style: none; margin: 0; padding: 0; font-size: 14px; display: grid; gap: 2px; }
@@ -5479,7 +5530,7 @@ button.systems-grid__item:hover {
   justify-content: center;
   margin-left: auto;
   border-radius: 50%;
-  color: var(--nhs-colour-white);
+  color: var(--nhs-colour-white)!important;
   background: var(--nhs-colour-blue);
 }
 
@@ -5629,4 +5680,14 @@ button.systems-grid__item:hover {
 @media (max-width: 767px) {
   .ncrs-patient--compact .ncrs-patient__row { flex-direction: column; align-items: flex-start; }
   .ncrs-patient--compact .ncrs-patient__facts { flex: none; }
+
+  .frailty-vitals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .ncrs-tabs a {
+    min-height: 44px;
+    padding: 8px 10px 6px;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+  }
 }

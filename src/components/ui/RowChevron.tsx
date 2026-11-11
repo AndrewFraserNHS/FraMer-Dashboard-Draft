@@ -1,5 +1,5 @@
 /**
- * Decorative chevron for a row that navigates to, or opens a modal for, more detail.
+ * Decorative chevron for a row that navigates to, or opens an inline panel for, more detail.
  * Rows that expand in place use ExpandableRow's plus and minus instead, so the two behaviours look different.
  * Hidden from assistive technology: the row's own name and role say what it does.
  */

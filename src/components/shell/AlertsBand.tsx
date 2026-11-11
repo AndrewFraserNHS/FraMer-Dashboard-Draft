@@ -21,7 +21,8 @@ export function AlertsBand({ flags }: { flags: readonly AlertFlag[] }) {
   const [open, setOpen] = useState(true);
   const id = useId();
   const high = flags.filter((flag) => flag.level === "high");
-  const hidden = flags.length - high.length;
+  const medium = flags.filter((flag) => flag.level === "medium").length;
+  const low = flags.filter((flag) => flag.level === "low").length;
 
   const toggle = () => setOpen((value) => !value);
 
@@ -52,7 +53,14 @@ export function AlertsBand({ flags }: { flags: readonly AlertFlag[] }) {
                 </button>
               </li>
             ))}
-            {hidden > 0 && <li className="ncrs-alerts__more">+ {hidden} more {hidden === 1 ? "flag" : "flags"} hidden</li>}
+            {(medium > 0 || low > 0) && (
+              <li className="ncrs-alerts__more">
+                {medium > 0 && `${medium} medium risk${medium === 1 ? "" : "s"}`}
+                {medium > 0 && low > 0 && ", "}
+                {low > 0 && `${low} low risk${low === 1 ? "" : "s"}`}
+                {" hidden"}
+              </li>
+            )}
           </ul>
         )}
       </div>

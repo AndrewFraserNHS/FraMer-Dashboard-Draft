@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useId, useRef, useState } from "react";
+import { ReactNode, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 
 export type MenuItem = {
@@ -29,28 +29,8 @@ type MenuButtonProps = {
  */
 export function MenuButton({ label, items, className = "" }: MenuButtonProps) {
   const [open, setOpen] = useState(false);
-  const root = useRef<HTMLDivElement | null>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const id = useId();
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        trigger.current?.focus();
-      }
-    };
-    window.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open]);
 
   function moveFocus(event: React.KeyboardEvent<HTMLUListElement>) {
     if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
@@ -64,7 +44,7 @@ export function MenuButton({ label, items, className = "" }: MenuButtonProps) {
   }
 
   return (
-    <div className={`ncrs-menu ${className}`} ref={root}>
+    <div className={`ncrs-menu ${className}`}>
       <button
         ref={trigger}
         type="button"
@@ -86,6 +66,7 @@ export function MenuButton({ label, items, className = "" }: MenuButtonProps) {
               onClick={() => {
                 if (item.disabled) return;
                 setOpen(false);
+                trigger.current?.focus();
                 item.onSelect();
               }}
             >

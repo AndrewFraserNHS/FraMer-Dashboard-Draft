@@ -1,5 +1,4 @@
 import type { ProgressSection } from "../../../components/ui/AssessmentProgress";
-import type { PromptStatus } from "../../../components/ui/ReviewField";
 import { cgaDomains, type CgaDomain, type CgaField } from "../../../data/frailty";
 
 export const CGA_BASE = "/frailty/cga/v2";
@@ -9,8 +8,9 @@ export const donePath = `${CGA_BASE}/done`;
 
 export type Step = {
   id: string;
-  kind: "suggestions" | "field";
+  kind: "prompt" | "field";
   domain: CgaDomain;
+  prompt?: { id: string; text: string };
   field?: CgaField;
   /** From 1, across the whole assessment */
   number: number;
@@ -20,7 +20,7 @@ export type Step = {
 };
 
 /** What the clinician said about a pre-filled item */
-export type Review = "confirmed" | "changed" | "rejected";
+export type Review = "confirmed" | "changed";
 
 export type Answer = {
   /** Finished: answered, or deliberately skipped */
@@ -31,21 +31,22 @@ export type Answer = {
   choice?: string;
 };
 export type Answers = Record<string, Answer>;
-export type Prompts = Record<string, PromptStatus>;
 
-/** The assessment as a flat list of pages: for each section, its suggestions (if any), then one page per question. */
+/** The assessment as a flat list of pages: one page per suggestion and one page per question. */
 export const steps: readonly Step[] = (() => {
   const list: Step[] = [];
   let number = 0;
   for (const domain of cgaDomains) {
-    const sectionTotal = domain.fields.length + (domain.prompts ? 1 : 0);
+    const sectionTotal = domain.fields.length + (domain.prompts?.length ?? 0);
     let inSection = 0;
-    const add = (partial: Pick<Step, "id" | "kind" | "field">) => {
+    const add = (partial: Pick<Step, "id" | "kind" | "field" | "prompt">) => {
       number += 1;
       inSection += 1;
       list.push({ ...partial, domain, number, inSection, sectionTotal });
     };
-    if (domain.prompts) add({ id: `${domain.id}-suggestions`, kind: "suggestions" });
+    for (const prompt of domain.prompts ?? []) {
+      add({ id: prompt.id, kind: "prompt", prompt });
+    }
     for (const field of domain.fields) add({ id: field.id, kind: "field", field });
   }
   return list;

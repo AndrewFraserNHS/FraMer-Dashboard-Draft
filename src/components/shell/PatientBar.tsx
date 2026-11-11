@@ -35,7 +35,7 @@ type PatientBarProps = {
   patient: PatientSummary;
   /** Record view control, shown beside the facts on wide screens */
   viewMenu?: React.ReactNode;
-  /** Narrow screens: identity only. The view control and patient details live in the menu drawer. */
+  /** Narrow screens: identity only. The view control and patient details live in the expanded mobile menu. */
   compact?: boolean;
 };
 

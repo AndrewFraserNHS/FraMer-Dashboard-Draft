@@ -35,10 +35,7 @@ export function DetailPanel({
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Let an open modal dialog handle its own Escape
-      if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
-        onCloseRef.current();
-      }
+      if (event.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);

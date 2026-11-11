@@ -75,7 +75,7 @@ export function QuestionPage({
           </div>
         </form>
         {saveLaterTo && (
-          <p>
+          <p className="question-page__save-later">
             <Link to={saveLaterTo}>Save and finish later</Link>
           </p>
         )}

@@ -238,7 +238,7 @@ export default function Patterns() {
               <h3>How accessibility is handled across the library</h3>
               <ul className="pl-checks">
                 <li>
-                  Native elements first: button, dialog, select, dl, table. The
+                  Native elements first: button, select, dl, table. The
                   browser supplies keyboard, focus and screen reader behaviour.
                 </li>
                 <li>
@@ -251,15 +251,15 @@ export default function Patterns() {
                 </li>
                 <li>
                   Anything that hides or removes content is reversible, and
-                  focus moves to where the user needs it next.
+                  focus moves to its heading or back to the control that opened it.
                 </li>
                 <li>
                   No hover-only content. The yellow NHS focus style is kept on
                   every control.
                 </li>
                 <li>
-                  Dragging has a button alternative. Overlays use the native
-                  dialog or popover, so Escape and focus return work.
+                  Reordering has a button alternative. Related content expands
+                  in the page flow; source details have a disclosure fallback.
                 </li>
               </ul>
             </section>

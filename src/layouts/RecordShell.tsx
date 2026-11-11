@@ -2,11 +2,10 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { BreadcrumbProvider, BreadcrumbNav } from "../components/shell/BreadcrumbNav";
 import { DetailPanel as DetailPanelComponent } from "../components/shell/DetailPanel";
-import { ReorderDialog } from "../components/ui/ReorderDialog";
+import { ReorderPanel } from "../components/ui/ReorderPanel";
 import { DisclosureGroup } from "../components/ui/DisclosureGroup";
 import { AccountMenu, ServiceHeader } from "../components/shell/ServiceHeader";
 import { PatientBar, PatientDetails } from "../components/shell/PatientBar";
-import { Drawer } from "../components/ui/Drawer";
 import { NARROW_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
 import { usePersistentState } from "../hooks/usePersistentState";
 import { AlertsBand } from "../components/shell/AlertsBand";
@@ -21,7 +20,7 @@ import { defaultSectionOrder, SectionOrderContext } from "../components/ui/Secti
 import { FrailtyFlagPanel, frailtyFlags } from "../components/record/FrailtyFlagPanel";
 import { allViewLabels, recordViews, viewForPath, type ViewKey } from "../views";
 import { Button } from "../components/ui/Button";
-import { Dialog } from "../components/ui/Dialog";
+import { InlinePanel } from "../components/ui/InlinePanel";
 import { DetailList } from "../components/ui/DetailList";
 
 export default function RecordShell({ children }: { children: ReactNode }) {
@@ -43,7 +42,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
   const [textSize, setTextSize] = usePersistentState<TextSize>("ncrs.textSize", "medium");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
-  const [showReorderModal, setShowReorderModal] = useState(false);
+  const [showReorderPanel, setShowReorderPanel] = useState(false);
   const isNarrow = useMediaQuery(NARROW_QUERY);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingView, setPendingView] = useState<ViewKey | null>(null);
@@ -74,7 +73,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
     });
   }
 
-  // The menu drawer only exists on narrow screens, and closes once a choice has changed the page
+  // The inline mobile menu closes once a choice has changed the page
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname, isNarrow]);
@@ -161,7 +160,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
     onReorder: view.canReorder
       ? () => {
           setMenuOpen(false);
-          setShowReorderModal(true);
+          setShowReorderPanel(true);
         }
       : undefined,
   };
@@ -208,8 +207,48 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                 patientMenu={patientMenu}
                 narrow={isNarrow}
                 menuOpen={menuOpen}
-                onToggleMenu={() => setMenuOpen(true)}
+                onToggleMenu={() => setMenuOpen((value) => !value)}
               />
+              {isNarrow && (
+                <section id="ncrs-mobile-menu" className="ncrs-mobile-menu" hidden={!menuOpen} aria-label="Menu">
+                  <div className="ncrs-mobile-menu__header">
+                    <h2>Menu</h2>
+                    <Button variant="secondary" onClick={() => setMenuOpen(false)}>
+                      Close menu
+                    </Button>
+                  </div>
+                  <button
+                    type="button"
+                    className="ncrs-mobile-menu__find nhsuk-button nhsuk-button--secondary"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setAppView("search");
+                    }}
+                  >
+                    Find patient
+                  </button>
+                  <div className="ncrs-mobile-menu__group">
+                    <h3>Patient</h3>
+                    {patientMenu}
+                  </div>
+                  <div className="ncrs-mobile-menu__group">
+                    <h3>Record view</h3>
+                    {viewMenu}
+                  </div>
+                  <div className="ncrs-mobile-menu__group">
+                    <h3>Patient details</h3>
+                    <PatientDetails patient={view.patient} />
+                  </div>
+                  <div className="ncrs-mobile-menu__group">
+                    <h3>Signed in as</h3>
+                    <AccountMenu />
+                  </div>
+                  <div className="ncrs-mobile-menu__group">
+                    <h3>Page options</h3>
+                    <PageOptions {...pageOptions} />
+                  </div>
+                </section>
+              )}
               <PatientBar
                 key={view.key}
                 patient={view.patient}
@@ -259,86 +298,50 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                       backLabel={`Back`}
                     />
                   </DetailPanelContext.Provider>
+                  <InlinePanel
+                    open={pendingView !== null}
+                    title="Switch patient?"
+                    footer={
+                      <>
+                        <Button variant="secondary" onClick={() => setPendingView(null)}>
+                          Stay on {view.patient.name}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const next = pendingView && recordViews[pendingView];
+                            setPendingView(null);
+                            if (next) navigate(next.home);
+                          }}
+                        >
+                          Open {pendingView && recordViews[pendingView].patient.name}
+                        </Button>
+                      </>
+                    }
+                  >
+                    {pendingView && (
+                      <>
+                        <p>You are leaving {view.patient.name}'s record. Check these details match the patient in front of you.</p>
+                        <DetailList
+                          rows={[
+                            ["Name", recordViews[pendingView].patient.name],
+                            ["Date of birth", recordViews[pendingView].patient.dob],
+                            ["NHS number", recordViews[pendingView].patient.nhsNumber],
+                            ["Record", `${recordViews[pendingView].label} record`],
+                          ]}
+                        />
+                      </>
+                    )}
+                  </InlinePanel>
+                  <ReorderPanel
+                    open={showReorderPanel}
+                    title="Reorder sections"
+                    description="Use the arrow buttons to change the order of the sections on the Summary page."
+                    items={cardOrder}
+                    onApply={setCardOrder}
+                    onClose={() => setShowReorderPanel(false)}
+                  />
                 </main>
               </div>
-              <Dialog
-                open={pendingView !== null}
-                title="Switch patient?"
-                closeOnBackdrop={false}
-                onClose={() => setPendingView(null)}
-                footer={
-                  <>
-                    <Button variant="secondary" onClick={() => setPendingView(null)}>
-                      Stay on {view.patient.name}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        const next = pendingView && recordViews[pendingView];
-                        setPendingView(null);
-                        if (next) navigate(next.home);
-                      }}
-                    >
-                      Open {pendingView && recordViews[pendingView].patient.name}
-                    </Button>
-                  </>
-                }
-              >
-                {pendingView && (
-                  <>
-                    <p>You are leaving {view.patient.name}'s record. Check these details match the patient in front of you.</p>
-                    <DetailList
-                      rows={[
-                        ["Name", recordViews[pendingView].patient.name],
-                        ["Date of birth", recordViews[pendingView].patient.dob],
-                        ["NHS number", recordViews[pendingView].patient.nhsNumber],
-                        ["Record", `${recordViews[pendingView].label} record`],
-                      ]}
-                    />
-                  </>
-                )}
-              </Dialog>
-              {isNarrow && (
-                <Drawer open={menuOpen} title="Menu" onClose={() => setMenuOpen(false)}>
-                  <button
-                    type="button"
-                    className="ncrs-drawer__find nhsuk-button nhsuk-button--secondary"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setAppView("search");
-                    }}
-                  >
-                    Find patient
-                  </button>
-                  <div className="ncrs-drawer__group">
-                    <h3>Patient</h3>
-                    {patientMenu}
-                  </div>
-                  <div className="ncrs-drawer__group">
-                    <h3>Record view</h3>
-                    {viewMenu}
-                  </div>
-                  <div className="ncrs-drawer__group">
-                    <h3>Patient details</h3>
-                    <PatientDetails patient={view.patient} />
-                  </div>
-                  <div className="ncrs-drawer__group">
-                    <h3>Signed in as</h3>
-                    <AccountMenu />
-                  </div>
-                  <div className="ncrs-drawer__group">
-                    <h3>Page options</h3>
-                    <PageOptions {...pageOptions} />
-                  </div>
-                </Drawer>
-              )}
-              <ReorderDialog
-                open={showReorderModal}
-                title="Reorder sections"
-                description="Use the arrow buttons to change the order of the sections on the Summary page."
-                items={cardOrder}
-                onApply={setCardOrder}
-                onClose={() => setShowReorderModal(false)}
-              />
             </div>
           </div>
         </SectionOrderContext.Provider>

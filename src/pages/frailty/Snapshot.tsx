@@ -5,7 +5,7 @@ import { Callout } from "../../components/ui/Callout";
 import { DataSection } from "../../components/ui/DataSection";
 import { DataTable } from "../../components/ui/DataTable";
 import { DetailList, FactsGrid } from "../../components/ui/DetailList";
-import { Dialog } from "../../components/ui/Dialog";
+import { InlinePanel } from "../../components/ui/InlinePanel";
 import { Button } from "../../components/ui/Button";
 import { KeyFigure } from "../../components/ui/KeyFigure";
 import { RecordPage } from "../../components/ui/RecordPage";
@@ -89,6 +89,14 @@ export default function FrailtySnapshot() {
 
   const active = snapshotFilters.find((f) => f.value === filter) ?? snapshotFilters[0];
   const show = (panel: SnapshotPanel) => active.panels === null || (active.panels as readonly string[]).includes(panel);
+  const openCfs = () => {
+    setVitalOpen(null);
+    setCfsOpen(true);
+  };
+  const openVital = (vital: Vital) => {
+    setCfsOpen(false);
+    setVitalOpen(vital);
+  };
 
   const high = frailtyRisks.filter((r) => r.level === "high");
   const medium = frailtyRisks.filter((r) => r.level === "medium");
@@ -111,7 +119,7 @@ export default function FrailtySnapshot() {
             trend="up"
             concern
             note={`Up from ${frailtyScale.previous}. ${frailtyScale.label}.`}
-            onOpen={() => setCfsOpen(true)}
+            onOpen={openCfs}
             openLabel="View scale details"
           >
             <p className="key-figure__note">Last updated {frailtyScale.updated}</p>
@@ -259,7 +267,7 @@ export default function FrailtySnapshot() {
                 note={period === "latest" ? `Updated ${vital.updated}` : period === "6m" ? vital.summary6m : vital.summary1y}
               >
                 <Source of={vital.provenance} />
-                <button type="button" className="link-button" onClick={() => setVitalOpen(vital)}>
+                <button type="button" className="link-button" onClick={() => openVital(vital)}>
                   View history<span className="nhs-visually-hidden"> for {vital.label}</span>
                 </button>
               </KeyFigure>
@@ -352,10 +360,9 @@ export default function FrailtySnapshot() {
         </DataSection>
       )}
 
-      <Dialog
+      <InlinePanel
         open={cfsOpen}
         title="Clinical Frailty Scale"
-        onClose={() => setCfsOpen(false)}
         footer={
           <Button variant="secondary" onClick={() => setCfsOpen(false)}>
             Close
@@ -373,12 +380,11 @@ export default function FrailtySnapshot() {
         <p>
           <strong>Current score:</strong> {frailtyScale.score} ({frailtyScale.label})
         </p>
-      </Dialog>
+      </InlinePanel>
 
-      <Dialog
+      <InlinePanel
         open={vitalOpen !== null}
         title={vitalOpen ? `${vitalOpen.label}: history` : ""}
-        onClose={() => setVitalOpen(null)}
         footer={
           <Button variant="secondary" onClick={() => setVitalOpen(null)}>
             Close
@@ -390,7 +396,7 @@ export default function FrailtySnapshot() {
             <VitalHistory vital={vitalOpen} />
           </Subsection>
         )}
-      </Dialog>
+      </InlinePanel>
     </RecordPage>
   );
 }

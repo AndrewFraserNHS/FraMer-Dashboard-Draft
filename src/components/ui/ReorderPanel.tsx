@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "./Button";
-import { Dialog } from "./Dialog";
+import { InlinePanel } from "./InlinePanel";
 
 type Direction = "up" | "down";
 
-type ReorderDialogProps = {
+type ReorderPanelProps = {
   open: boolean;
   title: string;
   /** Plain-language instruction shown above the list */
@@ -16,13 +16,13 @@ type ReorderDialogProps = {
 };
 
 /**
- * Reorder a list of named items with up and down buttons, in a modal dialog.
+ * Reorder a list of named items with up and down buttons, in an inline panel.
  * Buttons keep focus where it was after a move, and each move is announced to screen readers.
  * The list is mounted only while open, so the working order resets each time.
  */
-export function ReorderDialog({ open, title, description, items, onApply, onClose }: ReorderDialogProps) {
+export function ReorderPanel({ open, title, description, items, onApply, onClose }: ReorderPanelProps) {
   return (
-    <Dialog open={open} title={title} onClose={onClose}>
+    <InlinePanel open={open} title={title}>
       <ReorderList
         description={description}
         items={items}
@@ -32,7 +32,7 @@ export function ReorderDialog({ open, title, description, items, onApply, onClos
         }}
         onCancel={onClose}
       />
-    </Dialog>
+    </InlinePanel>
   );
 }
 
@@ -104,7 +104,7 @@ function ReorderList({
         ))}
       </ul>
       <p role="status" className="nhs-visually-hidden">{announcement}</p>
-      <div className="ncrs-dialog__footer">
+      <div className="ncrs-inline-panel__footer">
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

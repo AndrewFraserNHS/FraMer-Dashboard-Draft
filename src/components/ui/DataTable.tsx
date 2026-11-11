@@ -106,14 +106,14 @@ export function DataTable<T>({
         </div>
       )}
       {/* Explicit roles keep the table semantics when the stacked mobile layout changes the display type */}
-      <table className="documents-table data-table nhsuk-table-responsive" role="table">
+      <table className="documents-table data-table nhsuk-table nhsuk-table--responsive" role="table">
         <caption className="nhs-visually-hidden">{caption}</caption>
-        <thead role="rowgroup">
-          <tr role="row">
+        <thead className="nhsuk-table__head" role="rowgroup">
+          <tr className="nhsuk-table__row" role="row">
             {columns.map((column) => {
               const active = sort?.header === column.header ? sort.direction : undefined;
               return (
-                <th key={column.header} role="columnheader" scope="col" aria-sort={column.sort ? (active ?? "none") : undefined}>
+                <th key={column.header} className="nhsuk-table__header" role="columnheader" scope="col" aria-sort={column.sort ? (active ?? "none") : undefined}>
                   {column.sort ? (
                     <button
                       type="button"
@@ -136,20 +136,24 @@ export function DataTable<T>({
               );
             })}
             {onView && (
-              <th role="columnheader" scope="col">
+              <th className="nhsuk-table__header" role="columnheader" scope="col">
                 <span className="nhs-visually-hidden">Actions</span>
               </th>
             )}
           </tr>
         </thead>
-        <tbody role="rowgroup">
+        <tbody className="nhsuk-table__body" role="rowgroup">
           {sortedRows.map((row, index) => (
-            <tr key={rowKey(row, index)} role="row">
+            <tr key={rowKey(row, index)} className="nhsuk-table__row" role="row">
               {columns.map((column) => (
-                <td key={column.header} role="cell" data-label={column.header}>{column.cell(row)}</td>
+                <td key={column.header} className="nhsuk-table__cell" role="cell">
+                  <span className="nhsuk-table__heading" aria-hidden="true">{column.header}</span>
+                  {column.cell(row)}
+                </td>
               ))}
               {onView && (
-                <td role="cell">
+                <td className="nhsuk-table__cell" role="cell">
+                  <span className="nhsuk-table__heading" aria-hidden="true">Actions</span>
                   <button
                     type="button"
                     className="row-chevron-button"

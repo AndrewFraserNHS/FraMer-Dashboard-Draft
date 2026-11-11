@@ -13,5 +13,5 @@ export function useMediaQuery(query: string): boolean {
   );
 }
 
-/** The narrow layout: the service header collapses to a menu drawer. Matches the CSS breakpoint. */
+/** The narrow layout: the service header reveals its menu in the page flow. Matches the CSS breakpoint. */
 export const NARROW_QUERY = "(max-width: 767px)";

@@ -1,10 +1,11 @@
 import { Bell, HelpCircle, LogOut, Menu, MessageSquare, Search, Settings, Baby } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { MenuButton } from "./MenuButton";
 
 const noop = () => {};
 const nhsLogoSrc = `${import.meta.env.BASE_URL}assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg`;
 
-/** The signed-in clinician's menu. Shown in the header on wide screens and in the menu drawer on narrow ones. */
+/** The signed-in clinician's menu. Shown in the header on wide screens and in the expanded mobile menu on narrow ones. */
 export function AccountMenu() {
   return (
     <MenuButton
@@ -25,7 +26,7 @@ type ServiceHeaderProps = {
   onFindPatient: () => void;
   /** Demo patient picker, shown beside Find patient */
   patientMenu?: React.ReactNode;
-  /** Narrow screens: only the NHS bar and a Menu button remain; everything else moves to the drawer */
+  /** Narrow screens: only the NHS bar and a Menu button remain; everything else is revealed in the page flow */
   narrow?: boolean;
   menuOpen?: boolean;
   onToggleMenu?: () => void;
@@ -37,6 +38,14 @@ type ServiceHeaderProps = {
  * only the NHS bar and a Menu button.
  */
 export function ServiceHeader({ onFindPatient, patientMenu, narrow = false, menuOpen = false, onToggleMenu }: ServiceHeaderProps) {
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+
+  useEffect(() => {
+    if (narrow && wasOpen.current && !menuOpen) menuButton.current?.focus();
+    wasOpen.current = menuOpen;
+  }, [menuOpen, narrow]);
+
   return (
     <header className="ncrs-service">
       <div className="ncrs-service__brand">
@@ -55,10 +64,11 @@ export function ServiceHeader({ onFindPatient, patientMenu, narrow = false, menu
 
       {narrow ? (
         <button
+          ref={menuButton}
           type="button"
           className="ncrs-service__link ncrs-service__menu"
           aria-expanded={menuOpen}
-          aria-haspopup="dialog"
+          aria-controls="ncrs-mobile-menu"
           onClick={onToggleMenu}
         >
           <Menu size={20} aria-hidden="true" />

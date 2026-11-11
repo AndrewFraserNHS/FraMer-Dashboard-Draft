@@ -34,7 +34,7 @@ export type PageOptionsProps = {
   onReorder?: () => void;
 };
 
-/** Text size and page tools. Shared by the desktop sidebar and the mobile menu drawer. */
+/** Text size and page tools. Shared by the desktop sidebar and the expanded mobile menu. */
 export function PageOptions({ textSize, onTextSize, filtersOpen, onToggleFilters, onReorder }: PageOptionsProps) {
   return (
     <>

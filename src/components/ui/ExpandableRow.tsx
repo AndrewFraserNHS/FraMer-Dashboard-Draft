@@ -10,7 +10,7 @@ type ExpandableRowProps = {
 
 /**
  * A list row that reveals more detail in place. A plus becomes a minus while open, so the state is
- * visible without colour. (A row that opens a modal or page keeps the RowChevron instead.)
+ * visible without colour. (A row that opens an inline panel or page keeps the RowChevron instead.)
  * No aria-label override: the visible text names the control, and aria-expanded carries the state (WCAG 2.5.3).
  */
 export function ExpandableRow({ children, detail }: ExpandableRowProps) {

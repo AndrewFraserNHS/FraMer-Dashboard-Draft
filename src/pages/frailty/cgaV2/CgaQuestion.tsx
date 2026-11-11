@@ -4,7 +4,6 @@ import { Source } from "../../../components/record/Source";
 import { AssessmentProgress } from "../../../components/ui/AssessmentProgress";
 import { RadioField, TextAreaQuestion, TextAreaField } from "../../../components/ui/FormField";
 import { QuestionPage } from "../../../components/ui/QuestionPage";
-import { ReviewPrompt } from "../../../components/ui/ReviewField";
 import { StatusTag } from "../../../components/ui/StatusTag";
 import type { ErrorSummaryItem } from "../../../components/ui/ErrorSummary";
 import {
@@ -56,39 +55,88 @@ function StepPage({ index }: { index: number }) {
     backLabel: previous ? "Back" : "Back to the assessment",
   };
 
-  if (step.kind === "suggestions") {
-    return (
-      <QuestionPage
-        {...common}
-        documentTitle={`Suggestions: ${step.domain.title}`}
-        onContinue={() => {
-          store.setAnswer(step.id, { done: true });
-          goNext();
-        }}
-      >
-        <h1 className="nhsuk-heading-l">
-          <span className="nhsuk-caption-l">{caption}<span className="nhs-visually-hidden">: </span></span>
-          Suggestions to review for {step.domain.title.toLowerCase()}
-        </h1>
-        <p>
-          These were raised from the record. Confirm, edit or dismiss each one. Dismissing can be undone. You can
-          continue without deciding, and decide later from Check your answers.
-        </p>
-        <ul className="review-prompts">
-          {step.domain.prompts!.map((prompt) => (
-            <ReviewPrompt
-              key={prompt.id}
-              text={prompt.text}
-              status={store.prompts[prompt.id] ?? "pending"}
-              onStatus={(status) => store.setPrompt(prompt.id, status)}
-            />
-          ))}
-        </ul>
-      </QuestionPage>
-    );
-  }
+  if (step.kind === "prompt") return <PromptPage step={step} caption={caption} common={common} store={store} goNext={goNext} />;
 
   return <FieldPage step={step} caption={caption} common={common} store={store} goNext={goNext} />;
+}
+
+function PromptPage({
+  step,
+  caption,
+  common,
+  store,
+  goNext,
+}: {
+  step: Step;
+  caption: string;
+  common: Omit<React.ComponentProps<typeof QuestionPage>, "documentTitle" | "onContinue" | "children">;
+  store: ReturnType<typeof useCgaAnswers>;
+  goNext: () => void;
+}) {
+  const prompt = step.prompt!;
+  const saved = store.answers[step.id];
+  const [review, setReview] = useState<Review | "">(saved?.review ?? "");
+  const [text, setText] = useState(saved?.text ?? prompt.text);
+  const [error, setError] = useState<{ message: string; fieldId: string }>();
+  const base = `q-${step.id}`;
+
+  const editedSuggestion = (
+    <TextAreaField
+      id={`${base}-edit`}
+      label="Edit the suggested action"
+      rows={5}
+      value={text}
+      onChange={(event) => setText(event.target.value)}
+      error={error?.fieldId === `${base}-edit` ? error.message : undefined}
+    />
+  );
+
+  return (
+    <QuestionPage
+      {...common}
+      documentTitle="Review suggested action"
+      errors={error ? [{ text: error.message, fieldId: error.fieldId }] : []}
+      onContinue={() => {
+        if (!review) {
+          setError({ message: "Select whether to confirm or edit this suggestion", fieldId: `${base}-review` });
+          return;
+        }
+        if (review === "changed" && !text.trim()) {
+          setError({ message: "Enter the edited suggestion", fieldId: `${base}-edit` });
+          return;
+        }
+        store.setAnswer(step.id, {
+          done: true,
+          review,
+          text: review === "changed" ? text.trim() : prompt.text,
+        });
+        goNext();
+      }}
+    >
+      <RadioField
+        id={`${base}-review`}
+        name={`${base}-review`}
+        legend="Is this suggested action appropriate?"
+        asPageHeading={{ caption }}
+        before={
+          <div className="nhsuk-inset-text question-page__existing">
+            <p className="question-page__existing-label">Suggested action</p>
+            <p>{prompt.text}</p>
+          </div>
+        }
+        error={error?.fieldId === `${base}-review` ? error.message : undefined}
+        value={review}
+        onChange={(value) => {
+          setReview(value as Review);
+          setError(undefined);
+        }}
+        options={[
+          { value: "confirmed", label: "Yes, confirm this suggestion" },
+          { value: "changed", label: "No, edit this suggestion", reveal: editedSuggestion },
+        ]}
+      />
+    </QuestionPage>
+  );
 }
 
 type FieldPageProps = {
@@ -194,7 +242,6 @@ function FieldPage({ step, caption, common, store, goNext }: FieldPageProps) {
             options={[
               { value: "confirmed", label: "Yes, this is correct" },
               { value: "changed", label: "No, I want to change it", reveal: replacement },
-              ...(field.mandatory ? [] : [{ value: "rejected", label: "This does not apply, remove it" }]),
             ]}
           />
       ) : field.kind === "choice" ? (
@@ -225,12 +272,39 @@ function FieldPage({ step, caption, common, store, goNext }: FieldPageProps) {
 }
 
 /** Shown above a pre-filled question: what the record currently says, and where it came from. */
+function existingFacts(value: string): Array<{ label: string; detail: string }> {
+  const pairs = Array.from(value.matchAll(/([^:.;\n]+):\s*([^.;\n]+)(?:[.;]|$)/g)).map((match) => ({
+    label: match[1].trim(),
+    detail: match[2].trim(),
+  }));
+  if (pairs.length < 2) return [];
+  const covered = pairs.reduce((sum, pair) => sum + pair.label.length + pair.detail.length + 2, 0);
+  return covered >= Math.floor(value.length * 0.55) ? pairs : [];
+}
+
 export function ExistingValue({ value, source }: { value: string; source?: React.ReactNode }) {
+  const facts = existingFacts(value);
   return (
     <div className="nhsuk-inset-text question-page__existing">
       <p className="question-page__existing-label">The record currently says</p>
-      <p>{value}</p>
-      {source}
+      {facts.length > 0 ? (
+        <dl className="question-page__existing-facts">
+          {facts.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>{fact.detail}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="question-page__existing-text">{value}</p>
+      )}
+      {source && (
+        <div className="question-page__existing-source">
+          <span className="question-page__existing-source-label">Source</span>
+          {source}
+        </div>
+      )}
       <p className="review-field__notice">Pre-filled from another system. Not checked yet.</p>
     </div>
   );

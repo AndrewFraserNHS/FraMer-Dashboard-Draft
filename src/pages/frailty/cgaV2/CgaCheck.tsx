@@ -13,7 +13,6 @@ import {
   donePath,
   firstUnfinished,
   optionLabel,
-  Prompts,
   questionPath,
   sectionsFor,
   Step,
@@ -23,18 +22,15 @@ import {
 } from "./model";
 import { useCgaAnswers } from "./useCgaAnswers";
 
-function describe(step: Step, answer: Answer | undefined, prompts: Prompts) {
-  if (step.kind === "suggestions") {
-    const list = step.domain.prompts ?? [];
-    const count = (status: string) => list.filter((prompt) => (prompts[prompt.id] ?? "pending") === status).length;
-    return `${count("confirmed")} confirmed, ${count("dismissed")} dismissed, ${count("pending")} not decided`;
+function describe(step: Step, answer: Answer | undefined) {
+  if (!answer) return <StatusTag tone={meaningTone.warning}>Not answered</StatusTag>;
+  if (step.kind === "prompt") {
+    return answer.review === "changed" ? <>Edited to: {answer.text}</> : "Confirmed";
   }
   const field = step.field!;
-  if (!answer) return <StatusTag tone={meaningTone.warning}>Not answered</StatusTag>;
   if (answer.skipped) return <StatusTag tone={meaningTone.neutral}>Skipped</StatusTag>;
   const held = systemValue(field);
   if (answer.review === "confirmed") return <>Confirmed as correct: {held}</>;
-  if (answer.review === "rejected") return <>Removed: this does not apply</>;
   if (answer.review === "changed") return <>Changed to: {answer.choice ? optionLabel(field, answer.choice) : answer.text}</>;
   return answer.choice ? optionLabel(field, answer.choice) : answer.text;
 }
@@ -42,8 +38,8 @@ function describe(step: Step, answer: Answer | undefined, prompts: Prompts) {
 /** NHS "check answers" page: everything in one place, each with a Change link, before completing. */
 export default function CgaCheck() {
   const navigate = useNavigate();
-  const { answers, prompts, finish } = useCgaAnswers();
-  const unanswered = steps.filter((step) => step.kind === "field" && (!answers[step.id] || answers[step.id].skipped));
+  const { answers, finish } = useCgaAnswers();
+  const unanswered = steps.filter((step) => !answers[step.id] || answers[step.id].skipped);
   const first = firstUnfinished(answers);
 
   return (
@@ -74,8 +70,8 @@ export default function CgaCheck() {
           .filter((step) => step.domain.id === domain.id)
           .map((step) => ({
             key: step.id,
-            label: step.kind === "suggestions" ? "Suggestions to review" : step.field!.title,
-            value: describe(step, answers[step.id], prompts),
+            label: step.kind === "prompt" ? step.prompt!.text : step.field!.title,
+            value: describe(step, answers[step.id]),
             changeTo: questionPath(step.id),
           }));
         return (

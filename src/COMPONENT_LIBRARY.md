@@ -165,25 +165,24 @@ Every record tab is built from these. Pages must not render their own header, pa
 |---|---|---|
 | `RecordPage` | Page layout: one `<h1>`, stacked sections, connected systems, prototype note | Single h1 per page |
 | `DataSection` | Collapsible section (`title`, `summary`, `badge`, `toolbar`) | Heading containing a button with `aria-expanded` and `aria-controls`; visible text is the name; responds to Expand all |
-| `ExpandableRow` | A list row that reveals a `DetailList` in place. Shows a plus that becomes a minus. Rows that open a modal or page use `RowChevron` instead, so the two behaviours look different | Button name comes from its visible text; `aria-expanded` carries the state, and the icon changes shape, not just colour |
-| `RowChevron` | The arrow on a row that opens a modal, panel or page | Decorative, hidden from assistive technology |
+| `ExpandableRow` | A list row that reveals a `DetailList` in place. Shows a plus that becomes a minus. Rows that open an inline panel or page use `RowChevron` instead, so the two behaviours look different | Button name comes from its visible text; `aria-expanded` carries the state, and the icon changes shape, not just colour |
+| `RowChevron` | The arrow on a row that opens an inline panel or page | Decorative, hidden from assistive technology |
 | `RecordCardList` / `RecordCard` | Read-only record summaries with an optional status tag | Real list; status is text |
 | `Button` / `ButtonLink` | NHS buttons (`primary`, `secondary`); `ButtonLink` goes to another page | Defaults to `type="button"`; `disabled` becomes `aria-disabled` so focus is never lost |
 | `DateField` | Date of birth and other known dates as day, month and year | Fieldset with legend, `bday` autocomplete, shared hint and error |
 | `TextField` / `TextAreaField` / `SelectField` | Every form control: visible label, hint, error | Hint and error are linked with `aria-describedby`; `aria-invalid`; error is text prefixed "Error:", never colour alone; hints replace placeholder-only instructions |
 | `ErrorSummary` | List of problems at the top of a form, each linking to its field | Takes focus when it appears; `role="alert"` |
 | `BackLink` | Back in a multi-step flow | Visible text is the name |
-| `Drawer` | Side sheet (the narrow-screen menu) | Native `<dialog>`: focus trap, Escape, focus return |
-| `ReorderDialog` | Reorder a list with up and down buttons in a dialog | Focus stays on the pressed button; each move is announced |
+| `InlinePanel` | Related content revealed in the page flow | Labelled region; focus moves to its heading and returns to the trigger |
+| `ReorderPanel` | Reorder a list with up and down buttons in an inline panel | Focus stays on the pressed button; each move is announced |
 | `DetailList` / `FactsGrid` | Label/value pairs; missing values show "Not supplied by source" | Description list |
-| `DataTable` | Any table; optional per-row "view" button | Caption, `scope="col"`, keyboard-scrollable region; rows are never buttons |
+| `DataTable` | Any table; optional per-row "view" button | NHS.UK Frontend responsive table classes, caption, `scope="col"`, keyboard-scrollable region; rows are never buttons |
 | `StatusTag`, `PriorityTag`, `ResultTag`, `SourceTag` | Status and provenance | Text always states the status |
 | `Callout` | Highlighted message (`red`, `amber`, `blue`, `grey`) | Tone also stated in hidden text |
 | `Subsection` | Headed group inside a section | Real `<h3>`/`<h4>` |
 | `ToggleGroup` | Filter buttons | `aria-pressed` |
 | `SortSelect` | Sorting | Visible label, polite announcement |
 | `ConnectedSystems` | Connected-systems panel | Status as text tag |
-| `Dialog` | Modal dialogs | Native `<dialog>`: focus trap, Escape, focus return |
 | `DetailPanel` | Drill-in view | Focus moves to heading; Back button text is its name |
 | `ProvenanceTag` | A source tag that opens to show organisation, system, date and author | Native Popover API: opens on click or Enter (never hover alone), Escape closes, never clipped by a scrolling table; `aria-expanded` |
 | `KeyFigure` | A measurement or score shown large (vitals, Clinical Frailty Scale) | Trend is an icon plus words, never colour alone |
@@ -215,6 +214,6 @@ Authored dates are written as ISO strings and passed through a scenario clock (`
 
 ## Narrow screens
 
-Below 768px the service header keeps only the NHS bar and a Menu button, and the patient bar shows identity only. Find patient, the patient and record view menus, patient details, the account menu and page options move into a `Drawer`.
+Below 768px the service header keeps only the NHS bar and a Menu button, and the patient bar shows identity only. The Menu button reveals Find patient, patient and record view choices, patient details, the account menu and page options in the page flow.
 
 Patient data lives in `src/data/`, so risks, banners and safety flags share one source.

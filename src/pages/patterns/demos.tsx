@@ -14,15 +14,14 @@ import { ConnectedSystems } from "../../components/ui/ConnectedSystems";
 import { DataSection } from "../../components/ui/DataSection";
 import { DataTable } from "../../components/ui/DataTable";
 import { DetailList, FactsGrid } from "../../components/ui/DetailList";
-import { Dialog } from "../../components/ui/Dialog";
-import { Drawer } from "../../components/ui/Drawer";
+import { InlinePanel } from "../../components/ui/InlinePanel";
 import { ErrorSummary } from "../../components/ui/ErrorSummary";
 import { ExpandableRow } from "../../components/ui/ExpandableRow";
 import { DateField, DateParts, emptyDate, SelectField, TextAreaField, TextField } from "../../components/ui/FormField";
 import { KeyFigure } from "../../components/ui/KeyFigure";
 import { ProvenanceTag } from "../../components/ui/ProvenanceTag";
 import { RecordCard, RecordCardList } from "../../components/ui/RecordCardList";
-import { ReorderDialog } from "../../components/ui/ReorderDialog";
+import { ReorderPanel } from "../../components/ui/ReorderPanel";
 import { PromptStatus, ReviewField, ReviewPrompt, ReviewStatus } from "../../components/ui/ReviewField";
 import { RowChevron } from "../../components/ui/RowChevron";
 import { SortSelect, SortValue } from "../../components/ui/SortSelect";
@@ -97,26 +96,20 @@ function ReviewDemo() {
   );
 }
 
-function DialogDemo() {
+function InlinePanelDemo() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Open a dialog</Button>
-      <Dialog open={open} title="Blood pressure: history" onClose={() => setOpen(false)} footer={<Button variant="secondary" onClick={() => setOpen(false)}>Close</Button>}>
-        <p>Press Escape, choose Close, or click outside to close. Focus returns to the button.</p>
-      </Dialog>
-    </>
-  );
-}
-
-function DrawerDemo() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Open the drawer</Button>
-      <Drawer open={open} title="Menu" onClose={() => setOpen(false)}>
-        <p>On narrow screens the patient and record view menus, patient details and page options live here.</p>
-      </Drawer>
+      <Button variant="secondary" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        {open ? "Hide the history" : "Show the history"}
+      </Button>
+      <InlinePanel
+        open={open}
+        title="Blood pressure: history"
+        footer={<Button variant="secondary" onClick={() => setOpen(false)}>Close</Button>}
+      >
+        <p>The history appears in the page flow. There is no overlay or focus trap.</p>
+      </InlinePanel>
     </>
   );
 }
@@ -128,7 +121,7 @@ function ReorderDemo() {
     <>
       <Button variant="secondary" onClick={() => setOpen(true)}>Reorder sections</Button>
       <p className="pl-note">Current order: {order.join(", ")}</p>
-      <ReorderDialog open={open} title="Reorder sections" description="Use the arrow buttons to change the order." items={order} onApply={setOrder} onClose={() => setOpen(false)} />
+      <ReorderPanel open={open} title="Reorder sections" description="Use the arrow buttons to change the order." items={order} onApply={setOrder} onClose={() => setOpen(false)} />
     </>,
   );
 }
@@ -147,6 +140,7 @@ const alertFlags = [
   { id: "gd", label: "Gestational diabetes", level: "high" as const, onOpen: () => {} },
   { id: "pen", label: "Penicillin allergy", level: "high" as const, onOpen: () => {} },
   { id: "bmi", label: "High body mass index (32)", level: "medium" as const, onOpen: () => {} },
+  { id: "follow-up", label: "Routine follow-up due", level: "low" as const, onOpen: () => {} },
 ];
 
 const tableRows = [
@@ -295,9 +289,8 @@ export const demos: Record<string, ReactNode> = {
       </div>
     </>,
   ),
-  dialog: <DialogDemo />,
-  drawer: <DrawerDemo />,
-  "reorder-dialog": <ReorderDemo />,
+  "inline-panel": <InlinePanelDemo />,
+  "reorder-panel": <ReorderDemo />,
   "menu-button": row(
     <MenuButton
       label="Record view: Maternity"
@@ -316,7 +309,7 @@ export const demos: Record<string, ReactNode> = {
   "options-sidebar": stack(
     <>
       <SidebarDemo />
-      <p className="pl-note">Page options also appear inside the drawer on narrow screens:</p>
+      <p className="pl-note">Page options also appear in the expanded mobile menu on narrow screens:</p>
       <PageOptions textSize="small" onTextSize={() => {}} filtersOpen={false} onReorder={() => {}} />
     </>,
   ),

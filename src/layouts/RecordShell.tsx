@@ -20,7 +20,6 @@ import { defaultSectionOrder, SectionOrderContext } from "../components/ui/Secti
 import { FrailtyFlagPanel, frailtyFlags } from "../components/record/FrailtyFlagPanel";
 import { allViewLabels, recordViews, viewForPath, type ViewKey } from "../views";
 import { Button } from "../components/ui/Button";
-import { InlinePanel } from "../components/ui/InlinePanel";
 import { DetailList } from "../components/ui/DetailList";
 
 export default function RecordShell({ children }: { children: ReactNode }) {
@@ -55,6 +54,8 @@ export default function RecordShell({ children }: { children: ReactNode }) {
   const [panel, setPanel] = useState<DetailPanel | null>(null);
   const panelTrigger = useRef<HTMLElement | null>(null);
   const savedScrollPosition = useRef(0);
+  const showingSwitchPatient = pendingView !== null;
+  const hideContent = showingSwitchPatient || !!panel;
 
   function openPanel(nextPanel: DetailPanel) {
     panelTrigger.current = document.activeElement as HTMLElement;
@@ -284,9 +285,46 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                 >
                   <DetailPanelContext.Provider value={openPanel}>
                     <BreadcrumbNav />
-                    <div style={{ display: panel ? "none" : "block" }}>
+                    <div style={{ display: hideContent ? "none" : "block" }}>
                       {children}
                     </div>
+                    <DetailPanelComponent
+                      isOpen={showingSwitchPatient}
+                      title="Switch patient?"
+                      eyebrow="Patient safety check"
+                      tone="blue"
+                      content={
+                        pendingView ? (
+                          <>
+                            <p>You are leaving {view.patient.name}'s record. Check these details match the patient in front of you.</p>
+                            <DetailList
+                              rows={[
+                                ["Name", recordViews[pendingView].patient.name],
+                                ["Date of birth", recordViews[pendingView].patient.dob],
+                                ["NHS number", recordViews[pendingView].patient.nhsNumber],
+                                ["Record", `${recordViews[pendingView].label} record`],
+                              ]}
+                            />
+                            <div className="page-steps">
+                              <Button variant="secondary" onClick={() => setPendingView(null)}>
+                                Stay on {view.patient.name}
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  const next = pendingView && recordViews[pendingView];
+                                  setPendingView(null);
+                                  if (next) navigate(next.home);
+                                }}
+                              >
+                                Open {recordViews[pendingView].patient.name}
+                              </Button>
+                            </div>
+                          </>
+                        ) : null
+                      }
+                      onClose={() => setPendingView(null)}
+                      backLabel="Back"
+                    />
                     <DetailPanelComponent
                       isOpen={!!panel}
                       title={panel?.title || ""}
@@ -298,40 +336,6 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                       backLabel={`Back`}
                     />
                   </DetailPanelContext.Provider>
-                  <InlinePanel
-                    open={pendingView !== null}
-                    title="Switch patient?"
-                    footer={
-                      <>
-                        <Button variant="secondary" onClick={() => setPendingView(null)}>
-                          Stay on {view.patient.name}
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            const next = pendingView && recordViews[pendingView];
-                            setPendingView(null);
-                            if (next) navigate(next.home);
-                          }}
-                        >
-                          Open {pendingView && recordViews[pendingView].patient.name}
-                        </Button>
-                      </>
-                    }
-                  >
-                    {pendingView && (
-                      <>
-                        <p>You are leaving {view.patient.name}'s record. Check these details match the patient in front of you.</p>
-                        <DetailList
-                          rows={[
-                            ["Name", recordViews[pendingView].patient.name],
-                            ["Date of birth", recordViews[pendingView].patient.dob],
-                            ["NHS number", recordViews[pendingView].patient.nhsNumber],
-                            ["Record", `${recordViews[pendingView].label} record`],
-                          ]}
-                        />
-                      </>
-                    )}
-                  </InlinePanel>
                   <ReorderPanel
                     open={showReorderPanel}
                     title="Reorder sections"

@@ -4805,6 +4805,10 @@ button.systems-grid__item:hover {
   min-width: 0;
 }
 
+.ncrs-service .ncrs-menu {
+  position: relative;
+}
+
 .ncrs-menu__chevron {
   flex: none;
   transition: transform 120ms ease;
@@ -4824,6 +4828,16 @@ button.systems-grid__item:hover {
   color: #212b32;
   background: #fff;
   border: 1px solid #d8dde0;
+}
+
+.ncrs-service .ncrs-menu__list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 50;
+  margin: 0;
+  max-width: min(360px, calc(100vw - 24px));
+  box-shadow: 0 8px 20px rgb(0 0 0 / 22%);
 }
 
 .ncrs-menu__list[hidden] {
@@ -5658,7 +5672,17 @@ button.systems-grid__item:hover {
 .ncrs-menu__list button[aria-disabled="true"] { cursor: not-allowed; color: var(--nhs-colour-dark-grey); }
 .ncrs-menu__list button[aria-disabled="true"]:hover { background: transparent; }
 .ncrs-patient__row .ncrs-menu__trigger { border: 1px solid var(--nhs-colour-dark-grey); padding: 3px 10px; background: #fff; color: var(--nhs-colour-black); }
-.ncrs-patient__row .ncrs-menu__list { min-width: 260px; }
+.ncrs-patient__row .ncrs-menu { position: relative; }
+.ncrs-patient__row .ncrs-menu__list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  min-width: 260px;
+  margin: 0;
+  max-width: min(360px, calc(100vw - 24px));
+  box-shadow: 0 8px 20px rgb(0 0 0 / 22%);
+}
 .ncrs-patient__row .ncrs-menu__trigger { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
 
 /* =========================================================================
@@ -5769,8 +5793,10 @@ button.systems-grid__item:hover {
 }
 
 .ncrs-mobile-menu .ncrs-menu__list {
+  position: static;
   min-width: 0;
   margin-top: 4px;
+  box-shadow: none;
 }
 
 .ncrs-mobile-menu .ncrs-options__group { padding: 0 0 8px; }

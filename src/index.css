@@ -5826,8 +5826,8 @@ button.systems-grid__item:hover {
 }
 
 .record-shell.cga-v2-shell {
+  height: 100dvh;
   min-height: 100dvh;
-  height: auto;
   overflow-y: auto;
   overflow-x: hidden;
   background: #f0f4f5;
@@ -5948,6 +5948,8 @@ button.systems-grid__item:hover {
 .question-page__existing-facts dd { margin: 0; }
 .question-page__existing-source { display: grid; gap: 4px; margin-top: 12px; margin-bottom: 6px; }
 .question-page__existing-source-label { font-weight: 700; color: var(--ncrs-grey); }
+.question-page__existing-source-text { margin: 0; font-size: 0.95rem; line-height: 1.4; }
+.question-page__existing-notice { margin: 8px 0 0; color: var(--ncrs-grey); font-weight: 600; }
 .question-page__save-later { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #d8dde0; }
 .question-page__group { margin-top: 24px; }
 

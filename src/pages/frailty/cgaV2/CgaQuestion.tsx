@@ -283,16 +283,10 @@ function existingFacts(value: string): Array<{ label: string; detail: string }> 
   return covered >= Math.floor(value.length * 0.55) ? pairs : [];
 }
 
-export function ExistingValue({ value, source }: { value: string; source?: React.ReactNode }) {
+export function ExistingValue({ value, source }: { value: string; source?: Provenance }) {
   const facts = existingFacts(value);
-  const sourceLine =
-    source && typeof source !== "string" && "by" in source
-      ? `${(source as Provenance).by} · ${(source as Provenance).org} · ${(source as Provenance).system} · pulled ${(source as Provenance).pulled}`
-      : undefined;
-  const sourceLabel =
-    source && typeof source !== "string" && "source" in source
-      ? sourceMeta[(source as Provenance).source].label
-      : undefined;
+  const sourceLine = source ? `${source.by} · ${source.org} · ${source.system} · pulled ${source.pulled}` : undefined;
+  const sourceLabel = source ? sourceMeta[source.source].label : undefined;
   return (
     <div className="nhsuk-inset-text question-page__existing">
       <p className="question-page__existing-label">The record currently says</p>
@@ -317,7 +311,7 @@ export function ExistingValue({ value, source }: { value: string; source?: React
           </p>
         </div>
       )}
-      <p className="review-field__notice">Pre-filled from another system. Not checked yet.</p>
+      <p className="question-page__existing-notice">Pre-filled from another system. Not checked yet.</p>
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import type { Priority } from "./patient";
 import { createScenarioClock } from "../utils/dates";
 
-/** The scenario treats 7 February 2026 as today (see the "N days ago" provenance labels). */
+/** The scenario treats 7 February 2026 as today. */
 export const frailtyClock = createScenarioClock("2026-02-07");
 export const formatFrailtyDate = frailtyClock.long;
 export const formatFrailtyShortDate = frailtyClock.short;
+const FRAILTY_SCENARIO_TODAY_ISO = "2026-02-07";
 
 /** Frailty record view: Harold Bennett. Single source for every frailty page, flag and banner. */
 
@@ -48,18 +49,85 @@ const communityOrg = { source: "community", org: "Community Health Services", se
 const acuteOrg = { source: "acute", org: "Croydon University Hospital", setting: "Acute care", system: "Oracle Health" } as const;
 const socialOrg = { source: "social", org: "Croydon Council Adult Social Care", setting: "Social care", system: "Liquidlogic" } as const;
 
+function pulledDateLabel(raw: string): string {
+  const match = raw.trim().match(/^(\d+)\s+(day|days|week|weeks)\s+ago$/i);
+  if (!match) return raw;
+  const amount = Number(match[1]);
+  const unit = match[2].toLowerCase();
+  const offsetDays = unit.startsWith("week") ? amount * 7 : amount;
+  const base = new Date(`${FRAILTY_SCENARIO_TODAY_ISO}T00:00:00Z`);
+  base.setUTCDate(base.getUTCDate() - offsetDays);
+  return formatFrailtyDate(base.toISOString().slice(0, 10));
+}
+
 export const prov = {
-  gpPatel: (pulled = "3 days ago"): Provenance => ({ ...woodside, pulled, by: "Dr Patel (GP)" }),
-  gpPharmacist: { ...woodside, pulled: "3 days ago", by: "Hannah Green (GP pharmacist)" } as Provenance,
-  gpNurse: { ...woodside, pulled: "3 days ago", by: "Emily Brown (Practice nurse)" } as Provenance,
-  acute: (pulled = "7 days ago"): Provenance => ({ ...acuteOrg, pulled, by: "Dr Williams (Acute clinician)" }),
-  socialWorker: (pulled = "2 weeks ago"): Provenance => ({ ...socialOrg, pulled, by: "Aisha Khan (Social worker)" }),
-  safeguarding: { ...socialOrg, pulled: "5 days ago", by: "Mark Ellis (Safeguarding lead)" } as Provenance,
-  districtNurse: (system = "EMIS Community", pulled = "2 weeks ago"): Provenance => ({ ...communityOrg, system, pulled, by: "Jane Smith (District nurse)" }),
-  mdt: { ...communityOrg, system: "Frailty MDT notes", pulled: "3 days ago", by: "Jane Smith (District nurse)" } as Provenance,
-  physio: { ...communityOrg, system: "Community therapy notes", pulled: "2 weeks ago", by: "Tom Edwards (Physiotherapist)" } as Provenance,
-  urgent: { source: "urgent", org: "NHS 111 / South East London ICS", setting: "Urgent care", system: "NHS Pathways", pulled: "7 days ago", by: "NHS 111 clinician" } as Provenance,
-  cmht: { source: "mental-health", org: "Croydon Mental Health Services", setting: "Community care", system: "ePJS", pulled: "7 days ago", by: "CMHT discharge record" } as Provenance,
+  gpPatel: (pulled = "3 days ago"): Provenance => ({
+    ...woodside,
+    pulled: pulledDateLabel(pulled),
+    by: "Dr Patel (GP)",
+  }),
+  gpPharmacist: {
+    ...woodside,
+    pulled: pulledDateLabel("3 days ago"),
+    by: "Hannah Green (GP pharmacist)",
+  } as Provenance,
+  gpNurse: {
+    ...woodside,
+    pulled: pulledDateLabel("3 days ago"),
+    by: "Emily Brown (Practice nurse)",
+  } as Provenance,
+  acute: (pulled = "7 days ago"): Provenance => ({
+    ...acuteOrg,
+    pulled: pulledDateLabel(pulled),
+    by: "Dr Williams (Acute clinician)",
+  }),
+  socialWorker: (pulled = "2 weeks ago"): Provenance => ({
+    ...socialOrg,
+    pulled: pulledDateLabel(pulled),
+    by: "Aisha Khan (Social worker)",
+  }),
+  safeguarding: {
+    ...socialOrg,
+    pulled: pulledDateLabel("5 days ago"),
+    by: "Mark Ellis (Safeguarding lead)",
+  } as Provenance,
+  districtNurse: (
+    system = "EMIS Community",
+    pulled = "2 weeks ago",
+  ): Provenance => ({
+    ...communityOrg,
+    system,
+    pulled: pulledDateLabel(pulled),
+    by: "Jane Smith (District nurse)",
+  }),
+  mdt: {
+    ...communityOrg,
+    system: "Frailty MDT notes",
+    pulled: pulledDateLabel("3 days ago"),
+    by: "Jane Smith (District nurse)",
+  } as Provenance,
+  physio: {
+    ...communityOrg,
+    system: "Community therapy notes",
+    pulled: pulledDateLabel("2 weeks ago"),
+    by: "Tom Edwards (Physiotherapist)",
+  } as Provenance,
+  urgent: {
+    source: "urgent",
+    org: "NHS 111 / South East London ICS",
+    setting: "Urgent care",
+    system: "NHS Pathways",
+    pulled: pulledDateLabel("7 days ago"),
+    by: "NHS 111 clinician",
+  } as Provenance,
+  cmht: {
+    source: "mental-health",
+    org: "Croydon Mental Health Services",
+    setting: "Community care",
+    system: "ePJS",
+    pulled: pulledDateLabel("7 days ago"),
+    by: "CMHT discharge record",
+  } as Provenance,
 } as const;
 
 /** One line a screen reader or keyboard user can read without opening anything. */
@@ -135,30 +203,103 @@ export const frailtyRisks: readonly FrailtyRisk[] = [
 ];
 
 export type ServiceStatus =
-  | "Active care"
-  | "Referral pending - awaiting further detail"
+  | "Active"
+  | "Referred / waiting"
   | "Recently discharged";
 
-export const services: readonly { name: string; status: ServiceStatus }[] = [
-  { name: "Primary care", status: "Active care" },
-  { name: "Social care", status: "Active care" },
-  { name: "Community nursing", status: "Active care" },
-  { name: "Community frailty service", status: "Active care" },
+export type FrailtyService = {
+  team: string;
+  status: ServiceStatus | "Historical";
+  role: string;
+  nextPlannedActivity: string;
+  keyContact: string;
+  lastConfirmedDate: string;
+  source: Provenance;
+};
+
+export const services: readonly FrailtyService[] = [
   {
-    name: "Community therapy (OT/PT)",
-    status: "Referral pending - awaiting further detail",
+    team: "Primary care",
+    status: "Active",
+    role: "Medication optimisation and chronic disease oversight",
+    nextPlannedActivity: "GP frailty follow-up at next MDT cycle.",
+    keyContact: "Dr Patel (GP) · 020 7946 1021",
+    lastConfirmedDate: formatFrailtyShortDate("2026-02-06"),
+    source: prov.gpPatel(),
   },
   {
-    name: "Falls service",
-    status: "Referral pending - awaiting further detail",
+    team: "Social care",
+    status: "Active",
+    role: "Care package co-ordination and safeguarding liaison",
+    nextPlannedActivity: "Social care review with carer input.",
+    keyContact: "Aisha Khan (Social worker) · 020 7946 2081",
+    lastConfirmedDate: formatFrailtyShortDate("2026-02-02"),
+    source: prov.socialWorker(),
   },
-  { name: "Mental health services", status: "Recently discharged" },
+  {
+    team: "Community nursing",
+    status: "Active",
+    role: "Monitoring, wound and continence support",
+    nextPlannedActivity: "Weekly district nurse review continues.",
+    keyContact: "Jane Smith (District nurse) · 020 7946 2214",
+    lastConfirmedDate: formatFrailtyShortDate("2026-02-04"),
+    source: prov.districtNurse(),
+  },
+  {
+    team: "Community frailty service",
+    status: "Active",
+    role: "Multi-disciplinary frailty management",
+    nextPlannedActivity: `Frailty MDT review on ${formatFrailtyShortDate("2026-03-05")}.`,
+    keyContact: "Laura Chen (Frailty co-ordinator) · 020 7946 3320",
+    lastConfirmedDate: formatFrailtyShortDate("2026-02-06"),
+    source: prov.mdt,
+  },
+  {
+    team: "Community therapy (OT/PT)",
+    status: "Referred / waiting",
+    role: "Mobility and home safety assessment",
+    nextPlannedActivity: `OT home assessment booked for ${formatFrailtyShortDate("2026-02-20")}.`,
+    keyContact: "Sarah Linton (OT co-ordinator) · 020 7946 4302",
+    lastConfirmedDate: formatFrailtyShortDate("2026-02-05"),
+    source: prov.physio,
+  },
+  {
+    team: "Falls service",
+    status: "Referred / waiting",
+    role: "Specialist falls prevention intervention",
+    nextPlannedActivity: "Triage call pending service capacity.",
+    keyContact: "Falls triage team · 020 7946 4310",
+    lastConfirmedDate: formatFrailtyShortDate("2026-02-01"),
+    source: prov.mdt,
+  },
+  {
+    team: "Mental health services",
+    status: "Recently discharged",
+    role: "Mood and cognition support",
+    nextPlannedActivity: "Re-refer if mood or risk deteriorates.",
+    keyContact: "CMHT duty line · 020 7946 5200",
+    lastConfirmedDate: formatFrailtyShortDate("2026-01-30"),
+    source: prov.cmht,
+  },
+  {
+    team: "Respiratory outreach",
+    status: "Historical",
+    role: "Short-term exacerbation support",
+    nextPlannedActivity: "No routine follow-up planned.",
+    keyContact: "Respiratory outreach desk · 020 7946 6105",
+    lastConfirmedDate: formatFrailtyShortDate("2025-12-14"),
+    source: prov.acute(),
+  },
 ];
 
-export const serviceTone: Record<ServiceStatus, "green" | "orange" | "grey"> = {
-  "Active care": "green",
-  "Referral pending - awaiting further detail": "orange",
-  "Recently discharged": "grey",
+export const serviceTone: Record<
+  FrailtyService["status"],
+  "green" | "orange" | "blue" | "grey"
+> = {
+  Active: "green",
+  "Referred / waiting": "orange",
+  "Recently discharged": "blue",
+  Historical: "grey",
 };
 
 export type Trend = "up" | "down" | "stable";
@@ -177,6 +318,7 @@ export type Vital = {
   readings: readonly {
     date: string;
     value: string;
+    type?: "Sitting" | "Standing";
     by: string;
     system: string;
     height?: string;
@@ -189,7 +331,7 @@ export type Vital = {
 export const vitals: readonly Vital[] = [
   {
     key: "postural-bp",
-    label: "Postural blood pressure",
+    label: "Blood pressure",
     value: "116/72",
     concern: true,
     unit: "mmHg",
@@ -203,17 +345,20 @@ export const vitals: readonly Vital[] = [
       {
         date: formatFrailtyShortDate("2026-01-22"),
         value: "116/72 mmHg",
+        type: "Standing",
         by: "District nurse",
         system: "EMIS Community",
       },
       {
         date: formatFrailtyShortDate("2025-12-15"),
+        type: "Sitting",
         value: "120/74 mmHg",
         by: "Practice nurse",
         system: "EMIS GP",
       },
       {
         date: formatFrailtyShortDate("2025-11-15"),
+        type: "Standing",
         value: "128/78 mmHg",
         by: "GP",
         system: "EMIS GP",
@@ -235,36 +380,42 @@ export const vitals: readonly Vital[] = [
       {
         date: formatFrailtyShortDate("2026-01-22"),
         value: "62 bpm",
+        type: "Sitting",
         by: "District nurse",
         system: "EMIS Community",
       },
       {
         date: formatFrailtyShortDate("2026-01-08"),
         value: "65 bpm",
+        type: "Sitting",
         by: "District nurse",
         system: "EMIS Community",
       },
       {
         date: formatFrailtyShortDate("2025-12-15"),
         value: "68 bpm",
+        type: "Sitting",
         by: "Practice nurse",
         system: "EMIS GP",
       },
       {
         date: formatFrailtyShortDate("2025-12-01"),
         value: "66 bpm",
+        type: "Sitting",
         by: "Practice nurse",
         system: "EMIS GP",
       },
       {
         date: formatFrailtyShortDate("2025-11-01"),
         value: "63 bpm",
+        type: "Sitting",
         by: "GP",
         system: "EMIS GP",
       },
       {
         date: formatFrailtyShortDate("2025-01-22"),
         value: "64 bpm",
+        type: "Sitting",
         by: "GP",
         system: "EMIS GP",
       },
@@ -438,30 +589,255 @@ export const frailtyConditions: readonly FrailtyCondition[] = [
 
 export type FrailtyMedicine = {
   name: string;
-  status: "Optimised" | "Review needed";
+  status: "Active" | "Inactive" | "Current Course";
   frequency: string;
-  reviewed?: string;
+  startDate?: string;
+  endDate?: string;
   provenance: Provenance;
 };
 
 export const frailtyMedicines: readonly FrailtyMedicine[] = [
-  { name: "Amlodipine 5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyShortDate("2025-12-10"), provenance: prov.gpPharmacist },
-  { name: "Atorvastatin 20mg", status: "Optimised", frequency: "Once daily at night", reviewed: formatFrailtyShortDate("2025-12-10"), provenance: prov.gpPatel() },
-  { name: "Aspirin 75mg", status: "Review needed", frequency: "Once daily", provenance: prov.gpPatel() },
-  { name: "Ramipril 2.5mg", status: "Optimised", frequency: "Once daily", reviewed: formatFrailtyShortDate("2025-12-10"), provenance: prov.gpPatel() },
-  { name: "Bisoprolol 2.5mg", status: "Review needed", frequency: "Once daily", provenance: prov.acute() },
+  {
+    name: "Amlodipine 5mg",
+    status: "Active",
+    frequency: "Once daily",
+    startDate: formatFrailtyShortDate("2025-12-10"),
+    provenance: prov.gpPharmacist,
+  },
+  {
+    name: "Atorvastatin 20mg",
+    status: "Active",
+    frequency: "Once daily at night",
+    startDate: formatFrailtyShortDate("2025-12-10"),
+    provenance: prov.gpPatel(),
+  },
+  {
+    name: "Aspirin 75mg",
+    status: "Current Course",
+    frequency: "Once daily",
+    provenance: prov.gpPatel(),
+  },
+  {
+    name: "Ramipril 2.5mg",
+    status: "Active",
+    frequency: "Once daily",
+    startDate: formatFrailtyShortDate("2025-12-10"),
+    provenance: prov.gpPatel(),
+  },
+  {
+    name: "Bisoprolol 2.5mg",
+    status: "Inactive",
+    frequency: "Once daily",
+    provenance: prov.acute(),
+  },
 ];
 
 export type TimelineEvent = { date: string; title: string; description: string; provenance: Provenance };
 
 export const timeline: readonly TimelineEvent[] = [
-  { date: formatFrailtyShortDate("2026-02-05"), title: "Virtual ward", description: "Remote monitoring via virtual ward for 3 days following increased breathlessness and fall risk.", provenance: { ...prov.mdt, pulled: "2 days ago", by: "Claire Hobbs (Virtual ward nurse)" } },
-  { date: formatFrailtyShortDate("2026-02-04"), title: "Community visit", description: "District nurse wound care review.", provenance: prov.districtNurse("EMIS Community", "3 days ago") },
-  { date: formatFrailtyShortDate("2026-02-02"), title: "Social work involvement", description: "Social worker reviewed care package and logged safeguarding concern.", provenance: prov.socialWorker("5 days ago") },
-  { date: formatFrailtyShortDate("2026-01-31"), title: "Carer change", description: "Son (Nick Bennett) availability reduced (work commitments). Review requested.", provenance: prov.socialWorker("7 days ago") },
-  { date: formatFrailtyShortDate("2026-01-29"), title: "111 call", description: "Patient called about increased breathlessness.", provenance: prov.urgent },
-  { date: formatFrailtyShortDate("2026-01-22"), title: "ED visit", description: "Fall at home, no fracture.", provenance: prov.acute() },
-  { date: formatFrailtyShortDate("2026-01-18"), title: "Therapy appointment", description: "Physiotherapy mobility assessment.", provenance: prov.physio },
+  {
+    date: formatFrailtyShortDate("2026-02-05"),
+    title: "Virtual ward",
+    description:
+      "Remote monitoring via virtual ward for 3 days following increased breathlessness and fall risk.",
+    provenance: {
+      ...prov.mdt,
+      pulled: pulledDateLabel("2 days ago"),
+      by: "Claire Hobbs (Virtual ward nurse)",
+    },
+  },
+  {
+    date: formatFrailtyShortDate("2026-02-04"),
+    title: "Community visit",
+    description: "District nurse wound care review.",
+    provenance: prov.districtNurse("EMIS Community", "3 days ago"),
+  },
+  {
+    date: formatFrailtyShortDate("2026-02-02"),
+    title: "Social work involvement",
+    description:
+      "Social worker reviewed care package and logged safeguarding concern.",
+    provenance: prov.socialWorker("5 days ago"),
+  },
+  {
+    date: formatFrailtyShortDate("2026-01-31"),
+    title: "Carer change",
+    description:
+      "Son (Nick Bennett) availability reduced (work commitments). Review requested.",
+    provenance: prov.socialWorker("7 days ago"),
+  },
+  {
+    date: formatFrailtyShortDate("2026-01-29"),
+    title: "111 call",
+    description: "Patient called about increased breathlessness.",
+    provenance: prov.urgent,
+  },
+  {
+    date: formatFrailtyShortDate("2026-01-22"),
+    title: "ED visit",
+    description: "Fall at home, no fracture.",
+    provenance: prov.acute(),
+  },
+  {
+    date: formatFrailtyShortDate("2026-01-18"),
+    title: "Therapy appointment",
+    description: "Physiotherapy mobility assessment.",
+    provenance: prov.physio,
+  },
+];
+
+export type FallsHistoryEntry = {
+  date: string;
+  incident: string;
+  outcome: string;
+  changeAfterIncident: string;
+  provenance: Provenance;
+};
+
+export const fallsHistory: readonly FallsHistoryEntry[] = [
+  {
+    date: formatFrailtyShortDate("2026-01-22"),
+    incident: "Fall at home (ED attendance)",
+    outcome: "No fracture. Discharged same day with falls advice.",
+    changeAfterIncident:
+      "Falls service referral requested; increased observation at home.",
+    provenance: prov.acute(),
+  },
+  {
+    date: formatFrailtyShortDate("2026-01-12"),
+    incident: "Night-time fall in hallway",
+    outcome: "Minor soft tissue injury to left hip.",
+    changeAfterIncident:
+      "Sensor lighting requested and transfer review escalated to OT.",
+    provenance: prov.districtNurse(),
+  },
+  {
+    date: formatFrailtyShortDate("2025-12-03"),
+    incident: "Slip in kitchen",
+    outcome: "No injury recorded.",
+    changeAfterIncident: "Care package prompts for hydration and pacing added.",
+    provenance: prov.socialWorker(),
+  },
+  {
+    date: formatFrailtyShortDate("2025-11-08"),
+    incident: "Fall during transfer from bed",
+    outcome: "Bruising; no head injury.",
+    changeAfterIncident:
+      "Zimmer frame guidance reinforced by community physio.",
+    provenance: prov.physio,
+  },
+];
+
+export type MobilityHistoryEntry = {
+  date: string;
+  change: string;
+  detail: string;
+  trigger: string;
+  provenance: Provenance;
+};
+
+export const mobilityHistory: readonly MobilityHistoryEntry[] = [
+  {
+    date: formatFrailtyShortDate("2026-01-18"),
+    change: "Transfers now require assistance of 1",
+    detail: "Increased support needed for chair and bed transfers.",
+    trigger: "Post-fall confidence decline and deconditioning.",
+    provenance: prov.physio,
+  },
+  {
+    date: formatFrailtyShortDate("2025-12-12"),
+    change: "Outdoor mobility changed to wheeled zimmer frame",
+    detail: "Walking stick no longer sufficient outdoors.",
+    trigger: "Balance deterioration on uneven surfaces.",
+    provenance: prov.physio,
+  },
+  {
+    date: formatFrailtyShortDate("2025-10-30"),
+    change: "Reduced walking tolerance indoors",
+    detail: "Frequent rest pauses needed after short distance.",
+    trigger: "Breathlessness and lower-limb weakness.",
+    provenance: prov.districtNurse(),
+  },
+  {
+    date: formatFrailtyShortDate("2025-08-16"),
+    change: "Baseline: walking stick indoors and outdoors",
+    detail: "Independent indoors with occasional supervision.",
+    trigger: "Routine frailty review baseline.",
+    provenance: prov.mdt,
+  },
+];
+
+export type EquipmentAdaptationEntry = {
+  item: string;
+  status: "Active" | "Pending review" | "Awaiting installation";
+  provider: string;
+  installationDate: string;
+  currentUse: string;
+  reviewOrOutstandingAction: string;
+  provenance: Provenance;
+};
+
+export const equipmentAdaptations: readonly EquipmentAdaptationEntry[] = [
+  {
+    item: "Walking aid (indoor stick)",
+    status: "Active",
+    provider: "Community physiotherapy service",
+    installationDate: formatFrailtyShortDate("2025-08-16"),
+    currentUse: "Used for all indoor ambulation.",
+    reviewOrOutstandingAction:
+      "Recheck grip height and wear at next physio review.",
+    provenance: prov.physio,
+  },
+  {
+    item: "Wheeled zimmer frame (outdoor)",
+    status: "Active",
+    provider: "Community OT",
+    installationDate: formatFrailtyShortDate("2025-12-12"),
+    currentUse: "Primary support for all outdoor mobility.",
+    reviewOrOutstandingAction:
+      "Confirm brake use and curb technique at next OT visit.",
+    provenance: prov.physio,
+  },
+  {
+    item: "Bathroom equipment (shower chair and grab rails)",
+    status: "Active",
+    provider: "Adult social care equipment service",
+    installationDate: formatFrailtyShortDate("2025-10-03"),
+    currentUse: "Used daily for safe showering and transfers.",
+    reviewOrOutstandingAction:
+      "6-month safety check due at social care review.",
+    provenance: prov.socialWorker(),
+  },
+  {
+    item: "Transfer aids (bed rail and chair raiser)",
+    status: "Pending review",
+    provider: "Community OT",
+    installationDate: formatFrailtyShortDate("2025-11-18"),
+    currentUse: "Used for morning/evening transfers.",
+    reviewOrOutstandingAction:
+      "Reassess suitability after January falls and deconditioning.",
+    provenance: prov.physio,
+  },
+  {
+    item: "Access adaptation (key safe and entry support plan)",
+    status: "Active",
+    provider: "Social care and district nursing",
+    installationDate: formatFrailtyShortDate("2025-09-27"),
+    currentUse: "Supports care-worker access for 3 daily calls.",
+    reviewOrOutstandingAction:
+      "Confirm code governance and authorised user list at next review.",
+    provenance: prov.socialWorker(),
+  },
+  {
+    item: "Pressure equipment (alternating pressure cushion)",
+    status: "Awaiting installation",
+    provider: "Community nursing equipment hub",
+    installationDate: formatFrailtyShortDate("2026-02-08"),
+    currentUse: "Not in place yet.",
+    reviewOrOutstandingAction:
+      "Delivery booked; verify setup and skin-check protocol on arrival.",
+    provenance: prov.districtNurse(),
+  },
 ];
 
 export type FrailtyAppointment = {
@@ -477,33 +853,76 @@ export type FrailtyAppointment = {
 
 export const frailtyAppointments: readonly FrailtyAppointment[] = [
   {
-    title: "OT home assessment", service: "OT / Community therapy", date: formatFrailtyShortDate("2026-02-20"), time: "10:30", location: "Patient's home",
-    description: "Home assessment for equipment review and environmental hazard reduction following recurrent falls.",
+    title: "OT home assessment",
+    service: "OT / Community therapy",
+    date: formatFrailtyShortDate("2026-02-20"),
+    time: "10:30",
+    location: "Patient's home",
+    description:
+      "Home assessment for equipment review and environmental hazard reduction following recurrent falls.",
     booked: `Booked ${formatFrailtyShortDate("2026-02-06")} by Sarah Linton (OT co-ordinator)`,
-    provenance: { ...prov.physio, pulled: "1 day ago", by: "Sarah Linton (OT co-ordinator)" },
+    provenance: {
+      ...prov.physio,
+      pulled: pulledDateLabel("1 day ago"),
+      by: "Sarah Linton (OT co-ordinator)",
+    },
   },
   {
-    title: "Frailty MDT review", service: "Frailty team", date: formatFrailtyShortDate("2026-03-05"), time: "14:00", location: "Virtual (MS Teams)",
-    description: "Follow-up multi-disciplinary review to reassess CFS score, medication optimisation and the falls prevention plan.",
+    title: "Community Geriatrician Follow-up",
+    service: "Frailty team",
+    date: formatFrailtyShortDate("2026-03-05"),
+    time: "14:00",
+    location: "Virtual (MS Teams)",
+    description:
+      "Follow-up multi-disciplinary review to reassess CFS score, medication optimisation and the falls prevention plan.",
     booked: `Booked ${formatFrailtyShortDate("2026-02-07")} by Laura Chen (Frailty co-ordinator)`,
-    provenance: { ...prov.mdt, pulled: "1 day ago", by: "Laura Chen (Frailty co-ordinator)" },
+    provenance: {
+      ...prov.mdt,
+      pulled: pulledDateLabel("1 day ago"),
+      by: "Laura Chen (Frailty co-ordinator)",
+    },
   },
 ];
 
 // ── Quick filters ────────────────────────────────────────────────────────────
 
 export type SnapshotPanel =
-  | "falls" | "mobility" | "household" | "carer" | "vitals" | "conditions" | "medicines" | "timeline" | "appointments";
+  | "falls"
+  | "mobility"
+  | "equipment"
+  | "household"
+  | "carer"
+  | "vitals"
+  | "conditions"
+  | "medicines"
+  | "timeline"
+  | "appointments";
 
 export const snapshotFilters = [
   { value: "all", label: "All", panels: null },
-  { value: "clinical", label: "Clinical", panels: ["vitals", "conditions", "medicines"] },
-  { value: "functional", label: "Functional", panels: ["falls", "mobility", "household"] },
+  {
+    value: "clinical",
+    label: "Clinical",
+    panels: ["vitals", "conditions", "medicines"],
+  },
+  {
+    value: "functional",
+    label: "Functional",
+    panels: ["falls", "mobility", "equipment", "household"],
+  },
   { value: "social", label: "Social / carer", panels: ["carer", "household"] },
-  { value: "risks", label: "Risks", panels: ["falls", "conditions", "medicines"] },
+  {
+    value: "risks",
+    label: "Risks",
+    panels: ["falls", "conditions", "medicines"],
+  },
   { value: "medication", label: "Medication", panels: ["medicines"] },
   { value: "events", label: "Events", panels: ["timeline", "appointments"] },
-] as const satisfies readonly { value: string; label: string; panels: readonly SnapshotPanel[] | null }[];
+] as const satisfies readonly {
+  value: string;
+  label: string;
+  panels: readonly SnapshotPanel[] | null;
+}[];
 
 // ── CGA ──────────────────────────────────────────────────────────────────────
 
@@ -573,47 +992,197 @@ export const cgaSummary = [
 
 export const cgaDomains: readonly CgaDomain[] = [
   {
+    id: "Clinicial frailty scale",
+    title: "Clinical Frailty Scale",
+    fields: [
+      {
+        id: "cfs",
+        title: "Clinical Frailty Scale",
+        kind: "choice",
+        options: cfsOptions,
+        initialChoice: "6",
+        provenance: prov.mdt,
+        mandatory: true,
+      },
+    ],
+  },
+  {
     id: "physical",
     title: "Physical",
     risk: true,
     prompts: [
-      { id: "ai-phys-1", text: "Recurrent falls pattern detected (4 falls in 3 months). High risk of serious injury. Recommend urgent falls prevention referral." },
-      { id: "ai-phys-2", text: "Declining weight trend noted over the last 3 months (about 3 kg loss). MUST score elevated. Consider dietitian referral." },
-      { id: "ai-phys-3", text: "Deteriorating hearing detected from carer reports. Consider referral for audiological assessment or hearing aids." },
-      { id: "ai-phys-4", text: "Rising blood glucose values over the last 3 readings. Glycaemic management review recommended." },
+      {
+        id: "ai-phys-1",
+        text: "Recurrent falls pattern detected (4 falls in 3 months). High risk of serious injury. Recommend urgent falls prevention referral.",
+      },
+      {
+        id: "ai-phys-2",
+        text: "Declining weight trend noted over the last 3 months (about 3 kg loss). MUST score elevated. Consider dietitian referral.",
+      },
+      {
+        id: "ai-phys-3",
+        text: "Deteriorating hearing detected from carer reports. Consider referral for audiological assessment or hearing aids.",
+      },
+      {
+        id: "ai-phys-4",
+        text: "Rising blood glucose values over the last 3 readings. Glycaemic management review recommended.",
+      },
     ],
     fields: [
-      { id: "cfs", title: "Clinical Frailty Scale", kind: "choice", options: cfsOptions, initialChoice: "6", provenance: prov.mdt, mandatory: true },
-      p("active-conditions", "Active conditions", "Type 2 diabetes (2012), hypertension (2008), chronic heart failure (2019), CKD stage 3a (2020), dementia, mixed type (2024)", prov.gpPatel()),
-      p("history-presenting", "History of presenting condition", `80-year-old male with moderate frailty (CFS 6). 4 falls in the last 3 months, most recent ${formatFrailtyDate("2026-01-22")} resulting in ED attendance (no fracture). Episode of increased breathlessness ${formatFrailtyDate("2026-01-29")}, contact via 111 and subsequent virtual ward monitoring. Background of dementia (mixed type, 2024), chronic heart failure and type 2 diabetes. Carer strain noted; son's availability has recently reduced.`, prov.mdt),
-      p("current-diagnosis", "Current diagnosis", "Type 2 diabetes mellitus (2012) · Hypertension (2008) · Chronic heart failure (2019) · Chronic kidney disease stage 3a (2020) · Dementia, mixed type (2024)", prov.gpPatel(), undefined, { editable: false }),
-      t("past-medical", "Other significant past medical history", "Anything not captured in active conditions."),
-      t("medication-review", "Medication review", "Document medication review findings here.", { risk: true }),
-      t("smoking-drugs", "Smoking, drugs and alcohol", "Smoking status, alcohol intake, recreational drug use and history."),
-      { id: "vital-signs", title: "Vital signs observations", kind: "choice", options: yesNo, hint: "Have vital signs been observed?" },
+      // { id: "cfs", title: "Clinical Frailty Scale", kind: "choice", options: cfsOptions, initialChoice: "6", provenance: prov.mdt, mandatory: true },
+      p(
+        "active-conditions",
+        "Active conditions",
+        "Type 2 diabetes (2012), hypertension (2008), chronic heart failure (2019), CKD stage 3a (2020), dementia, mixed type (2024)",
+        prov.gpPatel(),
+      ),
+      p(
+        "history-presenting",
+        "History of presenting condition",
+        `80-year-old male with moderate frailty (CFS 6). 4 falls in the last 3 months, most recent ${formatFrailtyDate("2026-01-22")} resulting in ED attendance (no fracture). Episode of increased breathlessness ${formatFrailtyDate("2026-01-29")}, contact via 111 and subsequent virtual ward monitoring. Background of dementia (mixed type, 2024), chronic heart failure and type 2 diabetes. Carer strain noted; son's availability has recently reduced.`,
+        prov.mdt,
+      ),
+      p(
+        "current-diagnosis",
+        "Current diagnosis",
+        "Type 2 diabetes mellitus (2012) · Hypertension (2008) · Chronic heart failure (2019) · Chronic kidney disease stage 3a (2020) · Dementia, mixed type (2024)",
+        prov.gpPatel(),
+        undefined,
+        { editable: false },
+      ),
+      t(
+        "past-medical",
+        "Other significant past medical history",
+        "Anything not captured in active conditions.",
+      ),
+      t(
+        "medication-review",
+        "Medication review",
+        "Document medication review findings here.",
+        { risk: true },
+      ),
+      t(
+        "smoking-drugs",
+        "Smoking, drugs and alcohol",
+        "Smoking status, alcohol intake, recreational drug use and history.",
+      ),
+      {
+        id: "vital-signs",
+        title: "Vital signs observations",
+        kind: "choice",
+        options: yesNo,
+        hint: "Have vital signs been observed?",
+      },
       t("ecg", "ECG", "ECG findings and interpretation."),
-      p("weight-bmi", "Weight, height and BMI", "Weight: 54 kg (lost about 3 kg over 6 months). Height: not recorded. BMI: unable to calculate.", prov.districtNurse(), undefined, { editable: false }),
-      p("bloods", "Bloods of note", "HbA1c: 68 mmol/mol (raised, reviewed by GP). eGFR: reduced, consistent with CKD stage 3a. No recent full blood count on record.", prov.gpPatel(), undefined, { editable: false }),
-      p("falls-history", "Falls history", `4 falls in the last 3 months. Most recent: ${formatFrailtyDate("2026-01-22")}, ED attendance, no fracture. Previous falls on record via community and acute. Multifactorial falls intervention in place. Physiotherapy strength and balance programme ongoing (fortnightly).`, prov.acute(), "Add further detail here.", { risk: true, editable: false }),
-      t("pain", "Pain", "Describe pain location, type and severity. Consider a pain scale such as PAINAD, Abbey or visual analogue scale."),
-      t("pain-expression", "Differences expressing pain", "Any difficulties or differences in how the patient expresses pain."),
-      t("eating-drinking", "Eating and drinking", "Eating and drinking habits, independence, any concerns."),
+      p(
+        "weight-bmi",
+        "Weight, height and BMI",
+        "Weight: 54 kg (lost about 3 kg over 6 months). Height: not recorded. BMI: unable to calculate.",
+        prov.districtNurse(),
+        undefined,
+        { editable: false },
+      ),
+      p(
+        "bloods",
+        "Bloods of note",
+        "HbA1c: 68 mmol/mol (raised, reviewed by GP). eGFR: reduced, consistent with CKD stage 3a. No recent full blood count on record.",
+        prov.gpPatel(),
+        undefined,
+        { editable: false },
+      ),
+      p(
+        "falls-history",
+        "Falls history",
+        `4 falls in the last 3 months. Most recent: ${formatFrailtyDate("2026-01-22")}, ED attendance, no fracture. Previous falls on record via community and acute. Multifactorial falls intervention in place. Physiotherapy strength and balance programme ongoing (fortnightly).`,
+        prov.acute(),
+        "Add further detail here.",
+        { risk: true, editable: false },
+      ),
+      t(
+        "pain",
+        "Pain",
+        "Describe pain location, type and severity. Consider a pain scale such as PAINAD, Abbey or visual analogue scale.",
+      ),
+      t(
+        "pain-expression",
+        "Differences expressing pain",
+        "Any difficulties or differences in how the patient expresses pain.",
+      ),
+      t(
+        "eating-drinking",
+        "Eating and drinking",
+        "Eating and drinking habits, independence, any concerns.",
+      ),
       t("appetite", "Appetite", "Current appetite and any recent changes."),
-      t("swallowing", "Swallowing", "Any swallowing difficulties or concerns. Is speech and language therapy involved?"),
-      t("feeding-equipment", "Feeding equipment", "Any specialised feeding equipment in use."),
-      { id: "must-score", title: "MUST score", kind: "choice", options: mustOptions, hint: "Malnutrition Universal Screening Tool" },
-      t("bladder", "Bladder function", "Bladder function details. Align with the catheter care section."),
+      t(
+        "swallowing",
+        "Swallowing",
+        "Any swallowing difficulties or concerns. Is speech and language therapy involved?",
+      ),
+      t(
+        "feeding-equipment",
+        "Feeding equipment",
+        "Any specialised feeding equipment in use.",
+      ),
+      {
+        id: "must-score",
+        title: "MUST score",
+        kind: "choice",
+        options: mustOptions,
+        hint: "Malnutrition Universal Screening Tool",
+      },
+      t(
+        "bladder",
+        "Bladder function",
+        "Bladder function details. Align with the catheter care section.",
+      ),
       { id: "catheter", title: "Catheter", kind: "choice", options: yesNo },
-      t("catheter-care", "Catheter care", "Type, size, date inserted, next change due."),
+      t(
+        "catheter-care",
+        "Catheter care",
+        "Type, size, date inserted, next change due.",
+      ),
       t("bowel", "Bowel function", "Frequency, consistency, any concerns."),
-      t("skin", "Skin integrity", "Skin integrity assessment. Include ulcer grades where applicable."),
-      t("risk-score", "Risk score", "Consider Purpose T, Waterlow or Braden scale."),
-      t("bone-health", "Bone health", "Bone health findings, DEXA results, fracture risk."),
-      t("eyesight", "Eyesight", "Eyesight findings and any referrals required."),
-      t("hearing", "Hearing", "Hearing assessment findings, aids in use, any referrals."),
-      t("dental", "Dental health", "Dental health, dentures, oral hygiene, last review."),
-      t("other-physical", "Other physical assessment findings", "Any other physical assessment findings not captured above."),
-      t("physical-additional", "Additional details", "Any other relevant physical information."),
+      t(
+        "skin",
+        "Skin integrity",
+        "Skin integrity assessment. Include ulcer grades where applicable.",
+      ),
+      t(
+        "risk-score",
+        "Risk score",
+        "Consider Purpose T, Waterlow or Braden scale.",
+      ),
+      t(
+        "bone-health",
+        "Bone health",
+        "Bone health findings, DEXA results, fracture risk.",
+      ),
+      t(
+        "eyesight",
+        "Eyesight",
+        "Eyesight findings and any referrals required.",
+      ),
+      t(
+        "hearing",
+        "Hearing",
+        "Hearing assessment findings, aids in use, any referrals.",
+      ),
+      t(
+        "dental",
+        "Dental health",
+        "Dental health, dentures, oral hygiene, last review.",
+      ),
+      t(
+        "other-physical",
+        "Other physical assessment findings",
+        "Any other physical assessment findings not captured above.",
+      ),
+      t(
+        "physical-additional",
+        "Additional details",
+        "Any other relevant physical information.",
+      ),
     ],
   },
   {
@@ -621,24 +1190,59 @@ export const cgaDomains: readonly CgaDomain[] = [
     title: "Psychological",
     risk: true,
     prompts: [
-      { id: "ai-psych-1", text: "PHQ-9 score 14 (moderate depression). Antidepressant therapy not currently prescribed. Consider mental health review." },
-      { id: "ai-psych-2", text: "BPSD symptoms escalating: agitation and nocturnal wandering reported by carer. Consider non-pharmacological strategies first." },
+      {
+        id: "ai-psych-1",
+        text: "PHQ-9 score 14 (moderate depression). Antidepressant therapy not currently prescribed. Consider mental health review.",
+      },
+      {
+        id: "ai-psych-2",
+        text: "BPSD symptoms escalating: agitation and nocturnal wandering reported by carer. Consider non-pharmacological strategies first.",
+      },
     ],
     fields: [
-      p("cognitive", "Cognitive assessment", "Dementia (mixed type) diagnosed 2024. Cognitive impairment noted by GP and community team. Formal cognitive testing to be completed during assessment.", prov.gpPatel(), "Add further detail here."),
-      p("mood", "Mood and mental health", `Previously under community mental health for low mood following bereavement (wife Dorothy, deceased 2022). Discharged from CMHT with advice and a self-management plan (${frailtyClock.month("2025-12-10")}). No current mental health input. Carer strain from son may be contributing to low mood. Further assessment required.`, prov.cmht, "Add further detail here."),
-      t("bpsd", "Behavioural and psychological symptoms", "To be completed during assessment."),
+      p(
+        "cognitive",
+        "Cognitive assessment",
+        "Dementia (mixed type) diagnosed 2024. Cognitive impairment noted by GP and community team. Formal cognitive testing to be completed during assessment.",
+        prov.gpPatel(),
+        "Add further detail here.",
+      ),
+      p(
+        "mood",
+        "Mood and mental health",
+        `Previously under community mental health for low mood following bereavement (wife Dorothy, deceased 2022). Discharged from CMHT with advice and a self-management plan (${frailtyClock.month("2025-12-10")}). No current mental health input. Carer strain from son may be contributing to low mood. Further assessment required.`,
+        prov.cmht,
+        "Add further detail here.",
+      ),
+      t(
+        "bpsd",
+        "Behavioural and psychological symptoms",
+        "To be completed during assessment.",
+      ),
     ],
   },
   {
     id: "functional",
     title: "Functional",
     prompts: [
-      { id: "ai-func-1", text: "Barthel Index score declining over the past 3 assessments. OT home assessment overdue, scheduled for 20 February but not yet completed." },
+      {
+        id: "ai-func-1",
+        text: "Barthel Index score declining over the past 3 assessments. OT home assessment overdue, scheduled for 20 February but not yet completed.",
+      },
     ],
     fields: [
-      p("mobility", "Mobility and transfers", `Indoors: walking stick. Outdoors: wheeled zimmer frame. Transfers: requires assistance of 1. Physio mobility assessment completed ${formatFrailtyDate("2026-01-18")} by Tom Edwards (physiotherapist).`, prov.physio, "Add further detail here."),
-      t("adls", "Activities of daily living (ADLs)", "To be completed during assessment."),
+      p(
+        "mobility",
+        "Mobility and transfers",
+        `Indoors: walking stick. Outdoors: wheeled zimmer frame. Transfers: requires assistance of 1. Physio mobility assessment completed ${formatFrailtyDate("2026-01-18")} by Tom Edwards (physiotherapist).`,
+        prov.physio,
+        "Add further detail here.",
+      ),
+      t(
+        "adls",
+        "Activities of daily living (ADLs)",
+        "To be completed during assessment.",
+      ),
       t("ot-home", "OT home assessment", "To be completed during assessment."),
     ],
   },
@@ -647,62 +1251,192 @@ export const cgaDomains: readonly CgaDomain[] = [
     title: "Social",
     risk: true,
     prompts: [
-      { id: "ai-soc-1", text: "Carer strain indicators present. Zarit Burden score moderate. Explore respite care options urgently." },
-      { id: "ai-soc-2", text: "Self-neglect safeguarding concern raised by community nurse. Adult safeguarding referral recommended." },
+      {
+        id: "ai-soc-1",
+        text: "Carer strain indicators present. Zarit Burden score moderate. Explore respite care options urgently.",
+      },
+      {
+        id: "ai-soc-2",
+        text: "Self-neglect safeguarding concern raised by community nurse. Adult safeguarding referral recommended.",
+      },
     ],
     fields: [
-      p("carer-insights", "Carer insights", "Primary carer: son Nick Bennett (07700 900 123), lives locally. Contingency carer: daughter Rachel Bennett (07700 900 456), lives in Manchester. Formal: no. Informal: yes. Carer strain: moderate; son reporting reduced availability due to work commitments. Care package in place: 3 visits a day.", prov.socialWorker(), "Add further detail here.", { risk: true }),
-      p("safeguarding", "Safeguarding", `Self-neglect risk flagged. Concern logged ${formatFrailtyDate("2026-02-02")} by Aisha Khan (social worker) following care package review. Patient declining some care visits. Safeguarding referral made to Croydon Council Adult Social Care. Status: under review.`, prov.safeguarding, "Add further detail here.", { risk: true }),
-      p("isolation", "Social isolation and support networks", "Lives alone. Wife deceased (2022). Limited social contact noted. Son visits when work allows; daughter in Manchester. No voluntary sector input currently in place. Warm referral to Age UK suggested for social isolation support (status: pending).", prov.socialWorker("5 days ago"), "Add further detail here."),
+      p(
+        "carer-insights",
+        "Carer insights",
+        "Primary carer: son Nick Bennett (07700 900 123), lives locally. Contingency carer: daughter Rachel Bennett (07700 900 456), lives in Manchester. Formal: no. Informal: yes. Carer strain: moderate; son reporting reduced availability due to work commitments. Care package in place: 3 visits a day.",
+        prov.socialWorker(),
+        "Add further detail here.",
+        { risk: true },
+      ),
+      p(
+        "safeguarding",
+        "Safeguarding",
+        `Self-neglect risk flagged. Concern logged ${formatFrailtyDate("2026-02-02")} by Aisha Khan (social worker) following care package review. Patient declining some care visits. Safeguarding referral made to Croydon Council Adult Social Care. Status: under review.`,
+        prov.safeguarding,
+        "Add further detail here.",
+        { risk: true },
+      ),
+      p(
+        "isolation",
+        "Social isolation and support networks",
+        "Lives alone. Wife deceased (2022). Limited social contact noted. Son visits when work allows; daughter in Manchester. No voluntary sector input currently in place. Warm referral to Age UK suggested for social isolation support (status: pending).",
+        prov.socialWorker("5 days ago"),
+        "Add further detail here.",
+      ),
     ],
   },
   {
     id: "personal",
     title: "Personal information",
     fields: [
-      p("personal-main", "Personal information", "Preferred name: Harold. Language: English. Religion: Christian. Ethnicity: White British. Next of kin: Nick Bennett (son) · 07700 900 123.", prov.gpPatel()),
-      t("able-phone", "Able to use phone", "To be completed during assessment."),
-      t("preferred-contact", "Preferred method of contact", "Add any further detail here."),
-      t("comms-support", "Support with communication", "Communication support needs, hearing aids, interpreter and so on."),
-      p("contacts", "Personal contacts", "Son: Nick Bennett (primary carer) · 07700 900 123 · lives locally. Daughter: Rachel Bennett · 07700 900 456 · Manchester. Social worker: Aisha Khan · Croydon Council Adult Social Care.", prov.socialWorker("5 days ago"), undefined, { editable: false }),
-      p("professionals", "Health and social care professionals or services", "GP: Dr Patel · Woodside Health Centre. District nurse: Jane Smith · Community Health Services. Social worker: Aisha Khan · Croydon Council Adult Social Care. Physiotherapist: Tom Edwards · Community Health Services. Frailty team: Laura Chen (co-ordinator). OT: Sarah Linton (co-ordinator), awaiting allocation.", prov.mdt),
-      t("personal-additional", "Additional details", "Any other relevant personal information."),
+      p(
+        "personal-main",
+        "Personal information",
+        "Preferred name: Harold. Language: English. Religion: Christian. Ethnicity: White British. Next of kin: Nick Bennett (son) · 07700 900 123.",
+        prov.gpPatel(),
+      ),
+      t(
+        "able-phone",
+        "Able to use phone",
+        "To be completed during assessment.",
+      ),
+      t(
+        "preferred-contact",
+        "Preferred method of contact",
+        "Add any further detail here.",
+      ),
+      t(
+        "comms-support",
+        "Support with communication",
+        "Communication support needs, hearing aids, interpreter and so on.",
+      ),
+      p(
+        "contacts",
+        "Personal contacts",
+        "Son: Nick Bennett (primary carer) · 07700 900 123 · lives locally. Daughter: Rachel Bennett · 07700 900 456 · Manchester. Social worker: Aisha Khan · Croydon Council Adult Social Care.",
+        prov.socialWorker("5 days ago"),
+        undefined,
+        { editable: false },
+      ),
+      p(
+        "professionals",
+        "Health and social care professionals or services",
+        "GP: Dr Patel · Woodside Health Centre. District nurse: Jane Smith · Community Health Services. Social worker: Aisha Khan · Croydon Council Adult Social Care. Physiotherapist: Tom Edwards · Community Health Services. Frailty team: Laura Chen (co-ordinator). OT: Sarah Linton (co-ordinator), awaiting allocation.",
+        prov.mdt,
+      ),
+      t(
+        "personal-additional",
+        "Additional details",
+        "Any other relevant personal information.",
+      ),
     ],
   },
   {
     id: "environmental",
     title: "Environmental",
     fields: [
-      p("lives-with", "Who they live with", "Lives alone. Son Nick Bennett (primary carer) lives locally. Daughter Rachel Bennett lives in Manchester. Care package: 3 visits a day.", prov.socialWorker()),
+      p(
+        "lives-with",
+        "Who they live with",
+        "Lives alone. Son Nick Bennett (primary carer) lives locally. Daughter Rachel Bennett lives in Manchester. Care package: 3 visits a day.",
+        prov.socialWorker(),
+      ),
       t("access", "Access to property", "Steps, ramps, key access and so on."),
-      p("accommodation", "Type of accommodation", "Ground floor flat. Council property (Croydon Council). No steps at entrance. Support required for transport.", prov.socialWorker()),
-      t("property-issues", "Issues identified with this property", "Damp, disrepair, hazards, accessibility issues and so on.", { risk: true }),
-      t("housing-plan", "Plan to address housing issues", "Plans to resolve any identified housing issues."),
-      t("evacuation", "Emergency evacuation plan", "Details of the emergency evacuation plan."),
-      p("key-safe", "Key safe details", "Key safe present. Location: front door, left of frame. Code held by the district nursing team. Confirm the code with Jane Smith (district nurse) before the visit.", prov.districtNurse("EMIS Community", "3 days ago")),
+      p(
+        "accommodation",
+        "Type of accommodation",
+        "Ground floor flat. Council property (Croydon Council). No steps at entrance. Support required for transport.",
+        prov.socialWorker(),
+      ),
+      t(
+        "property-issues",
+        "Issues identified with this property",
+        "Damp, disrepair, hazards, accessibility issues and so on.",
+        { risk: true },
+      ),
+      t(
+        "housing-plan",
+        "Plan to address housing issues",
+        "Plans to resolve any identified housing issues.",
+      ),
+      t(
+        "evacuation",
+        "Emergency evacuation plan",
+        "Details of the emergency evacuation plan.",
+      ),
+      p(
+        "key-safe",
+        "Key safe details",
+        "Key safe present. Location: front door, left of frame. Code held by the district nursing team. Confirm the code with Jane Smith (district nurse) before the visit.",
+        prov.districtNurse("EMIS Community", "3 days ago"),
+      ),
       t("pets", "Pets", "Details of any pets in the home."),
-      t("keeping-safe", "Keeping safe at home and in the community", "Safety concerns, telecare, assistive technology, community safety and so on.", { risk: true }),
-      t("environmental-additional", "Additional details", "Any other relevant environmental information."),
+      t(
+        "keeping-safe",
+        "Keeping safe at home and in the community",
+        "Safety concerns, telecare, assistive technology, community safety and so on.",
+        { risk: true },
+      ),
+      t(
+        "environmental-additional",
+        "Additional details",
+        "Any other relevant environmental information.",
+      ),
     ],
   },
   {
     id: "wishes",
     title: "Future wishes",
     fields: [
-      p("dnacpr", "DNACPR", `DNACPR in place. Decision made ${formatFrailtyDate("2025-11-14")} by Dr Patel (GP) following discussion with patient and family. Documented in EMIS GP. Copy held at Woodside Health Centre.`, prov.gpPatel("5 days ago")),
-      t("place-of-care", "Preferred place of care and death", "To be completed during assessment."),
-      p("lpa", "Lasting power of attorney", "LPA status: not confirmed on record. To be verified with patient and family during assessment. Son Nick Bennett (07700 900 123) may hold authority.", prov.gpPatel()),
+      p(
+        "dnacpr",
+        "DNACPR",
+        `DNACPR in place. Decision made ${formatFrailtyDate("2025-11-14")} by Dr Patel (GP) following discussion with patient and family. Documented in EMIS GP. Copy held at Woodside Health Centre.`,
+        prov.gpPatel("5 days ago"),
+      ),
+      t(
+        "place-of-care",
+        "Preferred place of care and death",
+        "To be completed during assessment.",
+      ),
+      p(
+        "lpa",
+        "Lasting power of attorney",
+        "LPA status: not confirmed on record. To be verified with patient and family during assessment. Son Nick Bennett (07700 900 123) may hold authority.",
+        prov.gpPatel(),
+      ),
     ],
   },
   {
     id: "goals",
     title: "Patient goals",
     fields: [
-      t("daily-life", "Daily life and interests", "What does their day look like? Hobbies, routines, activities they enjoy."),
-      t("important", "What is important to them, and their preferences and wishes", "To be completed during assessment."),
-      t("concerns", "Concerns and wellbeing", "Any concerns the patient has about their health, wellbeing or situation."),
-      t("goals", "Goals", "Specific goals the patient would like to work towards."),
-      t("goals-additional", "Additional details", "Any other relevant information about the patient's goals."),
+      t(
+        "daily-life",
+        "Daily life and interests",
+        "What does their day look like? Hobbies, routines, activities they enjoy.",
+      ),
+      t(
+        "important",
+        "What is important to them, and their preferences and wishes",
+        "To be completed during assessment.",
+      ),
+      t(
+        "concerns",
+        "Concerns and wellbeing",
+        "Any concerns the patient has about their health, wellbeing or situation.",
+      ),
+      t(
+        "goals",
+        "Goals",
+        "Specific goals the patient would like to work towards.",
+      ),
+      t(
+        "goals-additional",
+        "Additional details",
+        "Any other relevant information about the patient's goals.",
+      ),
     ],
   },
 ];

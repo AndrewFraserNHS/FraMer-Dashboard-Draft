@@ -1,4 +1,4 @@
-import { formatFrailtyDate } from "../../data/frailty";
+import { formatFrailtyDate, formatFrailtyShortDate } from "../../data/frailty";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Callout } from "../../components/ui/Callout";
@@ -12,6 +12,7 @@ import { RecordPage } from "../../components/ui/RecordPage";
 import { StatusTag } from "../../components/ui/StatusTag";
 import { Subsection } from "../../components/ui/Subsection";
 import { ToggleGroup } from "../../components/ui/ToggleGroup";
+import { useDetailPanel } from "../../hooks/useDetailPanel";
 import {
   frailtyAppointments,
   frailtyConnectedSystems,
@@ -19,6 +20,9 @@ import {
   frailtyMedicines,
   frailtyRisks,
   frailtyScale,
+  equipmentAdaptations,
+  fallsHistory,
+  mobilityHistory,
   patientOverview,
   prov,
   provenanceLine,
@@ -28,6 +32,7 @@ import {
   sourceMeta,
   timeline,
   vitals,
+  type FrailtyService,
   type SnapshotPanel,
   type Vital,
 } from "../../data/frailty";
@@ -65,12 +70,35 @@ function VitalHistory({ vital }: { vital: Vital }) {
           { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
           { header: "Reading", cell: (r) => <strong>{r.value}</strong> },
           ...(vital.readings.some((r) => r.weight)
-            ? [{ header: "Weight", cell: (r: (typeof vital.readings)[number]) => <strong>{r.weight}</strong> }]
+            ? [
+                {
+                  header: "Weight",
+                  cell: (r: (typeof vital.readings)[number]) => (
+                    <strong>{r.weight}</strong>
+                  ),
+                },
+              ]
             : []),
           ...(vital.readings.some((r) => r.height)
-            ? [{ header: "Height", cell: (r: (typeof vital.readings)[number]) => <strong>{r.height}</strong> }]
+            ? [
+                {
+                  header: "Height",
+                  cell: (r: (typeof vital.readings)[number]) => (
+                    <strong>{r.height}</strong>
+                  ),
+                },
+              ]
             : []),
           { header: "Recorded by", cell: (r) => r.by, sort: (r) => r.by },
+          ...(vital.readings.some((r) => r.type)
+            ? [
+                {
+                  header: "Posture",
+                  cell: (r: (typeof vital.readings)[number]) => r.type ?? "-",
+                  sort: (r: (typeof vital.readings)[number]) => r.type ?? "",
+                },
+              ]
+            : []),
           { header: "System", cell: (r) => r.system, sort: (r) => r.system },
         ]}
         rows={vital.readings}
@@ -82,13 +110,17 @@ function VitalHistory({ vital }: { vital: Vital }) {
 }
 
 export default function FrailtySnapshot() {
+  const openPanel = useDetailPanel();
   const [filter, setFilter] = useState<string>("all");
   const [period, setPeriod] = useState<TrendPeriod>("6m");
   const [vitalOpen, setVitalOpen] = useState<Vital | null>(null);
   const [cfsOpen, setCfsOpen] = useState(false);
 
-  const active = snapshotFilters.find((f) => f.value === filter) ?? snapshotFilters[0];
-  const show = (panel: SnapshotPanel) => active.panels === null || (active.panels as readonly string[]).includes(panel);
+  const active =
+    snapshotFilters.find((f) => f.value === filter) ?? snapshotFilters[0];
+  const show = (panel: SnapshotPanel) =>
+    active.panels === null ||
+    (active.panels as readonly string[]).includes(panel);
   const openCfs = () => {
     setVitalOpen(null);
     setCfsOpen(true);
@@ -100,12 +132,189 @@ export default function FrailtySnapshot() {
 
   const high = frailtyRisks.filter((r) => r.level === "high");
   const medium = frailtyRisks.filter((r) => r.level === "medium");
-  const counts = (status: string) => services.filter((s) => s.status === status).length;
+  const counts = (status: FrailtyService["status"]) =>
+    services.filter((s) => s.status === status).length;
+
+  function openServiceDetail(service: FrailtyService) {
+    openPanel({
+      eyebrow: "Service involvement",
+      title: service.team,
+      status: service.status,
+      content: (
+        <DetailList
+          rows={[
+            ["Team or service", service.team],
+            ["Status", service.status],
+            ["Role", service.role],
+            ["Next planned activity", service.nextPlannedActivity],
+            ["Key contact", service.keyContact],
+            ["Last confirmed date", service.lastConfirmedDate],
+            ["Source", <Source of={service.source} />],
+          ]}
+        />
+      ),
+    });
+  }
+
+  function openFallsHistory() {
+    openPanel({
+      eyebrow: "Functional insight",
+      title: "Falls history",
+      content: (
+        <DataTable
+          caption="Falls history and incident changes"
+          columns={[
+            {
+              header: "Date",
+              cell: (row) => row.date,
+              sort: (row) => dateKey(row.date),
+            },
+            {
+              header: "Incident",
+              cell: (row) => <strong>{row.incident}</strong>,
+              sort: (row) => row.incident,
+            },
+            { header: "Outcome", cell: (row) => row.outcome },
+            {
+              header: "Change after incident",
+              cell: (row) => row.changeAfterIncident,
+            },
+            { header: "Source", cell: (row) => <Source of={row.provenance} /> },
+          ]}
+          rows={fallsHistory}
+          rowKey={(row) => `${row.date}-${row.incident}`}
+          defaultSort={{ header: "Date", direction: "descending" }}
+        />
+      ),
+    });
+  }
+
+  function openMobilityHistory() {
+    openPanel({
+      eyebrow: "Functional insight",
+      title: "Baseline mobility history",
+      content: (
+        <DataTable
+          caption="Baseline mobility changes and history"
+          columns={[
+            {
+              header: "Date",
+              cell: (row) => row.date,
+              sort: (row) => dateKey(row.date),
+            },
+            {
+              header: "Change",
+              cell: (row) => <strong>{row.change}</strong>,
+              sort: (row) => row.change,
+            },
+            { header: "Detail", cell: (row) => row.detail },
+            { header: "Trigger", cell: (row) => row.trigger },
+            { header: "Source", cell: (row) => <Source of={row.provenance} /> },
+          ]}
+          rows={mobilityHistory}
+          rowKey={(row) => `${row.date}-${row.change}`}
+          defaultSort={{ header: "Date", direction: "descending" }}
+        />
+      ),
+    });
+  }
+
+  function openEquipmentAdaptations() {
+    openPanel({
+      eyebrow: "Functional insight",
+      title: "Equipment and adaptations",
+      content: (
+        <DataTable
+          caption="Equipment and adaptations used across the MDT"
+          columns={[
+            {
+              header: "Equipment or adaptation",
+              cell: (row) => <strong>{row.item}</strong>,
+              sort: (row) => row.item,
+            },
+            {
+              header: "Status",
+              cell: (row) => (
+                <StatusTag
+                  tone={
+                    row.status === "Active"
+                      ? "green"
+                      : row.status === "Pending review"
+                        ? "orange"
+                        : "blue"
+                  }
+                >
+                  {row.status}
+                </StatusTag>
+              ),
+              sort: (row) => row.status,
+            },
+            {
+              header: "Provider",
+              cell: (row) => row.provider,
+              sort: (row) => row.provider,
+            },
+            {
+              header: "Installation date",
+              cell: (row) => row.installationDate,
+              sort: (row) => dateKey(row.installationDate),
+            },
+            { header: "Current use", cell: (row) => row.currentUse },
+            {
+              header: "Review or outstanding action",
+              cell: (row) => row.reviewOrOutstandingAction,
+            },
+            { header: "Source", cell: (row) => <Source of={row.provenance} /> },
+          ]}
+          rows={equipmentAdaptations}
+          rowKey={(row) => row.item}
+          defaultSort={{ header: "Installation date", direction: "descending" }}
+        />
+      ),
+    });
+  }
+  const cfsHistory = [
+    {
+      date: formatFrailtyShortDate("2026-02-06"),
+      score: "6",
+      label: "Moderately frail",
+      setting: "Community Geriatrician Follow-up",
+      source: prov.mdt,
+    },
+    {
+      date: formatFrailtyShortDate("2025-12-12"),
+      score: "5",
+      label: "Mildly frail",
+      setting: "Community frailty follow-up",
+      source: prov.districtNurse(),
+    },
+    {
+      date: formatFrailtyShortDate("2025-10-03"),
+      score: "5",
+      label: "Mildly frail",
+      setting: "Social care package review",
+      source: prov.socialWorker(),
+    },
+    {
+      date: formatFrailtyShortDate("2025-07-09"),
+      score: "4",
+      label: "Vulnerable",
+      setting: "GP annual frailty review",
+      source: prov.gpPatel(),
+    },
+    {
+      date: formatFrailtyShortDate("2025-03-21"),
+      score: "4",
+      label: "Vulnerable",
+      setting: "Post-discharge community review",
+      source: prov.acute(),
+    },
+  ] as const;
 
   return (
     <RecordPage
       title="Frailty snapshot"
-      intro="Assembled from GP, community, acute, social care and urgent care records. Select a source tag to see where a fact came from."
+      // intro="Assembled from GP, community, acute, social care and urgent care records. Select a source tag to see where a fact came from."
       systems={frailtyConnectedSystems}
       showSystems={false}
     >
@@ -138,6 +347,73 @@ export default function FrailtySnapshot() {
         </div>
       </DataSection>
 
+      <InlinePanel
+        open={cfsOpen}
+        title="Clinical Frailty Scale"
+        footer={
+          <Button variant="secondary" onClick={() => setCfsOpen(false)}>
+            Close
+          </Button>
+        }
+      >
+        <p>
+          The Rockwood Clinical Frailty Scale (CFS) is a 9-point judgment-based
+          clinical tool used to assess an older adult's baseline level of
+          physical fitness, daily function, and cognition from two weeks prior
+          to an acute illness to help guide care decisions and predict health
+          outcomes.
+        </p>
+        <ul className="bullet-list">
+          <li>
+            <strong>6:</strong> Moderately frail - needs help with outdoor
+            activities and keeping the house running.
+          </li>
+          <li>
+            <strong>7:</strong> Severely frail - completely dependent for
+            personal care.
+          </li>
+          <li>
+            <strong>8:</strong> Very severely frail - completely dependent and
+            nearing end of life.
+          </li>
+        </ul>
+        <p>
+          <strong>Current score:</strong> {frailtyScale.score} (
+          {frailtyScale.label})
+        </p>
+        <DataTable
+          caption="Clinical Frailty Scale history (last 12 months)"
+          columns={[
+            {
+              header: "Date",
+              cell: (row) => row.date,
+              sort: (row) => dateKey(row.date),
+            },
+            {
+              header: "Score",
+              cell: (row) => (
+                <strong>
+                  {row.score} - {row.label}
+                </strong>
+              ),
+              sort: (row) => Number(row.score),
+            },
+            {
+              header: "Assessment context",
+              cell: (row) => row.setting,
+              sort: (row) => row.setting,
+            },
+            {
+              header: "Source",
+              cell: (row) => <Source of={row.source} />,
+            },
+          ]}
+          rows={cfsHistory}
+          rowKey={(row) => `${row.date}-${row.score}-${row.setting}`}
+          defaultSort={{ header: "Date", direction: "descending" }}
+        />
+      </InlinePanel>
+
       <Callout
         tone="red"
         label="Important: "
@@ -156,15 +432,15 @@ export default function FrailtySnapshot() {
 
       <DataSection
         title="Services involved"
-        summary={`${counts("Active care")} active · ${counts("Referral pending - awaiting further detail")} referral pending · ${counts("Recently discharged")} recently discharged`}
+        summary={`${counts("Active")} active · ${counts("Referred / waiting")} referred/waiting · ${counts("Recently discharged")} recently discharged · ${counts("Historical")} historical`}
       >
         <DataTable
           caption="Services involved in this patient's care"
           columns={[
             {
-              header: "Service",
-              cell: (s) => <strong>{s.name}</strong>,
-              sort: (s) => s.name,
+              header: "Team or service",
+              cell: (s) => <strong>{s.team}</strong>,
+              sort: (s) => s.team,
             },
             {
               header: "Status",
@@ -173,9 +449,27 @@ export default function FrailtySnapshot() {
               ),
               sort: (s) => s.status,
             },
+            { header: "Role", cell: (s) => s.role, sort: (s) => s.role },
+            {
+              header: "Next planned activity",
+              cell: (s) => s.nextPlannedActivity,
+              sort: (s) => s.nextPlannedActivity,
+            },
+            {
+              header: "Key contact",
+              cell: (s) => s.keyContact,
+              sort: (s) => s.keyContact,
+            },
+            {
+              header: "Last confirmed date",
+              cell: (s) => s.lastConfirmedDate,
+              sort: (s) => dateKey(s.lastConfirmedDate),
+            },
           ]}
           rows={services}
-          rowKey={(s) => s.name}
+          rowKey={(s) => s.team}
+          onView={openServiceDetail}
+          viewLabel={(s) => `View service details for ${s.team}`}
         />
       </DataSection>
 
@@ -192,7 +486,10 @@ export default function FrailtySnapshot() {
         />
       </div>
 
-      {(show("falls") || show("mobility") || show("carer")) && (
+      {(show("falls") ||
+        show("mobility") ||
+        show("equipment") ||
+        show("carer")) && (
         <section
           className="frailty-insight-group"
           aria-labelledby="frailty-insights-heading"
@@ -213,6 +510,13 @@ export default function FrailtySnapshot() {
                     ],
                   ]}
                 />
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={openFallsHistory}
+                >
+                  View history
+                </button>
                 <SourceRow of={[prov.mdt, prov.acute()]} />
               </article>
             )}
@@ -227,7 +531,50 @@ export default function FrailtySnapshot() {
                     ["Transfers", "Requires assistance of 1"],
                   ]}
                 />
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={openMobilityHistory}
+                >
+                  View history
+                </button>
                 <SourceRow of={[prov.physio]} />
+              </article>
+            )}
+
+            {show("equipment") && (
+              <article className="frailty-insight-card">
+                <h3>Equipment and adaptations</h3>
+                <FactsGrid
+                  facts={[
+                    [
+                      "Walking aid",
+                      "Walking stick indoors · wheeled zimmer outdoors",
+                    ],
+                    [
+                      "Bathroom equipment",
+                      "Shower chair and grab rails in place",
+                    ],
+                    [
+                      "Transfer aids",
+                      "Bed rail and chair raiser (pending review)",
+                    ],
+                    [
+                      "Pressure equipment",
+                      "Alternating pressure cushion awaiting installation",
+                    ],
+                  ]}
+                />
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={openEquipmentAdaptations}
+                >
+                  View history
+                </button>
+                <SourceRow
+                  of={[prov.physio, prov.socialWorker(), prov.districtNurse()]}
+                />
               </article>
             )}
 
@@ -262,7 +609,27 @@ export default function FrailtySnapshot() {
                 "Family",
                 "Wife: Dorothy Bennett (deceased, 2022). Son: Nick Bennett (primary carer, lives locally). Daughter: Rachel Bennett (lives in Manchester).",
               ],
-              ["Care package", "3 visits a day"],
+              ["Care agency or provider", "Riverside Home Support"],
+              [
+                "Care contact details",
+                "01524 555 621 · duty@riversidecare.example",
+              ],
+              [
+                "Visits per day or week",
+                "3 visits per day (21 visits per week)",
+              ],
+              ["Usual timing", "08:00, 13:00 and 18:30"],
+              [
+                "Purpose and activities",
+                "Personal care, meal preparation, prompts for medicines, hydration checks and light domestic support.",
+              ],
+              ["Start date", formatFrailtyDate("2025-10-01")],
+              [
+                "Previous package or change",
+                `Increased from 2 visits a day after falls review on ${formatFrailtyDate("2026-01-24")}.`,
+              ],
+              ["Review date", formatFrailtyDate("2026-03-20")],
+              ["Source", "Social"],
               ["Transport", "Support required"],
             ]}
           />
@@ -354,7 +721,7 @@ export default function FrailtySnapshot() {
       {show("medicines") && (
         <DataSection
           title="Current medications"
-          summary={`${frailtyMedicines.length} medicines · ${frailtyMedicines.filter((m) => m.status === "Review needed").length} need review`}
+          summary={`${frailtyMedicines.length} medicines · ${frailtyMedicines.filter((m) => m.status === "Current Course").length} current course · ${frailtyMedicines.filter((m) => m.status === "Inactive").length} inactive`}
         >
           <DataTable
             caption="Current medications"
@@ -373,7 +740,13 @@ export default function FrailtySnapshot() {
                 header: "Status",
                 cell: (m) => (
                   <StatusTag
-                    tone={m.status === "Optimised" ? "green" : "orange"}
+                    tone={
+                      m.status === "Active"
+                        ? "green"
+                        : m.status === "Current Course"
+                          ? "orange"
+                          : "grey"
+                    }
                   >
                     {m.status}
                   </StatusTag>
@@ -381,9 +754,14 @@ export default function FrailtySnapshot() {
                 sort: (m) => m.status,
               },
               {
-                header: "Last reviewed",
-                cell: (m) => m.reviewed ?? "Not reviewed",
-                sort: (m) => (m.reviewed ? dateKey(m.reviewed) : null),
+                header: "Start date",
+                cell: (m) => m.startDate ?? "Not started",
+                sort: (m) => (m.startDate ? dateKey(m.startDate) : null),
+              },
+              {
+                header: "End date",
+                cell: (m) => m.endDate ?? "Ongoing",
+                sort: (m) => (m.endDate ? dateKey(m.endDate) : null),
               },
               { header: "Source", cell: (m) => <Source of={m.provenance} /> },
             ]}
@@ -459,39 +837,6 @@ export default function FrailtySnapshot() {
           />
         </DataSection>
       )}
-
-      <InlinePanel
-        open={cfsOpen}
-        title="Clinical Frailty Scale"
-        footer={
-          <Button variant="secondary" onClick={() => setCfsOpen(false)}>
-            Close
-          </Button>
-        }
-      >
-        <p>
-          The Clinical Frailty Scale is a nine-point summary of frailty, with
-          higher scores indicating greater frailty and a need for more support.
-        </p>
-        <ul className="bullet-list">
-          <li>
-            <strong>6:</strong> Moderately frail - needs help with outdoor
-            activities and keeping the house running.
-          </li>
-          <li>
-            <strong>7:</strong> Severely frail - completely dependent for
-            personal care.
-          </li>
-          <li>
-            <strong>8:</strong> Very severely frail - completely dependent and
-            nearing end of life.
-          </li>
-        </ul>
-        <p>
-          <strong>Current score:</strong> {frailtyScale.score} (
-          {frailtyScale.label})
-        </p>
-      </InlinePanel>
 
       <InlinePanel
         open={vitalOpen !== null}

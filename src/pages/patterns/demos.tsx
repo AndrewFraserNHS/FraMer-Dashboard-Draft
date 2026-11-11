@@ -197,41 +197,60 @@ function QuestionDemo() {
 export const demos: Record<string, ReactNode> = {
   "question-page": <QuestionDemo />,
   "assessment-progress": (
-          <AssessmentProgress
-        currentId="mental"
-        questionInSection={2}
-        questionOverall={37}
-        totalQuestions={69}
-        sections={[
-          { id: "physical", title: "Physical", done: 32, total: 32, to: "#" },
-          { id: "mental", title: "Mental health", done: 1, total: 6, to: "#" },
-          { id: "social", title: "Social", done: 0, total: 5, to: "#" },
-          { id: "environment", title: "Environment", done: 0, total: 4, to: "#" },
-        ]}
-      />
+    <AssessmentProgress
+      currentId="mental"
+      questionInSection={2}
+      questionOverall={37}
+      totalQuestions={69}
+      sections={[
+        { id: "physical", title: "Physical", done: 32, total: 32, to: "#" },
+        { id: "mental", title: "Mental health", done: 1, total: 6, to: "#" },
+        { id: "social", title: "Social", done: 0, total: 5, to: "#" },
+        { id: "environment", title: "Environment", done: 0, total: 4, to: "#" },
+      ]}
+    />
   ),
   "summary-list": (
-          <SummaryList
-        rows={[
-          { key: "a", label: "Clinical Frailty Scale", value: "Confirmed as correct: 6", changeTo: "#" },
-          { key: "b", label: "Falls history", value: <StatusTag tone="orange">Not answered</StatusTag>, changeTo: "#" },
-        ]}
-      />
+    <SummaryList
+      rows={[
+        {
+          key: "a",
+          label: "Clinical Frailty Scale",
+          value: "Confirmed as correct: 6",
+          changeTo: "#",
+        },
+        {
+          key: "b",
+          label: "Falls history",
+          value: <StatusTag tone="orange">Not answered</StatusTag>,
+          changeTo: "#",
+        },
+      ]}
+    />
   ),
   button: row(
     <>
       <Button>Primary</Button>
       <Button variant="secondary">Secondary</Button>
-      <ButtonLink to="/" variant="secondary">Link to the record</ButtonLink>
+      <ButtonLink to="/" variant="secondary">
+        Link to the record
+      </ButtonLink>
     </>,
   ),
   "form-field": stack(
     <>
       <TextField label="Full name" hint="For example, Leila Khan" />
-      <SelectField label="Care setting" options={["All care settings", "Community maternity", "Outpatient"]} />
+      <SelectField
+        label="Care setting"
+        options={["All care settings", "Community maternity", "Outpatient"]}
+      />
       <TextAreaField label="Action details" rows={2} optional />
       <DateDemo />
-      <TextField label="NHS number" hint="For example, 485 777 2910" error="Enter an NHS number" />
+      <TextField
+        label="NHS number"
+        hint="For example, 485 777 2910"
+        error="Enter an NHS number"
+      />
     </>,
   ),
   "error-summary": <ErrorSummaryDemo />,
@@ -240,17 +259,52 @@ export const demos: Record<string, ReactNode> = {
   "sort-select": <SortDemo />,
   "status-tag": stack(
     <>
-      {row(<><PriorityTag level="high" /><PriorityTag level="medium" /><PriorityTag level="low" /></>)}
-      {row(<><ResultTag tone="high">Abnormal</ResultTag><ResultTag tone="medium">Borderline</ResultTag><ResultTag tone="low">Normal</ResultTag></>)}
-      {row(<><StatusTag tone="blue">Referred</StatusTag><StatusTag tone="grey">Declined</StatusTag><SourceTag>GP record</SourceTag></>)}
+      {row(
+        <>
+          <PriorityTag level="high" />
+          <PriorityTag level="medium" />
+          <PriorityTag level="low" />
+        </>,
+      )}
+      {row(
+        <>
+          <ResultTag tone="high">Abnormal</ResultTag>
+          <ResultTag tone="medium">Borderline</ResultTag>
+          <ResultTag tone="low">Normal</ResultTag>
+        </>,
+      )}
+      {row(
+        <>
+          <StatusTag tone="blue">Referred</StatusTag>
+          <StatusTag tone="grey">Declined</StatusTag>
+          <SourceTag>GP record</SourceTag>
+        </>,
+      )}
     </>,
   ),
   callout: stack(
     <>
-      <Callout tone="red" title="Gestational diabetes" label="High priority: " source="Lab results">Diagnosed {formatDate("2026-09-05")}</Callout>
-      <Callout tone="amber" title="High body mass index (32)" label="Medium priority: ">BMI 32 requires monitoring</Callout>
-      <Callout tone="blue" title="Recommended action">Offer an early glucose test.</Callout>
-      <Callout tone="grey" title="Clinical note">Interpreter booked for the next visit.</Callout>
+      <Callout
+        tone="red"
+        title="Gestational diabetes"
+        label="High priority: "
+        source="Lab results"
+      >
+        Diagnosed {formatDate("2026-09-05")}
+      </Callout>
+      <Callout
+        tone="amber"
+        title="High body mass index (32)"
+        label="Medium priority: "
+      >
+        BMI 32 requires monitoring
+      </Callout>
+      <Callout tone="blue" title="Recommended action">
+        Offer an early glucose test.
+      </Callout>
+      <Callout tone="grey" title="Clinical note">
+        Interpreter booked for the next visit.
+      </Callout>
     </>,
   ),
   "alerts-band": <AlertsBand flags={alertFlags} />,
@@ -260,57 +314,148 @@ export const demos: Record<string, ReactNode> = {
       rows={tableRows}
       rowKey={(r) => r.name}
       columns={[
-        { header: "Medicine", cell: (r) => <strong>{r.name}</strong>, sort: (r) => r.name },
+        {
+          header: "Medicine",
+          cell: (r) => <strong>{r.name}</strong>,
+          sort: (r) => r.name,
+        },
         { header: "Dose", cell: (r) => r.dose },
-        { header: "Started", cell: (r) => r.started, sort: (r) => Date.parse(r.started) },
+        {
+          header: "Started",
+          cell: (r) => r.started,
+          sort: (r) => Date.parse(r.started),
+        },
       ]}
       defaultSort={{ header: "Medicine", direction: "ascending" }}
     />
   ),
   "detail-list": stack(
     <>
-      <DetailList rows={[["Medicine", "Metformin"], ["Dose", "500mg"], ["Prescriber", undefined]]} />
-      <FactsGrid facts={[["Date", formatDate("2026-09-05")], ["Centre", "Antenatal Clinic"], ["Findings", undefined]]} />
+      <DetailList
+        rows={[
+          ["Medicine", "Metformin"],
+          ["Dose", "500mg"],
+          ["Prescriber", undefined],
+        ]}
+      />
+      <FactsGrid
+        facts={[
+          ["Date", formatDate("2026-09-05")],
+          ["Centre", "Antenatal Clinic"],
+          ["Findings", undefined],
+        ]}
+      />
     </>,
   ),
   "key-figure": row(
     <>
-      <KeyFigure label="Blood pressure" value="148/90" unit="mmHg" trend="up" note="Up from 136/82 a year ago">
+      <KeyFigure
+        label="Blood pressure"
+        value="148/90"
+        unit="mmHg"
+        trend="up"
+        note="Up from 136/82 a year ago"
+      >
         <SourceTag>District nurse</SourceTag>
       </KeyFigure>
-      <KeyFigure label="Weight" value="54" unit="kg" trend="down" note="Lost about 3 kg over 6 months" onOpen={() => {}} openLabel="View history" />
-      <KeyFigure label="Clinical Frailty Scale" value="6" size="large" note="Moderately frail" />
+      <KeyFigure
+        label="Weight"
+        value="54"
+        unit="kg"
+        trend="down"
+        note="Lost about 3 kg over 6 months"
+        onOpen={() => {}}
+        openLabel="View history"
+      />
+      <KeyFigure
+        label="Clinical Frailty Scale"
+        value="6"
+        size="large"
+        note="Moderately frail"
+      />
     </>,
   ),
   "provenance-tag": row(
     <>
-      <ProvenanceTag label="GP" tone="blue" details={[["Organisation", "Woodside Health Centre"], ["System", "EMIS GP"], ["Pulled", "2 days ago"], ["By", "Dr Patel"]]} />
-      <ProvenanceTag label="Acute" tone="orange" details={[["Organisation", "Croydon University Hospital"], ["System", "Oracle Health"]]} />
+      <ProvenanceTag
+        label="GP"
+        tone="blue"
+        details={[
+          ["Organisation", "Woodside Health Centre"],
+          ["System", "EMIS GP"],
+          ["Pulled", "14th November 2026"],
+          ["By", "Dr Patel"],
+        ]}
+      />
+      <ProvenanceTag
+        label="Acute"
+        tone="orange"
+        details={[
+          ["Organisation", "Croydon University Hospital"],
+          ["System", "Oracle Health"],
+        ]}
+      />
     </>,
   ),
   "review-field": <ReviewDemo />,
   "record-card-list": (
     <RecordCardList>
-      <RecordCard heading="Diabetes Antenatal Clinic" status={<StatusTag tone="green">Referral reviewed</StatusTag>} meta={formatDate("2026-09-12")}>
+      <RecordCard
+        heading="Diabetes Antenatal Clinic"
+        status={<StatusTag tone="green">Referral reviewed</StatusTag>}
+        meta={formatDate("2026-09-12")}
+      >
         Gestational diabetes confirmed. Management plan agreed.
       </RecordCard>
-      <RecordCard heading="Gestational diabetes mellitus (O24.4)" meta="Active" />
+      <RecordCard
+        heading="Gestational diabetes mellitus (O24.4)"
+        meta="Active"
+      />
     </RecordCardList>
   ),
-  "connected-systems": <ConnectedSystems systems={connectedSystems.slice(0, 4)} defaultOpen headingLevel={3} />,
+  "connected-systems": (
+    <ConnectedSystems
+      systems={connectedSystems.slice(0, 4)}
+      defaultOpen
+      headingLevel={3}
+    />
+  ),
   "data-section": (
-    <DataSection headingLevel={3} title="Medicines" summary="3 active" badge={<StatusTag tone="red">Attention</StatusTag>}>
-      <p>Section content. The heading is a button, so the section can be opened and closed from the keyboard.</p>
+    <DataSection
+      headingLevel={3}
+      title="Medicines"
+      summary="3 active"
+      badge={<StatusTag tone="red">Attention</StatusTag>}
+    >
+      <p>
+        Section content. The heading is a button, so the section can be opened
+        and closed from the keyboard.
+      </p>
     </DataSection>
   ),
   "expandable-row": stack(
     <>
-      <ExpandableRow detail={<DetailList rows={[["Priority", "High priority"], ["Source", "Lab results"]]} />}>
-        <div><strong>Gestational diabetes</strong><small>Expands in place</small></div>
+      <ExpandableRow
+        detail={
+          <DetailList
+            rows={[
+              ["Priority", "High priority"],
+              ["Source", "Lab results"],
+            ]}
+          />
+        }
+      >
+        <div>
+          <strong>Gestational diabetes</strong>
+          <small>Expands in place</small>
+        </div>
         <PriorityTag level="high" />
       </ExpandableRow>
       <div className="dash-list-row interactive pl-fake-row" aria-hidden="true">
-        <div><strong>Penicillin allergy</strong><small>Opens a panel: chevron, not plus</small></div>
+        <div>
+          <strong>Penicillin allergy</strong>
+          <small>Opens a panel: chevron, not plus</small>
+        </div>
         <RowChevron />
       </div>
     </>,
@@ -323,28 +468,48 @@ export const demos: Record<string, ReactNode> = {
       label="Record view: Maternity"
       items={[
         { label: "Maternity", current: true, onSelect: () => {} },
-        { label: "Cancer", disabled: true, hint: "No cancer data for this patient", onSelect: () => {} },
+        {
+          label: "Cancer",
+          disabled: true,
+          hint: "No cancer data for this patient",
+          onSelect: () => {},
+        },
       ]}
     />,
   ),
   "service-header": (
     <PatientBar
       patient={recordViews.maternity.patient}
-      viewMenu={<MenuButton label="Record view: Maternity" items={[{ label: "Maternity", current: true, onSelect: () => {} }]} />}
+      viewMenu={
+        <MenuButton
+          label="Record view: Maternity"
+          items={[{ label: "Maternity", current: true, onSelect: () => {} }]}
+        />
+      }
     />
   ),
   "options-sidebar": stack(
     <>
       <SidebarDemo />
-      <p className="pl-note">Page options also appear in the expanded mobile menu on narrow screens:</p>
-      <PageOptions textSize="small" onTextSize={() => {}} filtersOpen={false} onReorder={() => {}} />
+      <p className="pl-note">
+        Page options also appear in the expanded mobile menu on narrow screens:
+      </p>
+      <PageOptions
+        textSize="small"
+        onTextSize={() => {}}
+        filtersOpen={false}
+        onReorder={() => {}}
+      />
     </>,
   ),
   "record-page": stack(
     <>
       <RecordFilterBar filters={recordViews.maternity.filters ?? []} />
       <Subsection title="A subsection heading">
-        <p>Sections group content under a real heading, so the page outline is navigable.</p>
+        <p>
+          Sections group content under a real heading, so the page outline is
+          navigable.
+        </p>
       </Subsection>
     </>,
   ),

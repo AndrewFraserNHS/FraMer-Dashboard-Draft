@@ -1,6 +1,0 @@
-1. Drawer component should never be used, we will use the inline modal at all times.
-2. Same with Dialog, would prefer inline modal
-3. MenuButton should ideally just be a variation on Expander
-4. DataTable should use NHS responsive table.
-5. AlertsBand we should still have a label showing how many medium and low risks hidden.
-6. V2 of the CGA still doesn't follow https://service-manual.nhs.uk/design-system/patterns/question-pages principles, dismiss on questions isn't valid, should just be confirm or edit on most questions, and not in the cards like they are already, unless there is a very valid reason for it to be more than 1 question a page, should remain that way.

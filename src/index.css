@@ -4040,7 +4040,7 @@ textarea:focus-visible {
   }
 }
 
-/* Safety flags: bordered buttons with a chevron, so they read as "opens detail", not as links */
+/* Safety flags and risks: bordered buttons with a chevron, so they read as "opens detail", not as links */
 .record-safety-strip .safety-flags {
   margin: 0;
   padding: 0;
@@ -5013,7 +5013,7 @@ button.systems-grid__item:hover {
   background: #f0f4f5;
 }
 
-/* Safety flags */
+/* Safety flags and risks */
 .ncrs-alerts {
   flex: none;
   color: #212b32;
@@ -5397,7 +5397,7 @@ button.systems-grid__item:hover {
   }
 }
 
-/* Safety flags: compact, always one line */
+/* Safety flags and risks: compact, always one line */
 .ncrs-alerts {
   font-size: calc(var(--ncrs-fs, 14px) - 1px);
 }

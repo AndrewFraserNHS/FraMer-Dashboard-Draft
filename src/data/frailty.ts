@@ -1635,7 +1635,7 @@ export const carePlanDomains: readonly CarePlanDomain[] = [
   },
   {
     id: "social",
-    title: "Carer support and social",
+    title: "Social Context & Support Network",
     risk: "high",
     text: "Carer and social support plan:\n• Care package confirmed: 3 visits a day (morning, midday, evening)\n• Safeguarding concern (self-neglect) logged and under review\n• Carer assessment for son arranged through social worker\n• Social isolation support: warm referral to Age UK day service\n• Emergency plan in place: son as named emergency contact",
     actions: [

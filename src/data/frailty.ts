@@ -1443,21 +1443,24 @@ export const cgaDomains: readonly CgaDomain[] = [
 
 // ── Care plan ────────────────────────────────────────────────────────────────
 
-export type ActionStatus = "Pending" | "Active" | "Suggested" | "Referred" | "Completed";
+export type ActionStatus = "Pending" | "Active" | "Referred" | "Completed";
 
-export const actionTone: Record<ActionStatus, "orange" | "green" | "purple" | "blue"> = {
+export const actionTone: Record<
+  ActionStatus,
+  "orange" | "green" | "purple" | "blue"
+> = {
   Pending: "orange",
   Active: "green",
-  Suggested: "purple",
   Referred: "blue",
-  Completed: "green",
+  Completed: "purple",
 };
 
 export type CarePlanAction = {
   title: string;
   status: ActionStatus;
   owner: string;
-  timescale: string;
+  frequency: string;
+  dateUpdatedOn: string;
   service: string;
 };
 
@@ -1471,59 +1474,219 @@ export type CarePlanDomain = {
 
 export const carePlanDomains: readonly CarePlanDomain[] = [
   {
-    id: "falls", title: "Falls prevention", risk: "high",
+    id: "falls",
+    title: "Falls prevention",
+    risk: "high",
     text: "Multifactorial falls intervention in place. Patient requires:\n• Ongoing physiotherapy strength and balance programme (fortnightly)\n• OT home assessment for equipment review and environmental hazard reduction\n• Medication review focusing on postural hypotension risk\n• Evening and night safety measures: sensor lighting, bed rail assessment\n• Footwear assessment and advice\n• Weight monitoring (weekly)",
     actions: [
-      { title: "Occupational therapy home assessment", status: "Referred", owner: "Community OT", timescale: "At home visit", service: "Community OT" },
-      { title: "Physiotherapy: strength and balance programme", status: "Active", owner: "Community physio", timescale: "Fortnightly", service: "Community physio" },
-      { title: "Medication review: postural hypotension risk", status: "Pending", owner: "GP / pharmacist", timescale: "At home visit", service: "Primary care" },
-      { title: "Sensor lighting and bed rail assessment", status: "Suggested", owner: "Community OT", timescale: "With OT visit", service: "Community OT" },
+      {
+        title: "Occupational therapy home assessment",
+        status: "Referred",
+        owner: "Community OT",
+        frequency: "At home visit",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Community OT",
+      },
+      {
+        title: "Physiotherapy: strength and balance programme",
+        status: "Active",
+        owner: "Community physio",
+        frequency: "Fortnightly",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Community physio",
+      },
+      {
+        title: "Medication review: postural hypotension risk",
+        status: "Pending",
+        owner: "GP / pharmacist",
+        frequency: "At home visit",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Primary care",
+      },
+      {
+        title: "Sensor lighting and bed rail assessment",
+        status: "Completed",
+        owner: "Community OT",
+        frequency: "With OT visit",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Community OT",
+      },
     ],
   },
   {
-    id: "medical", title: "Medical management", risk: "high",
+    id: "medical",
+    title: "Medical management",
+    risk: "high",
     text: "Active medical management priorities:\n• Polypharmacy review with deprescribing where appropriate, focusing on falls-related medications\n• Glycaemic management review: HbA1c recheck, dietary input if needed\n• Heart failure monitoring (weight, fluid balance, symptoms)\n• CKD stage 3a: renal function monitoring (6-monthly)\n• Ophthalmology follow-up: cataract progression assessment and falls contribution\n• Audiological referral: formal hearing assessment based on carer concerns\n• Dental assessment: urgent referral to community dental service",
     actions: [
-      { title: "Polypharmacy review with deprescribing", status: "Pending", owner: "GP", timescale: "1 week", service: "Primary care" },
-      { title: "Diabetes and heart failure monitoring", status: "Active", owner: "Practice nurse", timescale: "Monthly", service: "Primary care" },
-      { title: "Ophthalmology referral: cataract assessment", status: "Suggested", owner: "GP", timescale: "2 weeks", service: "Secondary care" },
-      { title: "Audiological assessment referral", status: "Suggested", owner: "GP", timescale: "2 weeks", service: "Audiology" },
-      { title: "Community dental service referral", status: "Suggested", owner: "GP / district nurse", timescale: "1 week", service: "Community dental" },
+      {
+        title: "Polypharmacy review with deprescribing",
+        status: "Pending",
+        owner: "GP",
+        frequency: "1 week",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Primary care",
+      },
+      {
+        title: "Diabetes and heart failure monitoring",
+        status: "Active",
+        owner: "Practice nurse",
+        frequency: "Monthly",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Primary care",
+      },
+      {
+        title: "Ophthalmology referral: cataract assessment",
+        status: "Completed",
+        owner: "GP",
+        frequency: "2 weeks",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Secondary care",
+      },
+      {
+        title: "Audiological assessment referral",
+        status: "Completed",
+        owner: "GP",
+        frequency: "2 weeks",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Audiology",
+      },
+      {
+        title: "Community dental service referral",
+        status: "Completed",
+        owner: "GP / district nurse",
+        frequency: "1 week",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Community dental",
+      },
     ],
   },
   {
-    id: "mental", title: "Mental health and wellbeing", risk: "medium",
+    id: "mental",
+    title: "Mental health and wellbeing",
+    risk: "medium",
     text: "Mental health and cognitive support plan:\n• IAPT referral for low mood management, adapted for cognitive impairment\n• Social prescribing: reconnect with community activities, reduce isolation\n• Delirium prevention: hydration, sleep hygiene, medication review\n• Sundowning management: structured evening routine, lighting adjustments\n• Regular mood monitoring by district nurse and social worker\n• Bereavement support consideration: wife passed 2022, ongoing grief",
     actions: [
-      { title: "IAPT referral for low mood management", status: "Pending", owner: "GP", timescale: "2 weeks", service: "IAPT / talking therapies" },
-      { title: "Social prescribing: community reconnection", status: "Suggested", owner: "Social prescriber", timescale: "Within 1 month", service: "Primary care network" },
-      { title: "Delirium prevention plan implementation", status: "Active", owner: "District nurse / GP", timescale: "Ongoing", service: "Community / primary care" },
-      { title: "Sundowning management protocol", status: "Suggested", owner: "District nurse", timescale: "At next home visit", service: "Community nursing" },
+      {
+        title: "IAPT referral for low mood management",
+        status: "Pending",
+        owner: "GP",
+        frequency: "2 weeks",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "IAPT / talking therapies",
+      },
+      {
+        title: "Social prescribing: community reconnection",
+        status: "Completed",
+        owner: "Social prescriber",
+        frequency: "Within 1 month",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Primary care network",
+      },
+      {
+        title: "Delirium prevention plan implementation",
+        status: "Active",
+        owner: "District nurse / GP",
+        frequency: "Ongoing",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+
+        service: "Community / primary care",
+      },
+      {
+        title: "Sundowning management protocol",
+        status: "Completed",
+        owner: "District nurse",
+        frequency: "At next home visit",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Community nursing",
+      },
     ],
   },
   {
-    id: "functional", title: "Functional independence",
+    id: "functional",
+    title: "Functional independence",
     text: "Functional independence support plan:\n• Rollator with seat in use; environmental modifications completed\n• Ongoing physiotherapy strength and balance programme (fortnightly)\n• ADL support from home carer 3 times a day: personal care, dressing, meal preparation\n• Raised toilet seat ordered; installation pending\n• Monthly OT check-in to monitor home safety and equipment needs",
     actions: [
-      { title: "OT home assessment", status: "Completed", owner: "Community OT", timescale: `Completed ${formatFrailtyDate("2026-02-24")}`, service: "Community OT" },
-      { title: "Physiotherapy: ongoing mobility programme", status: "Active", owner: "Community physio", timescale: "Fortnightly", service: "Community physio" },
+      {
+        title: "OT home assessment",
+        status: "Completed",
+        owner: "Community OT",
+        frequency: `Completed ${formatFrailtyDate("2026-02-24")}`,
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Community OT",
+      },
+      {
+        title: "Physiotherapy: ongoing mobility programme",
+        status: "Active",
+        owner: "Community physio",
+        frequency: "Fortnightly",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Community physio",
+      },
     ],
   },
   {
-    id: "social", title: "Carer support and social", risk: "high",
+    id: "social",
+    title: "Carer support and social",
+    risk: "high",
     text: "Carer and social support plan:\n• Care package confirmed: 3 visits a day (morning, midday, evening)\n• Safeguarding concern (self-neglect) logged and under review\n• Carer assessment for son arranged through social worker\n• Social isolation support: warm referral to Age UK day service\n• Emergency plan in place: son as named emergency contact",
     actions: [
-      { title: "Adult safeguarding referral: self-neglect", status: "Referred", owner: "Aisha Khan (social worker)", timescale: "Urgent, within 5 days", service: "Croydon Adult Social Care" },
-      { title: "Carer assessment and respite support", status: "Referred", owner: "Social work team", timescale: "Within 2 weeks", service: "Local authority" },
-      { title: "Age UK social isolation referral", status: "Suggested", owner: "Social prescriber", timescale: "Within 1 month", service: "Voluntary sector" },
+      {
+        title: "Adult safeguarding referral: self-neglect",
+        status: "Referred",
+        owner: "Aisha Khan (social worker)",
+        frequency: "Urgent, within 5 days",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Croydon Adult Social Care",
+      },
+      {
+        title: "Carer assessment and respite support",
+        status: "Referred",
+        owner: "Social work team",
+        frequency: "Within 2 weeks",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Local authority",
+      },
+      {
+        title: "Age UK social isolation referral",
+        status: "Completed",
+        owner: "Social prescriber",
+        frequency: "Within 1 month",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Voluntary sector",
+      },
     ],
   },
   {
-    id: "goals", title: "Patient goals and future wishes", risk: "low",
+    id: "goals",
+    title: "Patient goals and future wishes",
+    risk: "low",
     text: "Patient goals and advance care plan:\n• Remain at home with support; preferred place of care documented\n• DNACPR in place and reviewed with patient and son\n• LPA (health and welfare) status unconfirmed, to be verified with family\n• Faith community visits welcomed; chaplain referral offered\n• Priority: reduce falls, maintain independence with personal care",
     actions: [
-      { title: "Advance care planning: preferred place of care documentation", status: "Pending", owner: "Dr Patel (GP)", timescale: "Next MDT review", service: "Frailty team" },
-      { title: "Spiritual / pastoral care referral", status: "Suggested", owner: "Frailty co-ordinator", timescale: "Within 2 weeks", service: "Chaplaincy / voluntary" },
+      {
+        title: "Advance care planning: preferred place of care documentation",
+        status: "Pending",
+        owner: "Dr Patel (GP)",
+        frequency: "Next MDT review",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Frailty team",
+      },
+      {
+        title: "Spiritual / pastoral care referral",
+        status: "Completed",
+        owner: "Frailty co-ordinator",
+        frequency: "Within 2 weeks",
+        dateUpdatedOn: formatFrailtyDate("2026-02-24"),
+        service: "Chaplaincy / voluntary",
+      },
     ],
   },
 ];
@@ -1533,7 +1696,22 @@ export const riskLabel: Record<Priority, string> = { high: "High risk", medium: 
 
 export const ownerOptions = ["GP", "GP / pharmacist", "District nurse", "Community OT", "Community physio", "Social worker", "Frailty co-ordinator"] as const;
 export const serviceOptions = ["Primary care", "Community nursing", "Community OT", "Community physio", "Adult social care", "Frailty team", "Voluntary sector"] as const;
-export const timescaleOptions = ["Urgent, within 5 days", "Within 1 week", "Within 2 weeks", "Within 1 month", "At next home visit", "Next MDT review", "Ongoing"] as const;
+export const frequencyOptions = [
+  "Urgent, within 5 days",
+  "Within 1 week",
+  "Within 2 weeks",
+  "Within 1 month",
+  "At next home visit",
+  "Next MDT review",
+  "Ongoing",
+] as const;
+export const dateUpdatedOnOptions = [
+  "Today",
+  "Yesterday",
+  "Within 1 week",
+  "Within 2 weeks",
+  "Within 1 month",
+] as const;
 
 export type PlanVersion = {
   title: string;

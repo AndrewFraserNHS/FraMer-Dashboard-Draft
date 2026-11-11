@@ -373,7 +373,7 @@ export default function Comorbidities() {
           </p>
         </Callout>
 
-        <Subsection title="Suggested actions (connected record)">
+        <Subsection title="Completed actions (connected record)">
           <RecordCardList>
             {suggestedActions.map((action) => (
               <RecordCard

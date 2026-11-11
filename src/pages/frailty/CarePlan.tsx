@@ -17,8 +17,9 @@ import {
   planStatusTone,
   riskLabel,
   riskTone,
+  dateUpdatedOnOptions,
+  frequencyOptions,
   serviceOptions,
-  timescaleOptions,
 } from "../../data/frailty";
 import { dateKey } from "../../utils/sort";
 
@@ -40,7 +41,13 @@ function PlanText({ text }: { text: string }) {
   );
 }
 
-const blankAction = { owner: "", service: "", timescale: "", notes: "" };
+const blankAction = {
+  owner: "",
+  service: "",
+  frequency: "",
+  dateUpdatedOn: "",
+  notes: "",
+};
 
 function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: () => void }) {
   const [text, setText] = useState(domain.text);
@@ -59,7 +66,14 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
     event.preventDefault();
     setAdded((current) => [
       ...current,
-      { title: draft.notes.trim(), status: "Suggested", owner: draft.owner, service: draft.service, timescale: draft.timescale },
+      {
+        title: draft.notes.trim(),
+        status: "Completed",
+        owner: draft.owner,
+        service: draft.service,
+        frequency: draft.frequency,
+        dateUpdatedOn: draft.dateUpdatedOn,
+      },
     ]);
     setDraft(blankAction);
     setAdding(false);
@@ -78,9 +92,17 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
       defaultOpen={false}
       badge={
         <>
-          {domain.risk && <StatusTag tone={riskTone[domain.risk]}>{riskLabel[domain.risk]}</StatusTag>}
-          {referred > 0 && <StatusTag tone="blue">{referred} referred</StatusTag>}
-          {pending > 0 && <StatusTag tone="orange">{pending} pending</StatusTag>}
+          {domain.risk && (
+            <StatusTag tone={riskTone[domain.risk]}>
+              {riskLabel[domain.risk]}
+            </StatusTag>
+          )}
+          {referred > 0 && (
+            <StatusTag tone="blue">{referred} referred</StatusTag>
+          )}
+          {pending > 0 && (
+            <StatusTag tone="orange">{pending} pending</StatusTag>
+          )}
         </>
       }
       summary={`${actions.length} actions`}
@@ -101,13 +123,19 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
             }}
           >
             {editing ? "Save" : "Edit"}
-            <span className="nhs-visually-hidden"> {domain.title} care plan</span>
+            <span className="nhs-visually-hidden">
+              {" "}
+              {domain.title} care plan
+            </span>
           </button>
         }
       >
         {editing ? (
           <>
-            <label className="nhs-visually-hidden" htmlFor={`${domain.id}-plan`}>
+            <label
+              className="nhs-visually-hidden"
+              htmlFor={`${domain.id}-plan`}
+            >
               Detailed care plan: {domain.title}
             </label>
             <textarea
@@ -118,7 +146,9 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
               onChange={(event) => setText(event.target.value)}
               autoFocus
             />
-            <p className="review-field__hint">Review your changes, then select Save.</p>
+            <p className="review-field__hint">
+              Review your changes, then select Save.
+            </p>
           </>
         ) : (
           <PlanText text={text} />
@@ -135,7 +165,8 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
             aria-expanded={adding}
             onClick={() => setAdding((value) => !value)}
           >
-            Add action<span className="nhs-visually-hidden"> to {domain.title}</span>
+            Add action
+            <span className="nhs-visually-hidden"> to {domain.title}</span>
           </button>
         }
       >
@@ -146,7 +177,8 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
               [
                 ["owner", "Owner", ownerOptions],
                 ["service", "Service", serviceOptions],
-                ["timescale", "Timescale", timescaleOptions],
+                ["frequency", "Frequency", frequencyOptions],
+                ["dateUpdatedOn", "Date Updated on", dateUpdatedOnOptions],
               ] as const
             ).map(([key, label, options]) => (
               <SelectField
@@ -159,28 +191,69 @@ function DomainPanel({ domain, onEdited }: { domain: CarePlanDomain; onEdited: (
                 {...field(key)}
               />
             ))}
-            <TextAreaField id={`${domain.id}-notes`} label="Action details" rows={3} required {...field("notes")} />
+            <TextAreaField
+              id={`${domain.id}-notes`}
+              label="Action details"
+              rows={3}
+              required
+              {...field("notes")}
+            />
             <div className="page-steps">
               <Button type="submit">Save action</Button>
-              <Button variant="secondary" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setAdding(false)}>
+                Cancel
+              </Button>
             </div>
           </form>
         )}
         <DataTable
           caption={`Recommended actions: ${domain.title}`}
           columns={[
-            { header: "Action", cell: (a) => <strong>{a.title}</strong>, sort: (a) => a.title },
-            { header: "Status", cell: (a) => <StatusTag tone={actionTone[a.status]}>{a.status}</StatusTag>, sort: (a) => a.status },
-            { header: "Owner", cell: (a) => a.owner, sort: (a) => a.owner },
-            { header: "Timescale", cell: (a) => a.timescale, sort: (a) => a.timescale },
-            { header: "Service", cell: (a) => a.service, sort: (a) => a.service },
+            {
+              header: "Action",
+              cell: (a) => <strong>{a.title}</strong>,
+              sort: (a) => a.title,
+            },
+            {
+              header: "Status",
+              cell: (a) => (
+                <StatusTag tone={actionTone[a.status]}>{a.status}</StatusTag>
+              ),
+              sort: (a) => a.status,
+            },
+            {
+              header: "Action owner",
+              cell: (a) => a.owner,
+              sort: (a) => a.owner,
+            },
+            {
+              header: "Frequency",
+              cell: (a) => a.frequency,
+              sort: (a) => a.frequency,
+            },
+            {
+              header: "Date updated on",
+              cell: (a) => a.dateUpdatedOn,
+              sort: (a) => a.dateUpdatedOn,
+            },
+            {
+              header: "Service",
+              cell: (a) => a.service,
+              sort: (a) => a.service,
+            },
           ]}
           rows={actions}
           rowKey={(a, index) => `${a.title}-${index}`}
         />
       </Subsection>
-      <p className="nhs-visually-hidden" role="status">{message}</p>
-      {message && <p className="review-field__hint" aria-hidden="true">{message}</p>}
+      <p className="nhs-visually-hidden" role="status">
+        {message}
+      </p>
+      {message && (
+        <p className="review-field__hint" aria-hidden="true">
+          {message}
+        </p>
+      )}
     </DataSection>
   );
 }
@@ -191,11 +264,13 @@ export default function FrailtyCarePlan() {
   return (
     <RecordPage
       title="Care Plan"
-      intro="Generated from the CGA. Each domain pairs the written plan with the actions that deliver it."
       systems={frailtyConnectedSystems}
       showSystems={false}
     >
-      <DataSection title="Care plan history and attachments" summary={`${planHistory.length} plans`}>
+      <DataSection
+        title="Care plan history and attachments"
+        summary={`${planHistory.length} plans`}
+      >
         <DataTable
           caption="Care plan history and attachments"
           columns={[
@@ -204,13 +279,27 @@ export default function FrailtyCarePlan() {
               cell: (p) => (
                 <>
                   <strong>{p.title}</strong>
-                  {p.description && <small className="cell-note">{p.description}</small>}
+                  {p.description && (
+                    <small className="cell-note">{p.description}</small>
+                  )}
                 </>
               ),
               sort: (p) => p.title,
             },
-            { header: "Status", cell: (p) => <StatusTag tone={planStatusTone[p.status]}>{p.status}</StatusTag>, sort: (p) => p.status },
-            { header: "Last updated", cell: (p) => p.date, sort: (p) => dateKey(p.date) },
+            {
+              header: "Status",
+              cell: (p) => (
+                <StatusTag tone={planStatusTone[p.status]}>
+                  {p.status}
+                </StatusTag>
+              ),
+              sort: (p) => p.status,
+            },
+            {
+              header: "Last updated",
+              cell: (p) => p.date,
+              sort: (p) => dateKey(p.date),
+            },
             {
               header: "Attachments",
               cell: (p) => (
@@ -218,7 +307,9 @@ export default function FrailtyCarePlan() {
                   {p.files.map((file) => (
                     <li key={file}>
                       <span className="source-tag">Attachment</span>{" "}
-                      <a href="#" onClick={(event) => event.preventDefault()}>{file}</a>
+                      <a href="#" onClick={(event) => event.preventDefault()}>
+                        {file}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -232,7 +323,11 @@ export default function FrailtyCarePlan() {
       </DataSection>
 
       {carePlanDomains.map((domain) => (
-        <DomainPanel key={domain.id} domain={domain} onEdited={() => setSaved(false)} />
+        <DomainPanel
+          key={domain.id}
+          domain={domain}
+          onEdited={() => setSaved(false)}
+        />
       ))}
 
       <div className="page-steps">
@@ -240,7 +335,9 @@ export default function FrailtyCarePlan() {
         <ButtonLink variant="secondary" to="/frailty">
           Return to frailty snapshot
         </ButtonLink>
-        <p role="status" className="page-steps__status">{saved ? "Care plan saved." : ""}</p>
+        <p role="status" className="page-steps__status">
+          {saved ? "Care plan saved." : ""}
+        </p>
       </div>
     </RecordPage>
   );

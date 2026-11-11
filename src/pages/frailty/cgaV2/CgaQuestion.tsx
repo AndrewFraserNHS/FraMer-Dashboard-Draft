@@ -99,11 +99,17 @@ function PromptPage({
       errors={error ? [{ text: error.message, fieldId: error.fieldId }] : []}
       onContinue={() => {
         if (!review) {
-          setError({ message: "Select whether to confirm or edit this suggestion", fieldId: `${base}-review` });
+          setError({
+            message: "Select whether to confirm or edit this suggestion",
+            fieldId: `${base}-review`,
+          });
           return;
         }
         if (review === "changed" && !text.trim()) {
-          setError({ message: "Enter the edited suggestion", fieldId: `${base}-edit` });
+          setError({
+            message: "Enter the edited suggestion",
+            fieldId: `${base}-edit`,
+          });
           return;
         }
         store.setAnswer(step.id, {
@@ -121,7 +127,7 @@ function PromptPage({
         asPageHeading={{ caption }}
         before={
           <div className="nhsuk-inset-text question-page__existing">
-            <p className="question-page__existing-label">Suggested action</p>
+            <p className="question-page__existing-label">Completed action</p>
             <p>{prompt.text}</p>
           </div>
         }
@@ -133,7 +139,11 @@ function PromptPage({
         }}
         options={[
           { value: "confirmed", label: "Yes, confirm this suggestion" },
-          { value: "changed", label: "No, edit this suggestion", reveal: editedSuggestion },
+          {
+            value: "changed",
+            label: "No, edit this suggestion",
+            reveal: editedSuggestion,
+          },
         ]}
       />
     </QuestionPage>

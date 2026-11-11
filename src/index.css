@@ -1298,6 +1298,11 @@ button {
   background: #f0f4f5;
 }
 
+.dash-list-row.interactive:focus-visible {
+  outline: 4px solid var(--nhs-colour-focus);
+  outline-offset: 1px;
+}
+
 .dash-list-row > div {
   min-width: 0;
   display: flex;

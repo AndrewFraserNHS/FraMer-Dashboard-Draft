@@ -54,6 +54,18 @@ function sortRecords<T>(
 const activeCount = (count: number, noun = "active") =>
   `Showing ${count} of ${count} ${noun}`;
 
+type PriorityLevel = "high" | "medium" | "low";
+
+function priorityBreakdownSummary(
+  items: readonly PriorityLevel[],
+  label = "priority items",
+) {
+  const high = items.filter((item) => item === "high").length;
+  const medium = items.filter((item) => item === "medium").length;
+  const low = items.filter((item) => item === "low").length;
+  return `${high} high · ${medium} medium · ${low} low ${label}`;
+}
+
 const documentStatusTone = (status: string) =>
   status === "Received" ? "blue" as const : "green" as const;
 
@@ -86,7 +98,10 @@ export default function Summary() {
 
   const sections: Record<SectionName, ReactNode> = {
     "Clinical risks": (
-      <DataSection title="Clinical risks and alerts" summary={activeCount(risks.length)}>
+      <DataSection
+        title="Clinical risks and alerts"
+        summary={priorityBreakdownSummary(risks.map((risk) => risk.level))}
+      >
         {risks.map((risk) => (
           <ExpandableRow
             key={risk.id}
@@ -170,7 +185,9 @@ export default function Summary() {
     "Test results": (
       <DataSection
         title="Recent test results and investigations"
-        summary={`Showing ${results.length} of ${results.length} results`}
+        summary={priorityBreakdownSummary(
+          results.map((result) => result.tone),
+        )}
         defaultOpen={false}
         toolbar={
           <SortSelect
@@ -280,7 +297,10 @@ export default function Summary() {
     "Clinical events": (
       <DataSection
         title="Clinical events"
-        summary={`Showing ${events.length} of ${events.length} events`}
+        summary={priorityBreakdownSummary(
+          events.map((event) => event.level),
+          "priority events",
+        )}
         defaultOpen={false}
       >
         {events.map((item) => (
@@ -304,6 +324,7 @@ export default function Summary() {
               <small>{item.date} · {item.setting}</small>
               <SourceTag>{item.source}</SourceTag>
             </div>
+            <PriorityTag level={item.level} />
           </ExpandableRow>
         ))}
         <More to="/appointments">View full maternity timeline</More>

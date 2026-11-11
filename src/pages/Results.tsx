@@ -10,6 +10,7 @@ import { ToggleGroup } from "../components/ui/ToggleGroup";
 import { dateKey } from "../utils/sort";
 
 type Status = "Normal" | "Abnormal" | "Borderline" | "Declined" | "Awaiting" | "Reported";
+type PriorityLevel = "high" | "medium" | "low";
 
 const statusTone: Record<Status, TagTone> = {
   Normal: meaningTone.ok,
@@ -19,6 +20,19 @@ const statusTone: Record<Status, TagTone> = {
   Awaiting: meaningTone.info,
   Reported: meaningTone.neutral,
 };
+
+function priorityBreakdownSummary(levels: readonly PriorityLevel[], label = "priority items") {
+  const high = levels.filter((level) => level === "high").length;
+  const medium = levels.filter((level) => level === "medium").length;
+  const low = levels.filter((level) => level === "low").length;
+  return `${high} high · ${medium} medium · ${low} low ${label}`;
+}
+
+function statusPriority(status: Status): PriorityLevel {
+  if (status === "Abnormal") return "high";
+  if (status === "Borderline" || status === "Awaiting") return "medium";
+  return "low";
+}
 
 /** One status mapping for every table, so a value can never be shown with the wrong status. */
 function ResultStatus({ status }: { status: Status }) {
@@ -306,7 +320,10 @@ export default function Results() {
           <DataSection
             title="Antenatal screening"
             badge={<StatusTag tone="red">Attention</StatusTag>}
-            summary={`${antenatal.length} tests`}
+            summary={priorityBreakdownSummary(
+              antenatal.map((row) => statusPriority(row.status)),
+              "priority tests",
+            )}
             defaultOpen={false}
           >
             <DataTable
@@ -351,7 +368,10 @@ export default function Results() {
 
           <DataSection
             title="Urinalysis"
-            summary={`${dipstick.length} dipstick entries`}
+            summary={priorityBreakdownSummary(
+              dipstick.map((row) => (row.raised === "red" ? "high" : row.raised === "orange" ? "medium" : "low")),
+              "priority entries",
+            )}
             defaultOpen={false}
           >
             <Subsection title="Urine culture">
@@ -390,7 +410,10 @@ export default function Results() {
 
           <DataSection
             title="Imaging"
-            summary={`${scans.length} scans`}
+            summary={priorityBreakdownSummary(
+              scans.map((row) => statusPriority(row.status as Status)),
+              "priority scans",
+            )}
             defaultOpen={false}
           >
             <DataTable
@@ -470,7 +493,10 @@ export default function Results() {
       {show("awaiting") && (
         <DataSection
           title="Awaiting results"
-          summary={`${awaiting.length} awaiting`}
+          summary={priorityBreakdownSummary(
+            awaiting.map(() => "medium"),
+            "priority results",
+          )}
           defaultOpen={view === "awaiting"}
         >
           <DataTable

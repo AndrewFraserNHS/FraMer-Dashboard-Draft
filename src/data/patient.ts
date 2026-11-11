@@ -127,6 +127,7 @@ export const carePlans: readonly CarePlan[] = [
 
 export type ClinicalEvent = {
   date: string;
+  level: Priority;
   setting: string;
   event: string;
   reason: string;
@@ -136,10 +137,10 @@ export type ClinicalEvent = {
 };
 
 export const events: readonly ClinicalEvent[] = [
-  { date: formatDate("2026-09-15"), setting: "Community", event: "Perinatal mental health assessment", reason: "Wellbeing assessment completed. Safety plan reviewed.", organisation: "Community Perinatal Service", clinician: "Perinatal mental health team", source: "Perinatal mental health" },
-  { date: formatDate("2026-09-12"), setting: "Outpatient", event: "Gestational diabetes management", reason: "Metformin commenced. Glucose monitoring 4 times a day.", organisation: "Diabetes Antenatal Clinic", clinician: "Dr James Chen", source: "Diabetes service" },
-  { date: formatDate("2026-09-05"), setting: "Antenatal clinic", event: "Glucose tolerance test", reason: "Gestational diabetes mellitus confirmed following an abnormal oral glucose tolerance test.", organisation: "Antenatal Clinic", clinician: "Phlebotomy", source: "Lab results" },
-  { date: formatDate("2026-08-15"), setting: "Community", event: "Antenatal booking", reason: "Baseline observations and risk assessment completed.", organisation: "Community Midwifery - Central", clinician: "Midwife J. Davies", source: "BadgerNet Maternity" },
+  { date: formatDate("2026-09-15"), level: "medium", setting: "Community", event: "Perinatal mental health assessment", reason: "Wellbeing assessment completed. Safety plan reviewed.", organisation: "Community Perinatal Service", clinician: "Perinatal mental health team", source: "Perinatal mental health" },
+  { date: formatDate("2026-09-12"), level: "high", setting: "Outpatient", event: "Gestational diabetes management", reason: "Metformin commenced. Glucose monitoring 4 times a day.", organisation: "Diabetes Antenatal Clinic", clinician: "Dr James Chen", source: "Diabetes service" },
+  { date: formatDate("2026-09-05"), level: "high", setting: "Antenatal clinic", event: "Glucose tolerance test", reason: "Gestational diabetes mellitus confirmed following an abnormal oral glucose tolerance test.", organisation: "Antenatal Clinic", clinician: "Phlebotomy", source: "Lab results" },
+  { date: formatDate("2026-08-15"), level: "low", setting: "Community", event: "Antenatal booking", reason: "Baseline observations and risk assessment completed.", organisation: "Community Midwifery - Central", clinician: "Midwife J. Davies", source: "BadgerNet Maternity" },
 ];
 
 export type ClinicalDocument = {

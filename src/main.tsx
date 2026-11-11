@@ -200,11 +200,18 @@ function AppRouter() {
     );
   }
 
-  if (location.pathname === "/maternity-content-pattern-library") {
+  if (
+    location.pathname === "/maternity-content-pattern-library" ||
+    location.pathname === "/content-pattern"
+  ) {
     return (
       <Routes>
         <Route
           path="/maternity-content-pattern-library"
+          element={<ContentPatternLibrary />}
+        />
+        <Route
+          path="/content-pattern"
           element={<ContentPatternLibrary />}
         />
       </Routes>

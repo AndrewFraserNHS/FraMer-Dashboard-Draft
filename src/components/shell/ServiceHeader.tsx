@@ -1,5 +1,6 @@
 import { Bell, HelpCircle, LogOut, Menu, MessageSquare, Search, Settings, Baby } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { MenuButton } from "./MenuButton";
 
 const noop = () => {};
@@ -7,13 +8,16 @@ const nhsLogoSrc = `${import.meta.env.BASE_URL}assets/images/NHS%2010mm%20-%20RG
 
 /** The signed-in clinician's menu. Shown in the header on wide screens and in the expanded mobile menu on narrow ones. */
 export function AccountMenu() {
+  const navigate = useNavigate();
+
   return (
     <MenuButton
       label="Dr Amrita Kaur"
       items={[
         { label: "Change role", icon: <Settings size={16} aria-hidden="true" />, onSelect: noop },
         { label: "List birth notifications", icon: <Baby size={16} aria-hidden="true" />, onSelect: noop },
-        { label: "What's new", icon: <Bell size={16} aria-hidden="true" />, onSelect: noop },
+        { label: "Patterns", icon: <Bell size={16} aria-hidden="true" />, onSelect: () => navigate("/patterns") },
+        { label: "Content patterns", icon: <Bell size={16} aria-hidden="true" />, onSelect: () => navigate("/content-pattern") },
         { label: "Give feedback", icon: <MessageSquare size={16} aria-hidden="true" />, onSelect: noop },
         { label: "Help", icon: <HelpCircle size={16} aria-hidden="true" />, onSelect: noop },
         { label: "Log out", icon: <LogOut size={16} aria-hidden="true" />, onSelect: noop, separatorBefore: true },

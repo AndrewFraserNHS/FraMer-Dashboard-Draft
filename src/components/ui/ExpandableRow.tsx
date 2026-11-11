@@ -16,6 +16,8 @@ type ExpandableRowProps = {
 export function ExpandableRow({ children, detail }: ExpandableRowProps) {
   const [open, setOpen] = useState(false);
   const id = useId();
+  const triggerId = `${id}-trigger`;
+  const detailId = `${id}-detail`;
   const Icon = open ? Minus : Plus;
 
   return (
@@ -23,8 +25,9 @@ export function ExpandableRow({ children, detail }: ExpandableRowProps) {
       <button
         type="button"
         className={`dash-list-row interactive${open ? " expanded" : ""}`}
+        id={triggerId}
         aria-expanded={open}
-        aria-controls={id}
+        aria-controls={detailId}
         onClick={() => setOpen((value) => !value)}
       >
         {children}
@@ -32,7 +35,14 @@ export function ExpandableRow({ children, detail }: ExpandableRowProps) {
           <Icon size={14} strokeWidth={3} />
         </span>
       </button>
-      <div id={id} className="accordion-details" hidden={!open}>
+      <div
+        id={detailId}
+        className="accordion-details"
+        role="region"
+        aria-labelledby={triggerId}
+        tabIndex={open ? 0 : -1}
+        hidden={!open}
+      >
         {detail}
       </div>
     </>

@@ -68,8 +68,8 @@ export default function ContentPatternLibrary() {
       <main className="nhsuk-width-container content-pattern-library-main">
         <h1 className="nhsuk-heading-l">Content pattern library</h1>
         <p className="nhsuk-lede-text app-lede-text">
-          Reference patterns for writing and presenting maternity record content
-          in the viewer.
+          Reference patterns for writing and presenting record content in the
+          viewer.
         </p>
 
         <div className="nhsuk-grid-row">
@@ -362,7 +362,7 @@ export default function ContentPatternLibrary() {
 
               <Section
                 id="component-examples"
-                title="Component examples used in Maternity Viewer"
+                title="Component examples used in the viewer"
                 visible={activeSection === "component-examples"}
               >
                 <p>

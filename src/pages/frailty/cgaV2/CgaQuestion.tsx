@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { Source } from "../../../components/record/Source";
 import { AssessmentProgress } from "../../../components/ui/AssessmentProgress";
 import { RadioField, TextAreaQuestion, TextAreaField } from "../../../components/ui/FormField";
 import { QuestionPage } from "../../../components/ui/QuestionPage";
 import { StatusTag } from "../../../components/ui/StatusTag";
 import type { ErrorSummaryItem } from "../../../components/ui/ErrorSummary";
+import type { Provenance } from "../../../data/frailty";
+import { sourceMeta } from "../../../data/frailty";
 import {
   Answer,
   CGA_BASE,
@@ -235,7 +236,7 @@ function FieldPage({ step, caption, common, store, goNext }: FieldPageProps) {
             }
             asPageHeading={heading}
             hint={field.hint}
-            before={<ExistingValue value={existing} source={field.provenance ? <Source of={field.provenance} /> : undefined} />}
+            before={<ExistingValue value={existing} source={field.provenance} />}
             error={errors.review}
             value={review}
             onChange={(value) => setReview(value as Review)}
@@ -284,6 +285,14 @@ function existingFacts(value: string): Array<{ label: string; detail: string }> 
 
 export function ExistingValue({ value, source }: { value: string; source?: React.ReactNode }) {
   const facts = existingFacts(value);
+  const sourceLine =
+    source && typeof source !== "string" && "by" in source
+      ? `${(source as Provenance).by} · ${(source as Provenance).org} · ${(source as Provenance).system} · pulled ${(source as Provenance).pulled}`
+      : undefined;
+  const sourceLabel =
+    source && typeof source !== "string" && "source" in source
+      ? sourceMeta[(source as Provenance).source].label
+      : undefined;
   return (
     <div className="nhsuk-inset-text question-page__existing">
       <p className="question-page__existing-label">The record currently says</p>
@@ -299,10 +308,13 @@ export function ExistingValue({ value, source }: { value: string; source?: React
       ) : (
         <p className="question-page__existing-text">{value}</p>
       )}
-      {source && (
+      {sourceLine && (
         <div className="question-page__existing-source">
           <span className="question-page__existing-source-label">Source</span>
-          {source}
+          <p className="question-page__existing-source-text">
+            {sourceLabel ? `${sourceLabel}: ` : ""}
+            {sourceLine}
+          </p>
         </div>
       )}
       <p className="review-field__notice">Pre-filled from another system. Not checked yet.</p>

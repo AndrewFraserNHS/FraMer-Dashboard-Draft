@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { TagTone } from "./StatusTag";
 
 export type ProvenanceRow = readonly [label: string, value: string];
@@ -16,11 +16,26 @@ type ProvenanceTagProps = {
  * Built on the native Popover API: it renders in the top layer, so it is never clipped by a
  * scrolling table, and the browser supplies Escape to close, light-dismiss and focus return.
  */
+/** The Popover API needs Chrome 114, Safari 17 or Firefox 125. Older browsers get the same detail in a plain disclosure. */
+const supportsPopover = typeof HTMLElement !== "undefined" && "popover" in HTMLElement.prototype;
+
 export function ProvenanceTag({ label, tone, details }: ProvenanceTagProps) {
   const panelId = useId();
   const panel = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
+
+  // Keep the panel next to its tag if the page scrolls or resizes while it is open
+  useEffect(() => {
+    if (!open) return;
+    const reposition = () => place();
+    window.addEventListener("scroll", reposition, true);
+    window.addEventListener("resize", reposition);
+    return () => {
+      window.removeEventListener("scroll", reposition, true);
+      window.removeEventListener("resize", reposition);
+    };
+  }, [open]);
 
   function place() {
     const button = trigger.current;
@@ -32,6 +47,25 @@ export function ProvenanceTag({ label, tone, details }: ProvenanceTagProps) {
     const top = below + box.offsetHeight > window.innerHeight ? Math.max(8, anchor.top - box.offsetHeight - 6) : below;
     box.style.left = `${left}px`;
     box.style.top = `${top}px`;
+  }
+
+  if (!supportsPopover) {
+    return (
+      <details className="provenance-fallback">
+        <summary className="provenance-tag nhsuk-tag nhsuk-tag--white">
+          {label}
+          <span className="nhs-visually-hidden"> source details</span>
+        </summary>
+        <dl className="provenance-panel provenance-panel--inline">
+          {details.map(([term, value]) => (
+            <div key={term}>
+              <dt>{term}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
+    );
   }
 
   return (

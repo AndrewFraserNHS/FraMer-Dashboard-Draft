@@ -18,16 +18,18 @@ type CalloutProps = {
   /** Originating record. Shown on its own line, never inline with the message. */
   source?: string;
   children?: ReactNode;
+  /** Set when the callout appears after an action, so assistive technology announces it */
+  live?: boolean;
 };
 
 /**
  * The one alert component. Used for clinical risk banners, warnings and notes.
  * The tone is also stated in hidden text, so it never relies on colour or icon alone.
  */
-export function Callout({ tone, title, label, source, children }: CalloutProps) {
+export function Callout({ tone, title, label, source, children, live }: CalloutProps) {
   const { Icon, label: defaultLabel } = config[tone];
   return (
-    <div className={`callout callout--${tone}`}>
+    <div className={`callout callout--${tone}`} role={live ? "status" : undefined}>
       <Icon size={20} aria-hidden="true" className="callout__icon" />
       <div className="callout__content">
         {title && (

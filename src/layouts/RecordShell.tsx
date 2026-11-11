@@ -8,6 +8,7 @@ import { AccountMenu, ServiceHeader } from "../components/shell/ServiceHeader";
 import { PatientBar, PatientDetails } from "../components/shell/PatientBar";
 import { Drawer } from "../components/ui/Drawer";
 import { NARROW_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
+import { usePersistentState } from "../hooks/usePersistentState";
 import { AlertsBand } from "../components/shell/AlertsBand";
 import { RecordFilterBar } from "../components/shell/RecordFilterBar";
 import { SafetyFlagPanel, safetyFlags } from "../components/record/SafetyFlagPanel";
@@ -18,7 +19,10 @@ import { OptionsSidebar, PageOptions, TextSize } from "../components/shell/Optio
 import { MenuButton } from "../components/shell/MenuButton";
 import { defaultSectionOrder, SectionOrderContext } from "../components/ui/SectionOrder";
 import { FrailtyFlagPanel, frailtyFlags } from "../components/record/FrailtyFlagPanel";
-import { allViewLabels, recordViews, viewForPath } from "../views";
+import { allViewLabels, recordViews, viewForPath, type ViewKey } from "../views";
+import { Button } from "../components/ui/Button";
+import { Dialog } from "../components/ui/Dialog";
+import { DetailList } from "../components/ui/DetailList";
 
 export default function RecordShell({ children }: { children: ReactNode }) {
   const location = useLocation();
@@ -33,15 +37,19 @@ export default function RecordShell({ children }: { children: ReactNode }) {
     "record",
   );
   const [accessToastVisible, setAccessToastVisible] = useState(false);
-  const [textSize, setTextSize] = useState<TextSize>(
-    "medium",
-  );
+  const [textSize, setTextSize] = usePersistentState<TextSize>("ncrs.textSize", "medium");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [showReorderModal, setShowReorderModal] = useState(false);
   const isNarrow = useMediaQuery(NARROW_QUERY);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cardOrder, setCardOrder] = useState<string[]>([...defaultSectionOrder]);
+  const [pendingView, setPendingView] = useState<ViewKey | null>(null);
+  const [storedOrder, setCardOrder] = usePersistentState<string[]>("ncrs.sectionOrder", [...defaultSectionOrder]);
+  // Ignore a saved order that no longer matches the sections on the page
+  const cardOrder =
+    storedOrder.length === defaultSectionOrder.length && defaultSectionOrder.every((name) => storedOrder.includes(name))
+      ? storedOrder
+      : [...defaultSectionOrder];
   const [panel, setPanel] = useState<DetailPanel | null>(null);
   const panelTrigger = useRef<HTMLElement | null>(null);
   const savedScrollPosition = useRef(0);
@@ -88,7 +96,12 @@ export default function RecordShell({ children }: { children: ReactNode }) {
         label: item.patient.name,
         hint: `${item.label} record`,
         current: item.key === view.key,
-        onSelect: () => item.key !== view.key && navigate(item.home),
+        onSelect: () => {
+          if (item.key === view.key) return;
+          // Never change patient in one click: confirm who is about to be opened (wrong-patient safeguard)
+          setMenuOpen(false);
+          setPendingView(item.key);
+        },
       }))}
     />
   );
@@ -243,6 +256,42 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                   </DetailPanelContext.Provider>
                 </main>
               </div>
+              <Dialog
+                open={pendingView !== null}
+                title="Switch patient?"
+                closeOnBackdrop={false}
+                onClose={() => setPendingView(null)}
+                footer={
+                  <>
+                    <Button variant="secondary" onClick={() => setPendingView(null)}>
+                      Stay on {view.patient.name}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const next = pendingView && recordViews[pendingView];
+                        setPendingView(null);
+                        if (next) navigate(next.home);
+                      }}
+                    >
+                      Open {pendingView && recordViews[pendingView].patient.name}
+                    </Button>
+                  </>
+                }
+              >
+                {pendingView && (
+                  <>
+                    <p>You are leaving {view.patient.name}'s record. Check these details match the patient in front of you.</p>
+                    <DetailList
+                      rows={[
+                        ["Name", recordViews[pendingView].patient.name],
+                        ["Date of birth", recordViews[pendingView].patient.dob],
+                        ["NHS number", recordViews[pendingView].patient.nhsNumber],
+                        ["Record", `${recordViews[pendingView].label} record`],
+                      ]}
+                    />
+                  </>
+                )}
+              </Dialog>
               {isNarrow && (
                 <Drawer open={menuOpen} title="Menu" onClose={() => setMenuOpen(false)}>
                   <button

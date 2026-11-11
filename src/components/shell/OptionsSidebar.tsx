@@ -4,20 +4,23 @@ import { useSetAllDisclosures } from "../ui/DisclosureGroup";
 
 export type TextSize = "small" | "medium" | "large";
 
-/** Expands or collapses every DataSection on the page through DisclosureGroup state. */
-function ExpandAllButton() {
+/**
+ * Expand and collapse every DataSection on the page through DisclosureGroup state. Two buttons with fixed
+ * names, rather than one that swaps its label, so the label can never disagree with what is on screen.
+ */
+function ExpandAllButtons() {
   const setAll = useSetAllDisclosures();
-  const [expanded, setExpanded] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const apply = (open: boolean) => {
+    setAll(open);
+    setAnnouncement(open ? "All sections expanded" : "All sections collapsed");
+  };
   return (
-    <button
-      type="button"
-      onClick={() => {
-        setAll(!expanded);
-        setExpanded(!expanded);
-      }}
-    >
-      {expanded ? "Collapse all sections" : "Expand all sections"}
-    </button>
+    <>
+      <button type="button" onClick={() => apply(true)}>Expand all sections</button>
+      <button type="button" onClick={() => apply(false)}>Collapse all sections</button>
+      <span role="status" className="nhs-visually-hidden">{announcement}</span>
+    </>
   );
 }
 
@@ -55,7 +58,7 @@ export function PageOptions({ textSize, onTextSize, filtersOpen, onToggleFilters
       <div className="ncrs-options__group">
         <p className="ncrs-options__label">This page</p>
         <div className="ncrs-options__actions">
-          <ExpandAllButton />
+          <ExpandAllButtons />
           {onReorder && (
             <button type="button" onClick={onReorder}>
               <ListOrdered size={16} aria-hidden="true" />

@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useId, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { RowChevron } from "./RowChevron";
 
@@ -53,6 +53,8 @@ export function DataTable<T>({
     defaultSort ?? null,
   );
   const [announcement, setAnnouncement] = useState("");
+  const sortId = useId();
+  const sortable = columns.filter((column) => column.sort);
 
   const sortedRows = useMemo(() => {
     const column = columns.find((candidate) => candidate.header === sort?.header);
@@ -69,6 +71,11 @@ export function DataTable<T>({
     });
   }, [rows, columns, sort]);
 
+  function applySort(header: string, direction: Direction) {
+    setSort({ header, direction });
+    setAnnouncement(`Sorted by ${header}, ${direction}`);
+  }
+
   function toggleSort(header: string) {
     const direction: Direction =
       sort?.header === header && sort.direction === "ascending" ? "descending" : "ascending";
@@ -78,14 +85,35 @@ export function DataTable<T>({
 
   return (
     <div className="table-scroll" role="region" aria-label={caption} tabIndex={0}>
-      <table className="documents-table data-table">
+      {sortable.length > 0 && (
+        <div className="data-table__mobile-sort">
+          <label htmlFor={sortId}>Sort {caption.toLowerCase()} by</label>
+          <select
+            id={sortId}
+            className="nhsuk-select"
+            value={sort ? `${sort.header}|${sort.direction}` : ""}
+            onChange={(event) => {
+              const [header, direction] = event.target.value.split("|");
+              applySort(header, direction as Direction);
+            }}
+          >
+            {!sort && <option value="">Choose</option>}
+            {sortable.flatMap((column) => [
+              <option key={`${column.header}-a`} value={`${column.header}|ascending`}>{column.header} (ascending)</option>,
+              <option key={`${column.header}-d`} value={`${column.header}|descending`}>{column.header} (descending)</option>,
+            ])}
+          </select>
+        </div>
+      )}
+      {/* Explicit roles keep the table semantics when the stacked mobile layout changes the display type */}
+      <table className="documents-table data-table nhsuk-table-responsive" role="table">
         <caption className="nhs-visually-hidden">{caption}</caption>
-        <thead>
-          <tr>
+        <thead role="rowgroup">
+          <tr role="row">
             {columns.map((column) => {
               const active = sort?.header === column.header ? sort.direction : undefined;
               return (
-                <th key={column.header} scope="col" aria-sort={column.sort ? (active ?? "none") : undefined}>
+                <th key={column.header} role="columnheader" scope="col" aria-sort={column.sort ? (active ?? "none") : undefined}>
                   {column.sort ? (
                     <button
                       type="button"
@@ -108,20 +136,20 @@ export function DataTable<T>({
               );
             })}
             {onView && (
-              <th scope="col">
+              <th role="columnheader" scope="col">
                 <span className="nhs-visually-hidden">Actions</span>
               </th>
             )}
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {sortedRows.map((row, index) => (
-            <tr key={rowKey(row, index)}>
+            <tr key={rowKey(row, index)} role="row">
               {columns.map((column) => (
-                <td key={column.header}>{column.cell(row)}</td>
+                <td key={column.header} role="cell" data-label={column.header}>{column.cell(row)}</td>
               ))}
               {onView && (
-                <td>
+                <td role="cell">
                   <button
                     type="button"
                     className="row-chevron-button"

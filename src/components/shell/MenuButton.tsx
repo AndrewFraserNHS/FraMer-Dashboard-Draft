@@ -53,10 +53,12 @@ export function MenuButton({ label, items, className = "" }: MenuButtonProps) {
   }, [open]);
 
   function moveFocus(event: React.KeyboardEvent<HTMLUListElement>) {
-    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
     const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button"));
     const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
+    if (event.key === "Home") return buttons[0]?.focus();
+    if (event.key === "End") return buttons[buttons.length - 1]?.focus();
     const step = event.key === "ArrowDown" ? 1 : -1;
     buttons[(current + step + buttons.length) % buttons.length]?.focus();
   }

@@ -168,7 +168,8 @@ Every record tab is built from these. Pages must not render their own header, pa
 | `ExpandableRow` | A list row that reveals a `DetailList` in place. Shows a plus that becomes a minus. Rows that open a modal or page use `RowChevron` instead, so the two behaviours look different | Button name comes from its visible text; `aria-expanded` carries the state, and the icon changes shape, not just colour |
 | `RowChevron` | The arrow on a row that opens a modal, panel or page | Decorative, hidden from assistive technology |
 | `RecordCardList` / `RecordCard` | Read-only record summaries with an optional status tag | Real list; status is text |
-| `Button` / `ButtonLink` | NHS buttons (`primary`, `secondary`); `ButtonLink` goes to another page | Defaults to `type="button"` so it never submits by accident |
+| `Button` / `ButtonLink` | NHS buttons (`primary`, `secondary`); `ButtonLink` goes to another page | Defaults to `type="button"`; `disabled` becomes `aria-disabled` so focus is never lost |
+| `DateField` | Date of birth and other known dates as day, month and year | Fieldset with legend, `bday` autocomplete, shared hint and error |
 | `TextField` / `TextAreaField` / `SelectField` | Every form control: visible label, hint, error | Hint and error are linked with `aria-describedby`; `aria-invalid`; error is text prefixed "Error:", never colour alone; hints replace placeholder-only instructions |
 | `ErrorSummary` | List of problems at the top of a form, each linking to its field | Takes focus when it appears; `role="alert"` |
 | `BackLink` | Back in a multi-step flow | Visible text is the name |

@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { BackLink } from "../ui/BackLink";
 import { Button } from "../ui/Button";
 import { ErrorSummary } from "../ui/ErrorSummary";
-import { TextField } from "../ui/FormField";
+import { DateField, DateParts, datePartsToIso, emptyDate, TextField } from "../ui/FormField";
 import { ToggleGroup } from "../ui/ToggleGroup";
 import { PatientFinderLayout } from "./PatientFinderLayout";
 
@@ -12,7 +12,7 @@ type Errors = { nhsNumber?: string; fullName?: string; dob?: string };
 // The prototype only knows one (fictional) patient
 const KNOWN = { nhsNumber: "4857772910", name: "leila", dob: "1995-06-14" };
 
-function validate(mode: Mode, values: { nhsNumber: string; fullName: string; dob: string }): Errors {
+function validate(mode: Mode, values: { nhsNumber: string; fullName: string; dob: DateParts }): Errors {
   if (mode === "nhs-number") {
     return values.nhsNumber.replace(/\s/g, "") === KNOWN.nhsNumber
       ? {}
@@ -20,7 +20,7 @@ function validate(mode: Mode, values: { nhsNumber: string; fullName: string; dob
   }
   const errors: Errors = {};
   if (!values.fullName.trim().toLowerCase().includes(KNOWN.name)) errors.fullName = "Enter the fictional patient name, Leila Khan";
-  if (values.dob !== KNOWN.dob) errors.dob = "Enter the fictional date of birth, 14 June 1995";
+  if (datePartsToIso(values.dob) !== KNOWN.dob) errors.dob = "Enter the fictional date of birth, 14 June 1995";
   return errors;
 }
 
@@ -29,10 +29,10 @@ const fieldIds = { nhsNumber: "search-nhs-number", fullName: "search-full-name",
 /** First step of finding a patient: search by NHS number or by name and date of birth. */
 export function PatientSearchScreen({ onFound, onCancel }: { onFound: () => void; onCancel: () => void }) {
   const [mode, setMode] = useState<Mode>("nhs-number");
-  const [values, setValues] = useState({ nhsNumber: "", fullName: "", dob: "" });
+  const [values, setValues] = useState<{ nhsNumber: string; fullName: string; dob: DateParts }>({ nhsNumber: "", fullName: "", dob: emptyDate });
   const [errors, setErrors] = useState<Errors>({});
   const [searching, setSearching] = useState(false);
-  const set = (key: keyof typeof values) => (event: { target: { value: string } }) =>
+  const set = (key: "nhsNumber" | "fullName") => (event: { target: { value: string } }) =>
     setValues((current) => ({ ...current, [key]: event.target.value }));
 
   function search(event: FormEvent) {
@@ -92,13 +92,11 @@ export function PatientSearchScreen({ onFound, onCancel }: { onFound: () => void
                 onChange={set("fullName")}
                 error={errors.fullName}
               />
-              <TextField
+              <DateField
                 id={fieldIds.dob}
-                label="Date of birth"
-                type="date"
-                required
+                legend="Date of birth"
                 value={values.dob}
-                onChange={set("dob")}
+                onChange={(dob) => setValues((current) => ({ ...current, dob }))}
                 error={errors.dob}
               />
             </>

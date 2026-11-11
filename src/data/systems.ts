@@ -9,5 +9,5 @@ export const connectedSystems: readonly ConnectedSystem[] = [
   { name: "Perinatal mental health", updated: `${formatDate("2026-10-03")}, 2:05pm`, status: "connected" },
   { name: "Ultrasound department", updated: `${formatDate("2026-09-30")}, 11:40am`, status: "connected" },
   { name: "Interpreter booking", updated: `${formatDate("2026-10-05")}, 9am`, status: "connected" },
-  { name: "Social support and community", updated: `${formatDate("2026-10-01")}, 10:15am`, status: "partial" },
+  { name: "Social support and community", updated: `${formatDate("2026-10-01")}, 10:15am`, status: "partial", gap: "voluntary sector and housing records are not shared with this record" },
 ];

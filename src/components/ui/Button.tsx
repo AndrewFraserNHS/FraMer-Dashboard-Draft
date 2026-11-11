@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes, MouseEvent } from "react";
 import { Link, LinkProps } from "react-router-dom";
 
 type Variant = "primary" | "secondary";
@@ -9,9 +9,29 @@ const buttonClass = (variant: Variant, extra: string) =>
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
 
-/** NHS design system button. Defaults to type="button" so it never submits a form by accident. */
-export function Button({ variant = "primary", className = "", type = "button", ...props }: ButtonProps) {
-  return <button type={type} className={buttonClass(variant, className)} {...props} />;
+/**
+ * NHS design system button. Defaults to type="button" so it never submits a form by accident.
+ * `disabled` is exposed as aria-disabled and the click is ignored, rather than using the disabled
+ * attribute: a disabled button leaves the tab order and drops focus, which strands keyboard and
+ * screen reader users when a button disables itself (for example while searching).
+ */
+export function Button({ variant = "primary", className = "", type = "button", disabled, onClick, ...props }: ButtonProps) {
+  const block = (event: MouseEvent<HTMLButtonElement>) => {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+    onClick?.(event);
+  };
+  return (
+    <button
+      type={type}
+      className={buttonClass(variant, className)}
+      aria-disabled={disabled || undefined}
+      onClick={block}
+      {...props}
+    />
+  );
 }
 
 /** A link that looks like a button, for actions that go to another page. */

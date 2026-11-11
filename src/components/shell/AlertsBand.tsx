@@ -11,37 +11,19 @@ export type AlertFlag = {
 };
 
 const tone: Record<Priority, TagTone> = { high: "red", medium: "orange", low: "blue" };
-const STORAGE_KEY = "ncrs.alerts.open";
-
-function readOpen(): boolean {
-  try {
-    const stored = window.sessionStorage.getItem(STORAGE_KEY);
-    if (stored) return stored === "open";
-  } catch {
-    /* fall through to the default */
-  }
-  // Open by default so no flag is missed, except on narrow screens where the list would fill the view
-  return window.innerWidth >= 900;
-}
 
 /**
- * Safety flags, collapsible. Open by default so none can be missed on arrival.
- * Collapsed, it still names every high-priority flag. Severity is stated in text.
+ * Safety flags, collapsible. Always open on arrival, at every screen size, so none can be missed:
+ * the choice to collapse is never remembered, so it cannot hide a flag on the next patient or the next visit.
+ * Collapsed, it still names every high-priority flag and counts the rest. Severity is stated in text.
  */
 export function AlertsBand({ flags }: { flags: readonly AlertFlag[] }) {
-  const [open, setOpen] = useState(readOpen);
+  const [open, setOpen] = useState(true);
   const id = useId();
   const high = flags.filter((flag) => flag.level === "high");
+  const hidden = flags.length - high.length;
 
-  function toggle() {
-    const next = !open;
-    setOpen(next);
-    try {
-      window.sessionStorage.setItem(STORAGE_KEY, next ? "open" : "closed");
-    } catch {
-      /* remembering the choice is a convenience only */
-    }
-  }
+  const toggle = () => setOpen((value) => !value);
 
   return (
     <section className="ncrs-alerts" aria-label="Safety flags">
@@ -70,6 +52,7 @@ export function AlertsBand({ flags }: { flags: readonly AlertFlag[] }) {
                 </button>
               </li>
             ))}
+            {hidden > 0 && <li className="ncrs-alerts__more">+ {hidden} more {hidden === 1 ? "flag" : "flags"} hidden</li>}
           </ul>
         )}
       </div>

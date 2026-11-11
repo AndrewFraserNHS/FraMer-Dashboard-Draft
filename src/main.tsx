@@ -10,6 +10,7 @@ import CarePlans from "./pages/CarePlans";
 import Documents from "./pages/Documents";
 import Audit from "./pages/Audit";
 import MaternityContentPatternLibrary from "./pages/MaternityContentPatternLibrary";
+import Patterns from "./pages/patterns/Patterns";
 import RecordShell from "./layouts/RecordShell";
 import FrailtySnapshot from "./pages/frailty/Snapshot";
 import FrailtyCga from "./pages/frailty/Cga";
@@ -85,6 +86,14 @@ function RecordRoutes() {
 function AppRouter() {
   const location = useLocation();
 
+  if (location.pathname === "/patterns") {
+    return (
+      <Routes>
+        <Route path="/patterns" element={<Patterns />} />
+      </Routes>
+    );
+  }
+
   if (location.pathname === "/maternity-content-pattern-library") {
     return (
       <Routes>
@@ -94,6 +103,10 @@ function AppRouter() {
   }
 
   return <RecordRoutes />;
+}
+
+if (import.meta.env.DEV) {
+  void import("./dev/axe").then((module) => module.startAxe());
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

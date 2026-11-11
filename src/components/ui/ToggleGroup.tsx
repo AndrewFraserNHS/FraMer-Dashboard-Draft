@@ -6,13 +6,17 @@ export function ToggleGroup<V extends string>({
   options,
   value,
   onChange,
+  status,
 }: {
   label: string;
   options: readonly Option<V>[];
   value: V;
   onChange: (value: V) => void;
+  /** Announced politely after a change, e.g. "Showing 4 of 12 results". Say what is now shown. */
+  status?: string;
 }) {
   return (
+    <>
     <div className="toggle-group" role="group" aria-label={label}>
       <span className="toggle-group__label" aria-hidden="true">
         {label}
@@ -32,5 +36,7 @@ export function ToggleGroup<V extends string>({
         </button>
       ))}
     </div>
+    {status !== undefined && <p role="status" className="nhs-visually-hidden">{status}</p>}
+    </>
   );
 }

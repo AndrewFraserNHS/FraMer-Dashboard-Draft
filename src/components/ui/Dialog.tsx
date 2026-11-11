@@ -6,6 +6,8 @@ type DialogProps = {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  /** Clicking outside closes the dialog. Turn off for dialogs that hold a form, so a stray click never discards input. */
+  closeOnBackdrop?: boolean;
 };
 
 /**
@@ -13,7 +15,7 @@ type DialogProps = {
  * inert background, Escape to close and focus return to the trigger.
  * Children only render while open, so internal state resets each time.
  */
-export function Dialog({ open, title, onClose, children, footer }: DialogProps) {
+export function Dialog({ open, title, onClose, children, footer, closeOnBackdrop = true }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -31,7 +33,7 @@ export function Dialog({ open, title, onClose, children, footer }: DialogProps) 
       aria-labelledby={titleId}
       onClose={onClose}
       onClick={(event) => {
-        if (event.target === ref.current) onClose();
+        if (closeOnBackdrop && event.target === ref.current) onClose();
       }}
     >
       {open && (

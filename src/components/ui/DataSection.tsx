@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useId, useState } from "react";
 import { useDisclosureSignal } from "./DisclosureGroup";
+import { HeadingLevelContext } from "./HeadingLevel";
 
 type DataSectionProps = {
   title: string;
@@ -47,16 +48,24 @@ export function DataSection({
           className="nhs-expander-summary"
           aria-expanded={open}
           aria-controls={`${id}-content`}
+          aria-describedby={badge || summary ? `${id}-meta` : undefined}
           onClick={() => setOpen((value) => !value)}
         >
           <span className="nhs-expander-summary-text">{title}</span>
-          {badge}
-          {summary && <span className="nhs-expander-count">{summary}</span>}
+          {/* Status and count are shown, but kept out of the button name so the name stays short. They are read as its description. */}
+          {(badge || summary) && (
+            <span id={`${id}-meta`} className="nhs-expander-meta" aria-hidden="true">
+              {badge}
+              {summary && <span className="nhs-expander-count">{summary}</span>}
+            </span>
+          )}
         </button>
       </Heading>
       <div id={`${id}-content`} className="nhs-expander-content" hidden={!open}>
         {toolbar && <div className="nhs-expander-action">{toolbar}</div>}
-        <div className="dash-card-body">{children}</div>
+        <HeadingLevelContext.Provider value={headingLevel}>
+          <div className="dash-card-body">{children}</div>
+        </HeadingLevelContext.Provider>
       </div>
     </section>
   );

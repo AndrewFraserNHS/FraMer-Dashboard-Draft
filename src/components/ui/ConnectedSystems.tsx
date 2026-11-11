@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { RowChevron } from "./RowChevron";
 import { DataSection } from "./DataSection";
-import { StatusTag, TagTone } from "./StatusTag";
+import { meaningTone, StatusTag, TagTone } from "./StatusTag";
 
 export type SystemStatus = "primary" | "connected" | "partial" | "offline";
 
@@ -9,12 +9,14 @@ export type ConnectedSystem = {
   name: string;
   updated: string;
   status: SystemStatus;
+  /** Required for partial and offline systems: say what is missing, so a clinician can judge whether it matters */
+  gap?: string;
 };
 
 const statusDisplay: Record<SystemStatus, { label: string; tone: TagTone }> = {
   primary: { label: "Primary Record", tone: "blue" },
   connected: { label: "Connected", tone: "green" },
-  partial: { label: "Partially connected", tone: "yellow" },
+  partial: { label: "Partially connected", tone: meaningTone.warning },
   offline: { label: "Not connected", tone: "grey" },
 };
 
@@ -27,6 +29,7 @@ type Props = {
   intro?: ReactNode;
   /** When set, each system is a button (for example to open a detail panel) */
   onSelect?: (system: ConnectedSystem) => void;
+  headingLevel?: 2 | 3;
 };
 
 export function ConnectedSystems({
@@ -35,6 +38,7 @@ export function ConnectedSystems({
   defaultOpen = false,
   intro,
   onSelect,
+  headingLevel,
 }: Props) {
   const connected = systems.filter(
     (system) => system.status === "primary" || system.status === "connected",
@@ -45,6 +49,7 @@ export function ConnectedSystems({
       title={title}
       summary={`${connected} of ${systems.length} connected`}
       defaultOpen={defaultOpen}
+      headingLevel={headingLevel}
       className="systems-section"
     >
       {intro && <p className="systems-intro">{intro}</p>}
@@ -56,6 +61,7 @@ export function ConnectedSystems({
               <span className="systems-grid__text">
                 <strong>{system.name}</strong>
                 <small>Latest update: {system.updated}</small>
+                {system.gap && <small className="systems-grid__gap">Missing: {system.gap}</small>}
               </span>
               <StatusTag tone={tone}>{label}</StatusTag>
               {onSelect && <RowChevron />}

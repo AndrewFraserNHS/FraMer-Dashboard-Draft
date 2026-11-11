@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { usePersistentState } from "../../hooks/usePersistentState";
 import { ButtonLink } from "../../components/ui/Button";
 import { DataSection } from "../../components/ui/DataSection";
 import { DetailList } from "../../components/ui/DetailList";
@@ -10,8 +10,8 @@ import { cgaDomains, cgaSummary, frailtyConnectedSystems } from "../../data/frai
 import { Source } from "../../components/record/Source";
 
 export default function FrailtyCga() {
-  const [fields, setFields] = useState<Record<string, ReviewStatus>>({});
-  const [prompts, setPrompts] = useState<Record<string, PromptStatus>>({});
+  const [fields, setFields] = usePersistentState<Record<string, ReviewStatus>>("ncrs.cga.fields", {}, "session");
+  const [prompts, setPrompts] = usePersistentState<Record<string, PromptStatus>>("ncrs.cga.prompts", {}, "session");
 
   const totalFields = cgaDomains.reduce((sum, domain) => sum + domain.fields.length, 0);
   const totalReviewed = cgaDomains.reduce(

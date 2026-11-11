@@ -13,7 +13,7 @@ export const frailtyPatient = {
   age: 80,
   sex: "Male",
   dob: "15 June 1945",
-  nhsNumber: "485 777 2910",
+  nhsNumber: "485 777 4136",
   address: "14 Elm Grove, Bromley, BR1 3PQ",
   gp: "Dr Sarah Wilson · Central City Practice",
   occupation: "Retired warehouse supervisor",
@@ -160,6 +160,8 @@ export type Vital = {
   value: string;
   unit: string;
   trend: Trend;
+  /** True when the direction of travel is clinically worrying. A rise or fall is not good or bad by itself. */
+  concern?: boolean;
   trendNote: string;
   updated: string;
   provenance: Provenance;
@@ -180,6 +182,7 @@ export const vitals: readonly Vital[] = [
     key: "postural-bp",
     label: "Postural blood pressure",
     value: "116/72",
+    concern: true,
     unit: "mmHg",
     trend: "down",
     trendNote: "Orthostatic drop when standing from 136/82",
@@ -332,6 +335,7 @@ export const vitals: readonly Vital[] = [
     key: "glucose",
     label: "Blood glucose",
     value: "7.2",
+    concern: true,
     unit: "mmol/L",
     trend: "up",
     trendNote: "Risen from about 6.4 to 7.2 mmol/L",
@@ -382,6 +386,7 @@ export const vitals: readonly Vital[] = [
     key: "ecg-bp",
     label: "ECG",
     value: "132/80",
+    concern: true,
     unit: "mmHg",
     trend: "up",
     trendNote: "Mildly elevated compared with previous ECG readings",
@@ -812,5 +817,5 @@ export const frailtyConnectedSystems = [
   { name: "Oracle Health (Croydon University Hospital)", updated: `${formatFrailtyDate("2026-01-31")}, 8:05am`, status: "connected" },
   { name: "Liquidlogic (Adult Social Care)", updated: `${formatFrailtyDate("2026-02-02")}, 3:30pm`, status: "connected" },
   { name: "NHS Pathways (111)", updated: `${formatFrailtyDate("2026-01-29")}, 10:15am`, status: "connected" },
-  { name: "Mental health (ePJS)", updated: `${formatFrailtyDate("2026-01-30")}, 9:00am`, status: "partial" },
+  { name: "Mental health (ePJS)", updated: `${formatFrailtyDate("2026-01-30")}, 9:00am`, status: "partial", gap: "care coordinator notes and crisis plans are not shared with this record" },
 ] as const;

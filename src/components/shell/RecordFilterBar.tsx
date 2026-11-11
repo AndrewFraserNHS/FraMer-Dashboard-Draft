@@ -10,6 +10,7 @@ export type FilterDefinition = {
 export function RecordFilterBar({ filters }: { filters: readonly FilterDefinition[] }) {
   return (
     <section className="record-filterbar" aria-label="Record filters">
+      <p className="record-filterbar__note">Prototype: these filters are not connected to the record yet.</p>
       {filters.map((filter) => (
         <SelectField key={filter.label} label={filter.label} options={filter.options} defaultValue={filter.options[0]} />
       ))}

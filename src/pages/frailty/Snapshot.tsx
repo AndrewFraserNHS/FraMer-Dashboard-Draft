@@ -65,10 +65,10 @@ function VitalHistory({ vital }: { vital: Vital }) {
           { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
           { header: "Reading", cell: (r) => <strong>{r.value}</strong> },
           ...(vital.readings.some((r) => r.weight)
-            ? [{ header: "Weight", cell: (r) => <strong>{r.weight}</strong> }]
+            ? [{ header: "Weight", cell: (r: (typeof vital.readings)[number]) => <strong>{r.weight}</strong> }]
             : []),
           ...(vital.readings.some((r) => r.height)
-            ? [{ header: "Height", cell: (r) => <strong>{r.height}</strong> }]
+            ? [{ header: "Height", cell: (r: (typeof vital.readings)[number]) => <strong>{r.height}</strong> }]
             : []),
           { header: "Recorded by", cell: (r) => r.by, sort: (r) => r.by },
           { header: "System", cell: (r) => r.system, sort: (r) => r.system },
@@ -109,8 +109,10 @@ export default function FrailtySnapshot() {
             unit="out of 9"
             size="large"
             trend="up"
+            concern
             note={`Up from ${frailtyScale.previous}. ${frailtyScale.label}.`}
-            onClick={() => setCfsOpen(true)}
+            onOpen={() => setCfsOpen(true)}
+            openLabel="View scale details"
           >
             <p className="key-figure__note">Last updated {frailtyScale.updated}</p>
             <Source of={frailtyScale.provenance} />
@@ -161,10 +163,8 @@ export default function FrailtySnapshot() {
           options={snapshotFilters.map((f) => ({ value: f.value, label: f.label }))}
           value={filter}
           onChange={setFilter}
+          status={`Showing ${active.label} panels`}
         />
-        <p className="nhs-visually-hidden" role="status">
-          Showing {active.label} panels
-        </p>
       </div>
 
       {(show("falls") || show("mobility") || show("carer")) && (
@@ -255,6 +255,7 @@ export default function FrailtySnapshot() {
                 value={vital.value}
                 unit={vital.unit}
                 trend={period === "latest" ? undefined : vital.trend}
+                concern={vital.concern}
                 note={period === "latest" ? `Updated ${vital.updated}` : period === "6m" ? vital.summary6m : vital.summary1y}
               >
                 <Source of={vital.provenance} />

@@ -21,11 +21,23 @@ export function ResultTag({ tone, children }: { tone: Priority; children: ReactN
   return <StatusTag tone={statusTone[tone]}>{children}</StatusTag>;
 }
 
+/**
+ * One colour per meaning, used everywhere. Borderline and medium priority are both orange, so the same
+ * state never appears in two different colours on different pages.
+ */
+export const meaningTone = {
+  critical: "red",
+  warning: "orange",
+  ok: "green",
+  info: "blue",
+  neutral: "grey",
+} as const satisfies Record<string, TagTone>;
+
 export type TagTone = "red" | "orange" | "yellow" | "green" | "blue" | "grey" | "purple";
 
 /** NHS tag (nhsuk-tag). Use for status; the label text must say what the status is. */
 export function StatusTag({ tone, children }: { tone: TagTone; children: ReactNode }) {
-  return <strong className={`nhsuk-tag nhsuk-tag--${tone}`}>{children}</strong>;
+  return <span className={`nhsuk-tag nhsuk-tag--${tone}`}>{children}</span>;
 }
 
 /** Where a piece of information came from. */

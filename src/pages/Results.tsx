@@ -4,7 +4,7 @@ import { DataSection } from "../components/ui/DataSection";
 import { DataTable } from "../components/ui/DataTable";
 import { FactsGrid } from "../components/ui/DetailList";
 import { RecordPage } from "../components/ui/RecordPage";
-import { SourceTag, StatusTag, TagTone } from "../components/ui/StatusTag";
+import { meaningTone, SourceTag, StatusTag, TagTone } from "../components/ui/StatusTag";
 import { Subsection } from "../components/ui/Subsection";
 import { ToggleGroup } from "../components/ui/ToggleGroup";
 import { dateKey } from "../utils/sort";
@@ -12,12 +12,12 @@ import { dateKey } from "../utils/sort";
 type Status = "Normal" | "Abnormal" | "Borderline" | "Declined" | "Awaiting" | "Reported";
 
 const statusTone: Record<Status, TagTone> = {
-  Normal: "green",
-  Abnormal: "red",
-  Borderline: "yellow",
-  Declined: "grey",
-  Awaiting: "blue",
-  Reported: "grey",
+  Normal: meaningTone.ok,
+  Abnormal: meaningTone.critical,
+  Borderline: meaningTone.warning,
+  Declined: meaningTone.neutral,
+  Awaiting: meaningTone.info,
+  Reported: meaningTone.neutral,
 };
 
 /** One status mapping for every table, so a value can never be shown with the wrong status. */
@@ -113,7 +113,7 @@ const antenatal = [
 
 const dipstick = [
   { date: formatDate("2026-08-15"), protein: "Negative", glucose: "Negative", leucocytes: "Negative", nitrites: "Negative", clinician: "Midwife J. Davies", raised: "" },
-  { date: formatDate("2026-09-05"), protein: "Negative", glucose: "Trace", leucocytes: "Negative", nitrites: "Negative", clinician: "Phlebotomy Team", raised: "yellow" },
+  { date: formatDate("2026-09-05"), protein: "Negative", glucose: "Trace", leucocytes: "Negative", nitrites: "Negative", clinician: "Phlebotomy Team", raised: "orange" },
   { date: formatDate("2026-09-12"), protein: "Negative", glucose: "+1", leucocytes: "Negative", nitrites: "Negative", clinician: "Dr James Chen", raised: "red" },
 ] as const;
 
@@ -152,6 +152,7 @@ export default function Results() {
   return (
     <RecordPage title="Results">
       <ToggleGroup
+        status={viewDescription[view]}
         label="Show results"
         value={view}
         onChange={setView}
@@ -161,7 +162,6 @@ export default function Results() {
           { value: "awaiting", label: "Awaiting results", count: awaiting.length },
         ]}
       />
-      <p role="status" className="nhs-visually-hidden">{viewDescription[view]}</p>
 
       {show("attention") && (
         <DataSection

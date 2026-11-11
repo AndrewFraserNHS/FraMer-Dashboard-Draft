@@ -78,7 +78,7 @@ const medicines = [
 const mentalHealthRiskTone = (risk: string): TagTone => {
   if (risk.includes("No immediate")) return "green";
   if (risk.includes("Moderate")) return "orange";
-  if (risk.includes("Borderline")) return "yellow";
+  if (risk.includes("Borderline")) return "orange";
   return "grey";
 };
 

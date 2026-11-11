@@ -48,6 +48,9 @@ type ReviewFieldProps = {
  * One assessment item the clinician reviews: read what the system found, accept, edit or reject it.
  * The title is the label of the control. Reject is reversible and moves focus to Undo, so
  * nothing vanishes without the user knowing.
+ *
+ * Pre-filled answers invite accepting without reading (automation bias), so a pending pre-filled item always
+ * says in words that it has not been checked, there is no accept-all, and the notice is read with the Accept button.
  */
 export function ReviewField({
   title,
@@ -69,6 +72,8 @@ export function ReviewField({
   const { rejectedAction, restore } = useFocusOnChange<HTMLButtonElement>(status);
   const tag = statusTag[status];
   const showsTextarea = !choices && (!prefill || editing);
+  const unchecked = !!(prefill || choices) && status === "pending";
+  const noticeId = `${uid}-notice`;
 
   if (status === "rejected") {
     return (
@@ -98,6 +103,12 @@ export function ReviewField({
         {risk && <StatusTag tone="red">Risk</StatusTag>}
         <StatusTag tone={tag.tone}>{tag.text}</StatusTag>
       </div>
+
+      {unchecked && (
+        <p id={noticeId} className="review-field__notice">
+          Pre-filled from another system. Not checked yet: read it and confirm it is correct before you accept.
+        </p>
+      )}
 
       {hint && (showsTextarea || choices) && (
         <p id={hintId} className="review-field__hint">
@@ -156,6 +167,7 @@ export function ReviewField({
           type="button"
           className="review-button review-button--accept"
           aria-pressed={status === "accepted"}
+          aria-describedby={unchecked ? noticeId : undefined}
           onClick={() => onStatus(status === "accepted" ? "pending" : "accepted")}
           ref={(node) => {
             restore.current = node;

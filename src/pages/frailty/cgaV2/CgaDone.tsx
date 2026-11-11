@@ -8,7 +8,7 @@ import { CGA_BASE, checkPath } from "./model";
 export default function CgaDone() {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    document.title = "Assessment complete — Comprehensive Geriatric Assessment";
+    document.title = "Assessment complete - Comprehensive Geriatric Assessment";
     heading.current?.focus();
   }, []);
 

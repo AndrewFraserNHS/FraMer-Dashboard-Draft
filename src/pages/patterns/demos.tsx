@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import { AlertsBand } from "../../components/shell/AlertsBand";
+import { DetailPanel } from "../../components/shell/DetailPanel";
 import { MenuButton } from "../../components/shell/MenuButton";
 import { PatientBar } from "../../components/shell/PatientBar";
 import { RecordFilterBar } from "../../components/shell/RecordFilterBar";
@@ -111,6 +112,31 @@ function InlinePanelDemo() {
         <p>The history appears in the page flow. There is no overlay or focus trap.</p>
       </InlinePanel>
     </>
+  );
+}
+
+function DetailPanelDemo() {
+  return (
+    <DetailPanel
+      isOpen
+      onClose={() => {}}
+      tone="blue"
+      backLabel="Back to Summary"
+      eyebrow="Connected system"
+      title="Interpreter booking confirmation"
+      status="Booking confirmed"
+      content={
+        <DetailList
+          rows={[
+            ["Booking reference", "INT-447219"],
+            ["Language", "Bengali (Sylheti)"],
+            ["Date and time", `${formatDate("2026-10-07")} at 14:00`],
+            ["Provider", "Language Line"],
+            ["Source", "Interpreter booking"],
+          ]}
+        />
+      }
+    />
   );
 }
 
@@ -290,6 +316,7 @@ export const demos: Record<string, ReactNode> = {
     </>,
   ),
   "inline-panel": <InlinePanelDemo />,
+  "detail-panel": <DetailPanelDemo />,
   "reorder-panel": <ReorderDemo />,
   "menu-button": row(
     <MenuButton

@@ -125,7 +125,8 @@ export default function Patterns() {
   // The contents list starts open beside the page, and closed above it on small screens
   const wide = useMediaQuery("(min-width: 900px)");
   useEffect(() => {
-    document.title = "Pattern library — NHS National Care Records Service prototype";
+    document.title =
+      "Pattern library - NHS National Care Records Service prototype";
   }, []);
 
   const counts = {

@@ -1,0 +1,2 @@
+The modal we show for various bits of content, including Interpreter booking confirmation <section class="detail-panel tone-blue" aria-labelledby="detail-panel-title"></section>
+Needs to be added to pattern library and assessed as a component.

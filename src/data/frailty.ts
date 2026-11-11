@@ -134,21 +134,30 @@ export const frailtyRisks: readonly FrailtyRisk[] = [
   },
 ];
 
-export type ServiceStatus = "Active care" | "Referral pending — awaiting further detail" | "Recently discharged";
+export type ServiceStatus =
+  | "Active care"
+  | "Referral pending - awaiting further detail"
+  | "Recently discharged";
 
 export const services: readonly { name: string; status: ServiceStatus }[] = [
   { name: "Primary care", status: "Active care" },
   { name: "Social care", status: "Active care" },
   { name: "Community nursing", status: "Active care" },
   { name: "Community frailty service", status: "Active care" },
-  { name: "Community therapy (OT/PT)", status: "Referral pending — awaiting further detail" },
-  { name: "Falls service", status: "Referral pending — awaiting further detail" },
+  {
+    name: "Community therapy (OT/PT)",
+    status: "Referral pending - awaiting further detail",
+  },
+  {
+    name: "Falls service",
+    status: "Referral pending - awaiting further detail",
+  },
   { name: "Mental health services", status: "Recently discharged" },
 ];
 
 export const serviceTone: Record<ServiceStatus, "green" | "orange" | "grey"> = {
   "Active care": "green",
-  "Referral pending — awaiting further detail": "orange",
+  "Referral pending - awaiting further detail": "orange",
   "Recently discharged": "grey",
 };
 

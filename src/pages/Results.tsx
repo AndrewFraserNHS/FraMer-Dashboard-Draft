@@ -43,8 +43,8 @@ const haematology: readonly LabGroup[] = [
   {
     label: "Blood group and antibody screen",
     rows: [
-      normal("ABO group", "A", "—"),
-      normal("Rh factor", "Positive (D+)", "—"),
+      normal("ABO group", "A", "-"),
+      normal("Rh factor", "Positive (D+)", "-"),
       normal("Irregular antibodies", "Not detected", "Not detected"),
     ],
   },
@@ -52,7 +52,11 @@ const haematology: readonly LabGroup[] = [
     label: "Haemoglobinopathy screening",
     rows: [
       normal("Sickle cell screen", "Negative (AA)", "Negative"),
-      normal("Thalassaemia carrier status", "Low risk (MCH >27 pg)", "Low risk"),
+      normal(
+        "Thalassaemia carrier status",
+        "Low risk (MCH >27 pg)",
+        "Low risk",
+      ),
     ],
   },
 ];
@@ -104,11 +108,47 @@ const attention = [
 ];
 
 const antenatal = [
-  { test: "Combined first trimester screening", detail: "T21: 1:5400 · T18: 1:12000 · T13: < 1:20000", date: formatDate("2026-08-02"), result: "Low risk", source: "Screening Service", status: "Normal" as const },
-  { test: "NIPT (cfDNA)", detail: "Not requested — combined screening low risk", date: "—", result: "Not performed", source: "—", status: "Normal" as const },
-  { test: "Quadruple test", detail: "Not applicable — combined screening completed", date: "—", result: "Not performed", source: "—", status: "Normal" as const },
-  { test: "Oral glucose tolerance test (75 g)", detail: "Fasting 5.6 mmol/L (reference below 5.1) · 2-hour 8.7 mmol/L (reference below 7.8). Gestational diabetes mellitus confirmed.", date: formatDate("2026-09-05"), result: "Abnormal", source: "UHMB Biochemistry", status: "Abnormal" as const },
-  { test: "Group B Strep (GBS)", detail: "Patient declined GBS screening", date: "—", result: "Declined", source: "BadgerNet Maternity", status: "Declined" as const },
+  {
+    test: "Combined first trimester screening",
+    detail: "T21: 1:5400 · T18: 1:12000 · T13: < 1:20000",
+    date: formatDate("2026-08-02"),
+    result: "Low risk",
+    source: "Screening Service",
+    status: "Normal" as const,
+  },
+  {
+    test: "NIPT (cfDNA)",
+    detail: "Not requested - combined screening low risk",
+    date: "-",
+    result: "Not performed",
+    source: "-",
+    status: "Normal" as const,
+  },
+  {
+    test: "Quadruple test",
+    detail: "Not applicable - combined screening completed",
+    date: "-",
+    result: "Not performed",
+    source: "-",
+    status: "Normal" as const,
+  },
+  {
+    test: "Oral glucose tolerance test (75 g)",
+    detail:
+      "Fasting 5.6 mmol/L (reference below 5.1) · 2-hour 8.7 mmol/L (reference below 7.8). Gestational diabetes mellitus confirmed.",
+    date: formatDate("2026-09-05"),
+    result: "Abnormal",
+    source: "UHMB Biochemistry",
+    status: "Abnormal" as const,
+  },
+  {
+    test: "Group B Strep (GBS)",
+    detail: "Patient declined GBS screening",
+    date: "-",
+    result: "Declined",
+    source: "BadgerNet Maternity",
+    status: "Declined" as const,
+  },
 ];
 
 const dipstick = [
@@ -118,10 +158,51 @@ const dipstick = [
 ] as const;
 
 const scans = [
-  { title: "Dating scan", dept: "Ultrasound department", status: "Reported" as const, date: formatDate("2026-08-02"), gestation: "9 weeks and 0 days", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "Single intrauterine pregnancy. CRL consistent with dates. FH seen.", measurements: ["CRL: 23.4 mm"] },
-  { title: "Nuchal translucency", dept: "Screening Service", status: "Reported" as const, date: formatDate("2026-08-02"), gestation: "12 weeks and 4 days", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "NT measurement within normal limits. Nasal bone present.", measurements: ["CRL: 61 mm", "NT: 1.5 mm"] },
-  { title: "Anomaly scan (20w)", dept: "Ultrasound department", status: "Awaiting", date: formatDate("2026-09-02"), gestation: "20 weeks and 1 day", centre: "UHMB Ultrasound department", reporter: "Sonographer K. Patel", findings: "Booked — awaiting", measurements: [] as string[] },
-  { title: "Growth scan (28w)", dept: "Ultrasound department", status: "Awaiting", date: formatDate("2026-09-25"), gestation: "28 weeks and 0 days", centre: "UHMB Ultrasound department", reporter: "Sonographer M. Hussain", findings: "Scheduled (gestational diabetes mellitus pathway)", measurements: [] as string[] },
+  {
+    title: "Dating scan",
+    dept: "Ultrasound department",
+    status: "Reported" as const,
+    date: formatDate("2026-08-02"),
+    gestation: "9 weeks and 0 days",
+    centre: "UHMB Ultrasound department",
+    reporter: "Sonographer K. Patel",
+    findings:
+      "Single intrauterine pregnancy. CRL consistent with dates. FH seen.",
+    measurements: ["CRL: 23.4 mm"],
+  },
+  {
+    title: "Nuchal translucency",
+    dept: "Screening Service",
+    status: "Reported" as const,
+    date: formatDate("2026-08-02"),
+    gestation: "12 weeks and 4 days",
+    centre: "UHMB Ultrasound department",
+    reporter: "Sonographer K. Patel",
+    findings: "NT measurement within normal limits. Nasal bone present.",
+    measurements: ["CRL: 61 mm", "NT: 1.5 mm"],
+  },
+  {
+    title: "Anomaly scan (20w)",
+    dept: "Ultrasound department",
+    status: "Awaiting",
+    date: formatDate("2026-09-02"),
+    gestation: "20 weeks and 1 day",
+    centre: "UHMB Ultrasound department",
+    reporter: "Sonographer K. Patel",
+    findings: "Booked - awaiting",
+    measurements: [] as string[],
+  },
+  {
+    title: "Growth scan (28w)",
+    dept: "Ultrasound department",
+    status: "Awaiting",
+    date: formatDate("2026-09-25"),
+    gestation: "28 weeks and 0 days",
+    centre: "UHMB Ultrasound department",
+    reporter: "Sonographer M. Hussain",
+    findings: "Scheduled (gestational diabetes mellitus pathway)",
+    measurements: [] as string[],
+  },
 ];
 
 const awaiting = [
@@ -158,8 +239,16 @@ export default function Results() {
         onChange={setView}
         options={[
           { value: "all", label: "All results" },
-          { value: "attention", label: "Abnormal and borderline", count: attention.length },
-          { value: "awaiting", label: "Awaiting results", count: awaiting.length },
+          {
+            value: "attention",
+            label: "Abnormal and borderline",
+            count: attention.length,
+          },
+          {
+            value: "awaiting",
+            label: "Awaiting results",
+            count: awaiting.length,
+          },
         ]}
       />
 
@@ -185,8 +274,16 @@ export default function Results() {
                 ),
               },
               { header: "Value", cell: (r) => r.value },
-              { header: "Status", cell: (r) => <ResultStatus status={r.status} />, sort: (r) => r.status },
-              { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
+              {
+                header: "Status",
+                cell: (r) => <ResultStatus status={r.status} />,
+                sort: (r) => r.status,
+              },
+              {
+                header: "Date",
+                cell: (r) => r.date,
+                sort: (r) => dateKey(r.date),
+              },
             ]}
           />
         </DataSection>
@@ -227,15 +324,36 @@ export default function Results() {
                     </>
                   ),
                 },
-                { header: "Status", cell: (r) => <ResultStatus status={r.status} />, sort: (r) => r.status },
-                { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
-                { header: "Result", cell: (r) => r.result, sort: (r) => r.result },
-                { header: "Source", cell: (r) => (r.source === "—" ? "—" : <SourceTag>{r.source}</SourceTag>), sort: (r) => (r.source === "—" ? null : r.source) },
+                {
+                  header: "Status",
+                  cell: (r) => <ResultStatus status={r.status} />,
+                  sort: (r) => r.status,
+                },
+                {
+                  header: "Date",
+                  cell: (r) => r.date,
+                  sort: (r) => dateKey(r.date),
+                },
+                {
+                  header: "Result",
+                  cell: (r) => r.result,
+                  sort: (r) => r.result,
+                },
+                {
+                  header: "Source",
+                  cell: (r) =>
+                    r.source === "-" ? "-" : <SourceTag>{r.source}</SourceTag>,
+                  sort: (r) => (r.source === "-" ? null : r.source),
+                },
               ]}
             />
           </DataSection>
 
-          <DataSection title="Urinalysis" summary={`${dipstick.length} dipstick entries`} defaultOpen={false}>
+          <DataSection
+            title="Urinalysis"
+            summary={`${dipstick.length} dipstick entries`}
+            defaultOpen={false}
+          >
             <Subsection title="Urine culture">
               <FactsGrid facts={[["No growth", formatDate("2026-08-15")]]} />
             </Subsection>
@@ -245,13 +363,19 @@ export default function Results() {
                 rows={dipstick}
                 rowKey={(row) => row.date}
                 columns={[
-                  { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
+                  {
+                    header: "Date",
+                    cell: (r) => r.date,
+                    sort: (r) => dateKey(r.date),
+                  },
                   { header: "Protein", cell: (r) => r.protein },
                   {
                     header: "Glucose",
                     cell: (r) =>
                       r.raised ? (
-                        <StatusTag tone={r.raised as TagTone}>{r.glucose} (raised)</StatusTag>
+                        <StatusTag tone={r.raised as TagTone}>
+                          {r.glucose} (raised)
+                        </StatusTag>
                       ) : (
                         r.glucose
                       ),
@@ -264,7 +388,11 @@ export default function Results() {
             </Subsection>
           </DataSection>
 
-          <DataSection title="Imaging" summary={`${scans.length} scans`} defaultOpen={false}>
+          <DataSection
+            title="Imaging"
+            summary={`${scans.length} scans`}
+            defaultOpen={false}
+          >
             <DataTable
               caption="Imaging"
               rows={scans}
@@ -280,19 +408,37 @@ export default function Results() {
                     </>
                   ),
                 },
-                { header: "Status", cell: (r) => <ResultStatus status={r.status as Status} />, sort: (r) => r.status },
-                { header: "Date", cell: (r) => r.date, sort: (r) => dateKey(r.date) },
-                { header: "Gestation", cell: (r) => r.gestation, sort: (r) => r.gestation },
+                {
+                  header: "Status",
+                  cell: (r) => <ResultStatus status={r.status as Status} />,
+                  sort: (r) => r.status,
+                },
+                {
+                  header: "Date",
+                  cell: (r) => r.date,
+                  sort: (r) => dateKey(r.date),
+                },
+                {
+                  header: "Gestation",
+                  cell: (r) => r.gestation,
+                  sort: (r) => r.gestation,
+                },
                 {
                   header: "Findings",
                   cell: (r) => (
                     <>
                       {r.findings}
-                      {r.measurements.length > 0 && <small>{r.measurements.join(" · ")}</small>}
+                      {r.measurements.length > 0 && (
+                        <small>{r.measurements.join(" · ")}</small>
+                      )}
                     </>
                   ),
                 },
-                { header: "Reporter", cell: (r) => r.reporter, sort: (r) => r.reporter },
+                {
+                  header: "Reporter",
+                  cell: (r) => r.reporter,
+                  sort: (r) => r.reporter,
+                },
               ]}
               defaultSort={{ header: "Date", direction: "descending" }}
             />
@@ -304,9 +450,17 @@ export default function Results() {
               rows={cervical}
               rowKey={(row) => row.item}
               columns={[
-                { header: "Screening", cell: (r) => <strong>{r.item}</strong>, sort: (r) => r.item },
+                {
+                  header: "Screening",
+                  cell: (r) => <strong>{r.item}</strong>,
+                  sort: (r) => r.item,
+                },
                 { header: "Result", cell: (r) => r.result },
-                { header: "Source", cell: (r) => <SourceTag>{r.source}</SourceTag>, sort: (r) => r.source },
+                {
+                  header: "Source",
+                  cell: (r) => <SourceTag>{r.source}</SourceTag>,
+                  sort: (r) => r.source,
+                },
               ]}
             />
           </DataSection>
@@ -314,17 +468,37 @@ export default function Results() {
       )}
 
       {show("awaiting") && (
-        <DataSection title="Awaiting results" summary={`${awaiting.length} awaiting`} defaultOpen={view === "awaiting"}>
+        <DataSection
+          title="Awaiting results"
+          summary={`${awaiting.length} awaiting`}
+          defaultOpen={view === "awaiting"}
+        >
           <DataTable
             caption="Awaiting results"
             rows={awaiting}
             rowKey={(row) => row.test}
             columns={[
-              { header: "Test", cell: (r) => <strong>{r.test}</strong>, sort: (r) => r.test },
-              { header: "Due date", cell: (r) => r.due, sort: (r) => dateKey(r.due) },
-              { header: "Date requested", cell: (r) => r.requested, sort: (r) => dateKey(r.requested) },
+              {
+                header: "Test",
+                cell: (r) => <strong>{r.test}</strong>,
+                sort: (r) => r.test,
+              },
+              {
+                header: "Due date",
+                cell: (r) => r.due,
+                sort: (r) => dateKey(r.due),
+              },
+              {
+                header: "Date requested",
+                cell: (r) => r.requested,
+                sort: (r) => dateKey(r.requested),
+              },
               { header: "Requested by", cell: (r) => r.by, sort: (r) => r.by },
-              { header: "Source", cell: (r) => <SourceTag>{r.source}</SourceTag>, sort: (r) => r.source },
+              {
+                header: "Source",
+                cell: (r) => <SourceTag>{r.source}</SourceTag>,
+                sort: (r) => r.source,
+              },
             ]}
             defaultSort={{ header: "Due date", direction: "ascending" }}
           />

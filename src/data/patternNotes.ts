@@ -584,6 +584,36 @@ export const patterns: readonly PatternNote[] = [
     ],
   },
   {
+    id: "detail-panel",
+    name: "DetailPanel",
+    group: "Revealing content",
+    origin: "adapted",
+    source: "components/shell/DetailPanel.tsx, hooks/useDetailPanel.tsx, layouts/RecordShell.tsx",
+    summary:
+      "A drill-in detail view used for context such as interpreter booking confirmation and source-specific record details.",
+    accessibility: [
+      "The panel is a labelled section (aria-labelledby), with a visible heading that takes focus when opened.",
+      "The back control is a native button with visible text, and Escape closes the panel.",
+      "This pattern keeps context in the page flow and avoids hover-only interactions.",
+    ],
+    concerns: [
+      {
+        kind: "risk",
+        level: "medium",
+        text: "It behaves like an inline drill-in panel, not a true modal dialog. Background content remains available while open, which may not match user expectations for confirmation tasks.",
+      },
+      {
+        kind: "question",
+        text: "Should interpreter booking confirmation and similar confirmation content use a central modal pattern instead of this inline panel pattern?",
+      },
+      {
+        kind: "risk",
+        level: "low",
+        text: "The heading id is fixed to detail-panel-title. It is safe with one open panel, but would duplicate if multiple detail panels were rendered at once.",
+      },
+    ],
+  },
+  {
     id: "reorder-panel",
     name: "ReorderPanel",
     group: "Revealing content",

@@ -1313,7 +1313,7 @@ button {
   font-size: 12px;
 }
 
-.dash-list-row span,
+/* .dash-list-row span, */
 .dash-list-row small,
 .upcoming-list span,
 .upcoming-list small,
@@ -5600,7 +5600,7 @@ button.systems-grid__item:hover {
 .maternity-content .ncrs-main > .page-steps,
 .maternity-content .ncrs-main > .cga-progress,
 .cga-v2-main .ncrs-main > .page-steps,
-.cga-v2-main .ncrs-main > .cga-progress { width: calc(100% - 32px); max-width: 1280px; margin-left: auto; margin-right: auto; }
+.cga-v2-main .ncrs-main > .cga-progress { width: calc(100% - 32px); max-width: 1280px; margin-left: auto; margin-right: auto; margin-bottom: 10px}
 
 /* Review field: read what the system found, then accept, edit or reject it */
 .review-fields, .review-prompts { display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }

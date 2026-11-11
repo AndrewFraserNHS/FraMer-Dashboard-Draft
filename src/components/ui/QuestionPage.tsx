@@ -44,7 +44,7 @@ export function QuestionPage({
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    document.title = `${documentTitle} — Comprehensive Geriatric Assessment`;
+    document.title = `${documentTitle} - Comprehensive Geriatric Assessment`;
     const heading = root.current?.querySelector<HTMLElement>("h1");
     if (heading) {
       heading.tabIndex = -1;

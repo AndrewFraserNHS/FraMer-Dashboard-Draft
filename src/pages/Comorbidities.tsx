@@ -11,10 +11,31 @@ import { Subsection } from "../components/ui/Subsection";
 import { dateKey } from "../utils/sort";
 
 const riskFactors = [
-  { factor: "Ethnicity", detail: "Asian / Asian British — Pakistani", note: "South Asian ethnicity is classified as high-risk for gestational diabetes mellitus per NICE NG3", source: "Demographics", flagged: true },
-  { factor: "Body mass index ≥ 30", detail: "Body mass index 32 (Obesity)", source: "Booking", flagged: true },
-  { factor: "Family history of Type 2 diabetes", detail: "Mother: Type 2 Diabetes", source: "GP record", flagged: true },
-  { factor: "Previous gestational diabetes mellitus", detail: "Not applicable for first pregnancy", source: "BadgerNet", flagged: false },
+  {
+    factor: "Ethnicity",
+    detail: "Asian / Asian British - Pakistani",
+    note: "South Asian ethnicity is classified as high-risk for gestational diabetes mellitus per NICE NG3",
+    source: "Demographics",
+    flagged: true,
+  },
+  {
+    factor: "Body mass index ≥ 30",
+    detail: "Body mass index 32 (Obesity)",
+    source: "Booking",
+    flagged: true,
+  },
+  {
+    factor: "Family history of Type 2 diabetes",
+    detail: "Mother: Type 2 Diabetes",
+    source: "GP record",
+    flagged: true,
+  },
+  {
+    factor: "Previous gestational diabetes mellitus",
+    detail: "Not applicable for first pregnancy",
+    source: "BadgerNet",
+    flagged: false,
+  },
 ] as const;
 
 const glucoseResults = [
@@ -34,15 +55,40 @@ const contacts = [
 ] as const;
 
 const mentalHealthHistory = [
-  { item: "Anxiety history", detail: "Previous anxiety leading to panic attacks — recorded in GP/Rio", source: "GP and Rio" },
-  { item: "CMHT involvement", detail: "No current CMHT involvement recorded", source: "Connected record" },
-  { item: "Current psychiatric medications", detail: "No current psychiatric medications recorded", source: "Connected record" },
-  { item: "To confirm", detail: "Has the patient been prescribed anxiolytics or antidepressants previously?", source: "" },
+  {
+    item: "Anxiety history",
+    detail: "Previous anxiety leading to panic attacks - recorded in GP/Rio",
+    source: "GP and Rio",
+  },
+  {
+    item: "CMHT involvement",
+    detail: "No current CMHT involvement recorded",
+    source: "Connected record",
+  },
+  {
+    item: "Current psychiatric medications",
+    detail: "No current psychiatric medications recorded",
+    source: "Connected record",
+  },
+  {
+    item: "To confirm",
+    detail:
+      "Has the patient been prescribed anxiolytics or antidepressants previously?",
+    source: "",
+  },
 ] as const;
 
 const safetyContacts = [
-  { item: "Crisis line", detail: "Local crisis line (24/7) — demo number 0800 000 000", source: "Connected record" },
-  { item: "Maternity triage", detail: "Maternity triage — demo number 01524 555 999", source: "BadgerNet" },
+  {
+    item: "Crisis line",
+    detail: "Local crisis line (24/7) - demo number 0800 000 000",
+    source: "Connected record",
+  },
+  {
+    item: "Maternity triage",
+    detail: "Maternity triage - demo number 01524 555 999",
+    source: "BadgerNet",
+  },
 ] as const;
 
 const wellbeingPlan = [
@@ -90,7 +136,7 @@ export default function Comorbidities() {
         badge={<StatusTag tone="red">At risk</StatusTag>}
         defaultOpen={false}
       >
-        <Callout tone="red" title="Gestational diabetes — at risk">
+        <Callout tone="red" title="Gestational diabetes - at risk">
           <p>
             Risk factors identified from connected records. Diagnosis may or may
             not be confirmed.
@@ -205,7 +251,7 @@ export default function Comorbidities() {
               {
                 header: "Source",
                 cell: (r) =>
-                  r.source ? <SourceTag>{r.source}</SourceTag> : "—",
+                  r.source ? <SourceTag>{r.source}</SourceTag> : "-",
                 sort: (r) => r.source || null,
               },
             ]}
@@ -231,7 +277,11 @@ export default function Comorbidities() {
               { header: "Score", cell: (r) => r.score },
               {
                 header: "Risk level",
-                cell: (r) => <StatusTag tone={mentalHealthRiskTone(r.risk)}>{r.risk}</StatusTag>,
+                cell: (r) => (
+                  <StatusTag tone={mentalHealthRiskTone(r.risk)}>
+                    {r.risk}
+                  </StatusTag>
+                ),
                 sort: (r) => r.risk,
               },
               {
@@ -319,7 +369,7 @@ export default function Comorbidities() {
         <Callout tone="grey" title="Clinical note">
           <p>
             Mental health history may be under-reported due to language barrier
-            and limited prior NHS engagement — clinical judgement required.
+            and limited prior NHS engagement - clinical judgement required.
           </p>
         </Callout>
 
@@ -330,7 +380,11 @@ export default function Comorbidities() {
                 key={action.title}
                 heading={action.title}
                 status={
-                  <StatusTag tone={action.priority === "High" ? "red" : "orange"}>{action.priority} priority</StatusTag>
+                  <StatusTag
+                    tone={action.priority === "High" ? "red" : "orange"}
+                  >
+                    {action.priority} priority
+                  </StatusTag>
                 }
                 meta={
                   <>

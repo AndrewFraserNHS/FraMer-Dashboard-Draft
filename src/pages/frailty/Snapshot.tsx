@@ -122,7 +122,9 @@ export default function FrailtySnapshot() {
             onOpen={openCfs}
             openLabel="View scale details"
           >
-            <p className="key-figure__note">Last updated {frailtyScale.updated}</p>
+            <p className="key-figure__note">
+              Last updated {frailtyScale.updated}
+            </p>
             <Source of={frailtyScale.provenance} />
           </KeyFigure>
           <div className="frailty-overview__text">
@@ -143,22 +145,34 @@ export default function FrailtySnapshot() {
         source={provenanceLine(prov.gpPatel("5 days ago"))}
       >
         <p>
-          Recorded {formatFrailtyDate("2025-11-14")}. Outcome of decision: <strong>Do not attempt CPR.</strong>
+          Recorded {formatFrailtyDate("2025-11-14")}. Outcome of decision:{" "}
+          <strong>Do not attempt CPR.</strong>
         </p>
         <p>
-          <Link to="/frailty/care-plan">View the advance care plan</Link> for the full context and rationale.
+          <Link to="/frailty/care-plan">View the advance care plan</Link> for
+          the full context and rationale.
         </p>
       </Callout>
 
       <DataSection
         title="Services involved"
-        summary={`${counts("Active care")} active · ${counts("Referral pending — awaiting further detail")} referral pending · ${counts("Recently discharged")} recently discharged`}
+        summary={`${counts("Active care")} active · ${counts("Referral pending - awaiting further detail")} referral pending · ${counts("Recently discharged")} recently discharged`}
       >
         <DataTable
           caption="Services involved in this patient's care"
           columns={[
-            { header: "Service", cell: (s) => <strong>{s.name}</strong>, sort: (s) => s.name },
-            { header: "Status", cell: (s) => <StatusTag tone={serviceTone[s.status]}>{s.status}</StatusTag>, sort: (s) => s.status },
+            {
+              header: "Service",
+              cell: (s) => <strong>{s.name}</strong>,
+              sort: (s) => s.name,
+            },
+            {
+              header: "Status",
+              cell: (s) => (
+                <StatusTag tone={serviceTone[s.status]}>{s.status}</StatusTag>
+              ),
+              sort: (s) => s.status,
+            },
           ]}
           rows={services}
           rowKey={(s) => s.name}
@@ -168,7 +182,10 @@ export default function FrailtySnapshot() {
       <div className="frailty-filter">
         <ToggleGroup
           label="Show"
-          options={snapshotFilters.map((f) => ({ value: f.value, label: f.label }))}
+          options={snapshotFilters.map((f) => ({
+            value: f.value,
+            label: f.label,
+          }))}
           value={filter}
           onChange={setFilter}
           status={`Showing ${active.label} panels`}
@@ -176,8 +193,13 @@ export default function FrailtySnapshot() {
       </div>
 
       {(show("falls") || show("mobility") || show("carer")) && (
-        <section className="frailty-insight-group" aria-labelledby="frailty-insights-heading">
-          <h2 id="frailty-insights-heading" className="subsection__title">Functional and carer insights</h2>
+        <section
+          className="frailty-insight-group"
+          aria-labelledby="frailty-insights-heading"
+        >
+          <h2 id="frailty-insights-heading" className="subsection__title">
+            Functional and carer insights
+          </h2>
           <div className="frailty-insight-cards">
             {show("falls") && (
               <article className="frailty-insight-card">
@@ -185,7 +207,10 @@ export default function FrailtySnapshot() {
                 <FactsGrid
                   facts={[
                     ["Falls in the last 3 months", "4"],
-                    ["Most recent", `${formatFrailtyDate("2026-01-22")}, ED attendance`],
+                    [
+                      "Most recent",
+                      `${formatFrailtyDate("2026-01-22")}, ED attendance`,
+                    ],
                   ]}
                 />
                 <SourceRow of={[prov.mdt, prov.acute()]} />
@@ -212,7 +237,10 @@ export default function FrailtySnapshot() {
                 <DetailList
                   rows={[
                     ["Primary carer", "Son (Nick Bennett) · 07700 900 123"],
-                    ["Contingency carer", "Daughter (Rachel Bennett) · 07700 900 456"],
+                    [
+                      "Contingency carer",
+                      "Daughter (Rachel Bennett) · 07700 900 456",
+                    ],
                     ["Carer strain", "Moderate (reported struggling)"],
                   ]}
                 />
@@ -230,7 +258,10 @@ export default function FrailtySnapshot() {
               ["Accommodation", "Ground floor flat"],
               ["Tenure", "Council property"],
               ["Household", "Lives alone"],
-              ["Family", "Wife: Dorothy Bennett (deceased, 2022). Son: Nick Bennett (primary carer, lives locally). Daughter: Rachel Bennett (lives in Manchester)."],
+              [
+                "Family",
+                "Wife: Dorothy Bennett (deceased, 2022). Son: Nick Bennett (primary carer, lives locally). Daughter: Rachel Bennett (lives in Manchester).",
+              ],
               ["Care package", "3 visits a day"],
               ["Transport", "Support required"],
             ]}
@@ -264,11 +295,25 @@ export default function FrailtySnapshot() {
                 unit={vital.unit}
                 trend={period === "latest" ? undefined : vital.trend}
                 concern={vital.concern}
-                note={period === "latest" ? `Updated ${vital.updated}` : period === "6m" ? vital.summary6m : vital.summary1y}
+                note={
+                  period === "latest"
+                    ? `Updated ${vital.updated}`
+                    : period === "6m"
+                      ? vital.summary6m
+                      : vital.summary1y
+                }
               >
                 <Source of={vital.provenance} />
-                <button type="button" className="link-button" onClick={() => openVital(vital)}>
-                  View history<span className="nhs-visually-hidden"> for {vital.label}</span>
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => openVital(vital)}
+                >
+                  View history
+                  <span className="nhs-visually-hidden">
+                    {" "}
+                    for {vital.label}
+                  </span>
                 </button>
               </KeyFigure>
             ))}
@@ -277,13 +322,28 @@ export default function FrailtySnapshot() {
       )}
 
       {show("conditions") && (
-        <DataSection title="Active conditions" summary={`${frailtyConditions.length} active`}>
+        <DataSection
+          title="Active conditions"
+          summary={`${frailtyConditions.length} active`}
+        >
           <DataTable
             caption="Active conditions"
             columns={[
-              { header: "Condition", cell: (c) => <strong>{c.name}</strong>, sort: (c) => c.name },
-              { header: "Since", cell: (c) => c.since, sort: (c) => Number(c.since) },
-              { header: "Source", cell: (c) => <Source of={prov.gpPatel()} />, sort: (c) => sourceMeta[c.source].label },
+              {
+                header: "Condition",
+                cell: (c) => <strong>{c.name}</strong>,
+                sort: (c) => c.name,
+              },
+              {
+                header: "Since",
+                cell: (c) => c.since,
+                sort: (c) => Number(c.since),
+              },
+              {
+                header: "Source",
+                cell: (c) => <Source of={prov.gpPatel()} />,
+                sort: (c) => sourceMeta[c.source].label,
+              },
             ]}
             rows={frailtyConditions}
             rowKey={(c) => c.name}
@@ -299,14 +359,32 @@ export default function FrailtySnapshot() {
           <DataTable
             caption="Current medications"
             columns={[
-              { header: "Medicine", cell: (m) => <strong>{m.name}</strong>, sort: (m) => m.name },
-              { header: "How often", cell: (m) => m.frequency, sort: (m) => m.frequency },
+              {
+                header: "Medicine",
+                cell: (m) => <strong>{m.name}</strong>,
+                sort: (m) => m.name,
+              },
+              {
+                header: "How often",
+                cell: (m) => m.frequency,
+                sort: (m) => m.frequency,
+              },
               {
                 header: "Status",
-                cell: (m) => <StatusTag tone={m.status === "Optimised" ? "green" : "orange"}>{m.status}</StatusTag>,
+                cell: (m) => (
+                  <StatusTag
+                    tone={m.status === "Optimised" ? "green" : "orange"}
+                  >
+                    {m.status}
+                  </StatusTag>
+                ),
                 sort: (m) => m.status,
               },
-              { header: "Last reviewed", cell: (m) => m.reviewed ?? "Not reviewed", sort: (m) => (m.reviewed ? dateKey(m.reviewed) : null) },
+              {
+                header: "Last reviewed",
+                cell: (m) => m.reviewed ?? "Not reviewed",
+                sort: (m) => (m.reviewed ? dateKey(m.reviewed) : null),
+              },
               { header: "Source", cell: (m) => <Source of={m.provenance} /> },
             ]}
             rows={frailtyMedicines}
@@ -316,12 +394,23 @@ export default function FrailtySnapshot() {
       )}
 
       {show("timeline") && (
-        <DataSection title="Timeline of encounters" summary={`${timeline.length} encounters`}>
+        <DataSection
+          title="Timeline of encounters"
+          summary={`${timeline.length} encounters`}
+        >
           <DataTable
             caption="Timeline of encounters, most recent first"
             columns={[
-              { header: "Date", cell: (e) => e.date, sort: (e) => dateKey(e.date) },
-              { header: "Encounter", cell: (e) => <strong>{e.title}</strong>, sort: (e) => e.title },
+              {
+                header: "Date",
+                cell: (e) => e.date,
+                sort: (e) => dateKey(e.date),
+              },
+              {
+                header: "Encounter",
+                cell: (e) => <strong>{e.title}</strong>,
+                sort: (e) => e.title,
+              },
               { header: "Details", cell: (e) => e.description },
               { header: "Source", cell: (e) => <Source of={e.provenance} /> },
             ]}
@@ -333,7 +422,10 @@ export default function FrailtySnapshot() {
       )}
 
       {show("appointments") && (
-        <DataSection title="Scheduled appointments" summary={`${frailtyAppointments.length} upcoming`}>
+        <DataSection
+          title="Scheduled appointments"
+          summary={`${frailtyAppointments.length} upcoming`}
+        >
           <DataTable
             caption="Scheduled appointments"
             columns={[
@@ -348,9 +440,17 @@ export default function FrailtySnapshot() {
                 ),
                 sort: (a) => a.title,
               },
-              { header: "Date", cell: (a) => a.date, sort: (a) => dateKey(a.date) },
+              {
+                header: "Date",
+                cell: (a) => a.date,
+                sort: (a) => dateKey(a.date),
+              },
               { header: "Time", cell: (a) => a.time, sort: (a) => a.time },
-              { header: "Location", cell: (a) => a.location, sort: (a) => a.location },
+              {
+                header: "Location",
+                cell: (a) => a.location,
+                sort: (a) => a.location,
+              },
               { header: "Source", cell: (a) => <Source of={a.provenance} /> },
             ]}
             rows={frailtyAppointments}
@@ -370,15 +470,26 @@ export default function FrailtySnapshot() {
         }
       >
         <p>
-          The Clinical Frailty Scale is a nine-point summary of frailty, with higher scores indicating greater frailty and a need for more support.
+          The Clinical Frailty Scale is a nine-point summary of frailty, with
+          higher scores indicating greater frailty and a need for more support.
         </p>
         <ul className="bullet-list">
-          <li><strong>6:</strong> Moderately frail — needs help with outdoor activities and keeping the house running.</li>
-          <li><strong>7:</strong> Severely frail — completely dependent for personal care.</li>
-          <li><strong>8:</strong> Very severely frail — completely dependent and nearing end of life.</li>
+          <li>
+            <strong>6:</strong> Moderately frail - needs help with outdoor
+            activities and keeping the house running.
+          </li>
+          <li>
+            <strong>7:</strong> Severely frail - completely dependent for
+            personal care.
+          </li>
+          <li>
+            <strong>8:</strong> Very severely frail - completely dependent and
+            nearing end of life.
+          </li>
         </ul>
         <p>
-          <strong>Current score:</strong> {frailtyScale.score} ({frailtyScale.label})
+          <strong>Current score:</strong> {frailtyScale.score} (
+          {frailtyScale.label})
         </p>
       </InlinePanel>
 

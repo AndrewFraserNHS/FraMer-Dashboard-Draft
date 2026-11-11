@@ -82,7 +82,8 @@ export default function RecordShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Question pages set their own title, one per step
     const ownsTitle = location.pathname.startsWith("/frailty/cga/v2/");
-    if (!ownsTitle) document.title = `${currentTabLabel} — ${view.patient.name} — NHS National Care Records Service`;
+    if (!ownsTitle)
+      document.title = `${currentTabLabel} - ${view.patient.name} - NHS National Care Records Service`;
     setPanel(null);
   }, [location.pathname, currentTabLabel, view]);
 
@@ -200,7 +201,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
             <div className="record-frame">
               {accessToastVisible && (
                 <div className="access-toast" role="status" aria-live="polite">
-                  Access logged — this record access has been recorded for audit
+                  Access logged - this record access has been recorded for audit
                 </div>
               )}
               <ServiceHeader
@@ -211,10 +212,18 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                 onToggleMenu={() => setMenuOpen((value) => !value)}
               />
               {isNarrow && (
-                <section id="ncrs-mobile-menu" className="ncrs-mobile-menu" hidden={!menuOpen} aria-label="Menu">
+                <section
+                  id="ncrs-mobile-menu"
+                  className="ncrs-mobile-menu"
+                  hidden={!menuOpen}
+                  aria-label="Menu"
+                >
                   <div className="ncrs-mobile-menu__header">
                     <h2>Menu</h2>
-                    <Button variant="secondary" onClick={() => setMenuOpen(false)}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setMenuOpen(false)}
+                    >
                       Close menu
                     </Button>
                   </div>
@@ -264,7 +273,13 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                 <ul>
                   {tabs.map(([label, path]) => (
                     <li key={path}>
-                      <NavLink to={path} end={path === "/" || tabs.some(([, other]) => other.startsWith(`${path}/`))}>
+                      <NavLink
+                        to={path}
+                        end={
+                          path === "/" ||
+                          tabs.some(([, other]) => other.startsWith(`${path}/`))
+                        }
+                      >
                         {label}
                       </NavLink>
                     </li>
@@ -272,11 +287,17 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                 </ul>
               </nav>
 
-              {view.filters && filtersOpen && <RecordFilterBar filters={view.filters} />}
+              {view.filters && filtersOpen && (
+                <RecordFilterBar filters={view.filters} />
+              )}
 
               <div className="record-workspace">
                 {!isNarrow && (
-                  <OptionsSidebar open={optionsOpen} onOpenChange={setOptionsOpen} {...pageOptions} />
+                  <OptionsSidebar
+                    open={optionsOpen}
+                    onOpenChange={setOptionsOpen}
+                    {...pageOptions}
+                  />
                 )}
                 <main
                   id="main-content"
@@ -296,22 +317,39 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                       content={
                         pendingView ? (
                           <>
-                            <p>You are leaving {view.patient.name}'s record. Check these details match the patient in front of you.</p>
+                            <p>
+                              You are leaving {view.patient.name}'s record.
+                              Check these details match the patient in front of
+                              you.
+                            </p>
                             <DetailList
                               rows={[
                                 ["Name", recordViews[pendingView].patient.name],
-                                ["Date of birth", recordViews[pendingView].patient.dob],
-                                ["NHS number", recordViews[pendingView].patient.nhsNumber],
-                                ["Record", `${recordViews[pendingView].label} record`],
+                                [
+                                  "Date of birth",
+                                  recordViews[pendingView].patient.dob,
+                                ],
+                                [
+                                  "NHS number",
+                                  recordViews[pendingView].patient.nhsNumber,
+                                ],
+                                [
+                                  "Record",
+                                  `${recordViews[pendingView].label} record`,
+                                ],
                               ]}
                             />
                             <div className="page-steps">
-                              <Button variant="secondary" onClick={() => setPendingView(null)}>
+                              <Button
+                                variant="secondary"
+                                onClick={() => setPendingView(null)}
+                              >
                                 Stay on {view.patient.name}
                               </Button>
                               <Button
                                 onClick={() => {
-                                  const next = pendingView && recordViews[pendingView];
+                                  const next =
+                                    pendingView && recordViews[pendingView];
                                   setPendingView(null);
                                   if (next) navigate(next.home);
                                 }}

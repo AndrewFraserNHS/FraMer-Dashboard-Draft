@@ -20,6 +20,7 @@ import { demos } from "./demos";
 const originTone: Record<Origin, TagTone> = { nhs: "green", adapted: "blue", custom: "purple" };
 const levelTone: Record<NonNullable<Concern["level"]>, TagTone> = { high: "red", medium: "orange", low: "grey" };
 const levelRank = { high: 0, medium: 1, low: 2 } as const;
+const nhsLogoSrc = `${import.meta.env.BASE_URL}assets/images/NHS%2010mm%20-%20RGB%20Blue.jpg`;
 
 type RegisterRow = {
   level: "high" | "medium" | "low" | "question";
@@ -142,14 +143,18 @@ export default function Patterns() {
   return (
     <DisclosureGroup>
       <div className="record-shell text-medium pl-page">
-        <a className="record-skip-link" href="#pl-main">Skip to main content</a>
+        <a className="record-skip-link" href="#pl-main">
+          Skip to main content
+        </a>
         <header className="ncrs-service">
           <div className="ncrs-service__brand">
-            <span className="ncrs-logo" role="img" aria-label="NHS">NHS</span>
-            <span className="ncrs-service__name">Pattern library</span>
+            <img className="ncrs-logo" src={nhsLogoSrc} alt="NHS" />
+            <span className="ncrs-service__name">National Care Records Service</span>
           </div>
           <div className="ncrs-service__actions">
-            <Link className="ncrs-service__link" to="/">Back to the record</Link>
+            <Link className="ncrs-service__link" to="/">
+              Back to the record
+            </Link>
           </div>
         </header>
 
@@ -158,19 +163,33 @@ export default function Patterns() {
             <details open={wide} key={String(wide)}>
               <summary>Contents</summary>
               <ul>
-                <li><a href="#overview">Overview</a></li>
+                <li>
+                  <a href="#overview">Overview</a>
+                </li>
                 {patternGroups.map((group) => (
                   <li key={group}>
-                    <a href={`#${group.replace(/\s+/g, "-").toLowerCase()}`}>{group}</a>
+                    <a href={`#${group.replace(/\s+/g, "-").toLowerCase()}`}>
+                      {group}
+                    </a>
                     <ul>
-                      {patterns.filter((pattern) => pattern.group === group).map((pattern) => (
-                        <li key={pattern.id}><a href={`#${pattern.id}`}>{pattern.name}</a></li>
-                      ))}
+                      {patterns
+                        .filter((pattern) => pattern.group === group)
+                        .map((pattern) => (
+                          <li key={pattern.id}>
+                            <a href={`#${pattern.id}`}>{pattern.name}</a>
+                          </li>
+                        ))}
                     </ul>
                   </li>
                 ))}
-                <li><a href="#register">Risk and question register</a></li>
-                <li><Link to="/maternity-content-pattern-library">Content patterns (wording)</Link></li>
+                <li>
+                  <a href="#register">Risk and question register</a>
+                </li>
+                <li>
+                  <Link to="/maternity-content-pattern-library">
+                    Content patterns (wording)
+                  </Link>
+                </li>
               </ul>
             </details>
           </nav>
@@ -178,22 +197,27 @@ export default function Patterns() {
           <main id="pl-main" className="pl-main" tabIndex={-1}>
             <h1>Pattern library</h1>
             <p className="pl-lede">
-              The components behind this prototype of an NHS clinician interface. For each one: where it comes from,
-              what we did for accessibility, and where we think there is risk or a question we cannot answer yet.
+              The components behind this prototype of an NHS clinician
+              interface. For each one: where it comes from, what we did for
+              accessibility, and where we think there is risk or a question we
+              cannot answer yet.
             </p>
 
             <section id="overview" aria-labelledby="overview-title">
               <h2 id="overview-title">Overview</h2>
               <p>
-                {patterns.length} patterns. Everything here is built on the NHS.UK frontend CSS and aims for WCAG 2.2 AA.
-                Nothing has been tested with assistive technology or with users yet, so treat every accessibility
-                note as a design intention, not a result.
+                {patterns.length} patterns. Everything here is built on the
+                NHS.UK frontend CSS and aims for WCAG 2.2 AA. Further work is
+                needed to test with assistive technology and users, so treat
+                every accessibility note as a design intention, not a result.
               </p>
 
               <div className="pl-origins">
                 {(Object.keys(originLabel) as Origin[]).map((origin) => (
                   <div key={origin} className="pl-origin">
-                    <StatusTag tone={originTone[origin]}>{originLabel[origin]}</StatusTag>
+                    <StatusTag tone={originTone[origin]}>
+                      {originLabel[origin]}
+                    </StatusTag>
                     <p className="pl-origin__count">{counts.origin(origin)}</p>
                     <p>{originMeaning[origin]}</p>
                   </div>
@@ -201,29 +225,57 @@ export default function Patterns() {
               </div>
 
               <Callout tone="amber" title="Where we are" label="Note: ">
-                {counts.mitigated} of {register.length} items are mitigated in code, including {counts.mitigatedHigh} high risks.{" "}
-                {counts.open} stay open: {counts.question} questions that need a decision, and risks that need
-                clinical safety review, user research or manual testing with assistive technology.{" "}
-                <a href="#register">See the register at the end of this page.</a>
+                {counts.mitigated} of {register.length} items are mitigated in
+                code, including {counts.mitigatedHigh} high risks. {counts.open}{" "}
+                stay open: {counts.question} questions that need a decision, and
+                risks that need clinical safety review, user research or manual
+                testing with assistive technology.{" "}
+                <a href="#register">
+                  See the register at the end of this page.
+                </a>
               </Callout>
 
               <h3>How accessibility is handled across the library</h3>
               <ul className="pl-checks">
-                <li>Native elements first: button, dialog, select, dl, table. The browser supplies keyboard, focus and screen reader behaviour.</li>
-                <li>Meaning is never colour alone. Status, priority and trend are always text, and often an icon as well.</li>
-                <li>Every control has a visible label that is its accessible name. Hints are text, not placeholders.</li>
-                <li>Anything that hides or removes content is reversible, and focus moves to where the user needs it next.</li>
-                <li>No hover-only content. The yellow NHS focus style is kept on every control.</li>
-                <li>Dragging has a button alternative. Overlays use the native dialog or popover, so Escape and focus return work.</li>
+                <li>
+                  Native elements first: button, dialog, select, dl, table. The
+                  browser supplies keyboard, focus and screen reader behaviour.
+                </li>
+                <li>
+                  Meaning is never colour alone. Status, priority and trend are
+                  always text, and often an icon as well.
+                </li>
+                <li>
+                  Every control has a visible label that is its accessible name.
+                  Hints are text, not placeholders.
+                </li>
+                <li>
+                  Anything that hides or removes content is reversible, and
+                  focus moves to where the user needs it next.
+                </li>
+                <li>
+                  No hover-only content. The yellow NHS focus style is kept on
+                  every control.
+                </li>
+                <li>
+                  Dragging has a button alternative. Overlays use the native
+                  dialog or popover, so Escape and focus return work.
+                </li>
               </ul>
             </section>
 
             {patternGroups.map((group) => (
-              <section key={group} id={group.replace(/\s+/g, "-").toLowerCase()} aria-labelledby={`${group}-title`}>
+              <section
+                key={group}
+                id={group.replace(/\s+/g, "-").toLowerCase()}
+                aria-labelledby={`${group}-title`}
+              >
                 <h2 id={`${group}-title`}>{group}</h2>
-                {patterns.filter((pattern) => pattern.group === group).map((pattern) => (
-                  <PatternEntry key={pattern.id} pattern={pattern} />
-                ))}
+                {patterns
+                  .filter((pattern) => pattern.group === group)
+                  .map((pattern) => (
+                    <PatternEntry key={pattern.id} pattern={pattern} />
+                  ))}
               </section>
             ))}
 
@@ -231,7 +283,9 @@ export default function Patterns() {
               <h2 id="register-title">Risk and question register</h2>
               <p>
                 Every risk and question from this page in one table.{" "}
-                {counts.high} high, {counts.medium} medium, {counts.low} low, {counts.question} questions. {counts.mitigated} mitigated, {counts.open} open. Sort by any column.
+                {counts.high} high, {counts.medium} medium, {counts.low} low,{" "}
+                {counts.question} questions. {counts.mitigated} mitigated,{" "}
+                {counts.open} open. Sort by any column.
               </p>
               <DataTable
                 caption="Risks and open questions"
@@ -243,17 +297,41 @@ export default function Patterns() {
                     header: "Level",
                     sort: (row) => rank(row.level),
                     cell: (row) => (
-                      <StatusTag tone={row.level === "question" ? "yellow" : levelTone[row.level]}>{levelLabel(row.level)}</StatusTag>
+                      <StatusTag
+                        tone={
+                          row.level === "question"
+                            ? "yellow"
+                            : levelTone[row.level]
+                        }
+                      >
+                        {levelLabel(row.level)}
+                      </StatusTag>
                     ),
                   },
-                  { header: "Status", sort: (row) => row.status, cell: (row) => <StatusTag tone={row.status === "mitigated" ? "green" : "grey"}>{row.status === "mitigated" ? "Mitigated" : "Open"}</StatusTag> },
-                  { header: "Component", cell: (row) => row.area, sort: (row) => row.area },
+                  {
+                    header: "Status",
+                    sort: (row) => row.status,
+                    cell: (row) => (
+                      <StatusTag
+                        tone={row.status === "mitigated" ? "green" : "grey"}
+                      >
+                        {row.status === "mitigated" ? "Mitigated" : "Open"}
+                      </StatusTag>
+                    ),
+                  },
+                  {
+                    header: "Component",
+                    cell: (row) => row.area,
+                    sort: (row) => row.area,
+                  },
                   {
                     header: "Detail",
                     cell: (row) => (
                       <>
                         {row.text}
-                        {row.mitigation && <small>Mitigation: {row.mitigation}</small>}
+                        {row.mitigation && (
+                          <small>Mitigation: {row.mitigation}</small>
+                        )}
                       </>
                     ),
                   },

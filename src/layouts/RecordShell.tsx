@@ -30,7 +30,10 @@ export default function RecordShell({ children }: { children: ReactNode }) {
   const view = recordViews[viewForPath(location.pathname)];
   const tabs = view.tabs;
   const currentTabLabel =
-    tabs.find(([, path]) => path === location.pathname)?.[0] ?? tabs[0][0];
+    // The longest tab path that matches, so pages inside a tab (such as CGA version 2) keep that tab current
+    [...tabs]
+      .sort((a, b) => b[1].length - a[1].length)
+      .find(([, path]) => location.pathname === path || location.pathname.startsWith(`${path}/`))?.[0] ?? tabs[0][0];
   const [viewAnnouncement, setViewAnnouncement] = useState("");
   const previousView = useRef(view.key);
   const [appView, setAppView] = useState<"search" | "confirm" | "record">(
@@ -77,7 +80,9 @@ export default function RecordShell({ children }: { children: ReactNode }) {
   }, [location.pathname, isNarrow]);
 
   useEffect(() => {
-    document.title = `${currentTabLabel} — ${view.patient.name} — NHS National Care Records Service`;
+    // Question pages set their own title, one per step
+    const ownsTitle = location.pathname.startsWith("/frailty/cga/v2/");
+    if (!ownsTitle) document.title = `${currentTabLabel} — ${view.patient.name} — NHS National Care Records Service`;
     setPanel(null);
   }, [location.pathname, currentTabLabel, view]);
 
@@ -219,7 +224,7 @@ export default function RecordShell({ children }: { children: ReactNode }) {
                 <ul>
                   {tabs.map(([label, path]) => (
                     <li key={path}>
-                      <NavLink to={path} end={path === "/"}>
+                      <NavLink to={path} end={path === "/" || tabs.some(([, other]) => other.startsWith(`${path}/`))}>
                         {label}
                       </NavLink>
                     </li>

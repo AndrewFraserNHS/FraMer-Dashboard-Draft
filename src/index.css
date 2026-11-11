@@ -5948,3 +5948,44 @@ button.systems-grid__item:hover {
 }
 .pl-mitigation { font-size: 0.9em; }
 .pl-mitigation--open { color: var(--ncrs-grey); }
+
+/* =========================================================================
+   Question pages and assessment progress (CGA version 2)
+   ========================================================================= */
+.maternity-content .question-page { max-width: 960px; margin: 0 auto; padding: 16px; background: #fff; min-height: 60vh; }
+.question-page .back-link { margin-bottom: 12px; }
+.question-page__body { max-width: 40em; }
+.question-page:has(.question-page__group) .question-page__body { max-width: 52em; }
+.question-page h1 { outline: none; margin-top: 8px; }
+.question-page h1:focus-visible { outline: 4px solid var(--ncrs-warning); outline-offset: 2px; }
+.question-page .nhsuk-fieldset__legend--l, .question-page .nhsuk-label--l { font-size: 1.75rem; line-height: 1.2; font-weight: 700; }
+.question-page .nhsuk-caption-l { display: block; margin-bottom: 4px; font-size: 1rem; font-weight: 400; color: var(--ncrs-grey); }
+.question-page__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 24px; }
+.question-page__actions .nhsuk-button { margin: 0; }
+.question-page__existing { margin: 8px 0 16px; }
+.question-page__existing-label { margin: 0 0 4px; font-weight: 700; }
+.question-page__group { margin-top: 24px; }
+
+.assessment-progress { margin: 8px 0 24px; }
+.assessment-progress__summary { margin: 0 0 8px; font-size: 0.9375rem; }
+.assessment-progress__done { color: var(--ncrs-grey); }
+.assessment-progress__sections { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.assessment-progress__section { flex: 1; min-width: 0; margin: 0; }
+.assessment-progress__section a { display: block; text-decoration: none; color: var(--ncrs-text); }
+.assessment-progress__bar { display: block; height: 10px; background: #e8edee; border: 1px solid var(--ncrs-grey); }
+.assessment-progress__bar > span { display: block; height: 100%; background: var(--ncrs-blue); }
+.assessment-progress__section.is-complete .assessment-progress__bar > span { background: #00703c; }
+.assessment-progress__section.is-current .assessment-progress__bar { border-width: 2px; border-color: var(--ncrs-text); height: 12px; }
+.assessment-progress__label { display: block; margin-top: 4px; font-size: 0.75rem; line-height: 1.2; overflow-wrap: anywhere; }
+.assessment-progress__section.is-current .assessment-progress__label { font-weight: 700; text-decoration: underline; }
+.assessment-progress__section a:hover .assessment-progress__label { text-decoration: underline; }
+.assessment-progress__section a:focus-visible { outline: 4px solid transparent; background: var(--ncrs-warning); box-shadow: 0 0 0 4px var(--ncrs-warning), 0 6px 0 4px var(--ncrs-text); }
+@media (max-width: 767px) {
+  .assessment-progress__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .assessment-progress__section.is-current .assessment-progress__label { position: static; width: auto; height: auto; clip: auto; white-space: normal; }
+  .question-page .nhsuk-fieldset__legend--l, .question-page .nhsuk-label--l { font-size: 1.5rem; }
+}
+@media (forced-colors: active) {
+  .assessment-progress__bar > span { background: Highlight; }
+  .assessment-progress__bar { border-color: CanvasText; }
+}

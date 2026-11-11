@@ -539,6 +539,8 @@ export type CgaField = {
   risk?: boolean;
   /** Free-text fields that were prefilled can be edited; the rest are typed into directly */
   editable?: boolean;
+  /** Cannot be skipped or removed in the step-by-step assessment */
+  mandatory?: boolean;
 };
 
 export type CgaDomain = {
@@ -572,7 +574,7 @@ export const cgaDomains: readonly CgaDomain[] = [
       { id: "ai-phys-4", text: "Rising blood glucose values over the last 3 readings. Glycaemic management review recommended." },
     ],
     fields: [
-      { id: "cfs", title: "Clinical Frailty Scale", kind: "choice", options: cfsOptions, initialChoice: "6", provenance: prov.mdt },
+      { id: "cfs", title: "Clinical Frailty Scale", kind: "choice", options: cfsOptions, initialChoice: "6", provenance: prov.mdt, mandatory: true },
       p("active-conditions", "Active conditions", "Type 2 diabetes (2012), hypertension (2008), chronic heart failure (2019), CKD stage 3a (2020), dementia, mixed type (2024)", prov.gpPatel()),
       p("history-presenting", "History of presenting condition", `80-year-old male with moderate frailty (CFS 6). 4 falls in the last 3 months, most recent ${formatFrailtyDate("2026-01-22")} resulting in ED attendance (no fracture). Episode of increased breathlessness ${formatFrailtyDate("2026-01-29")}, contact via 111 and subsequent virtual ward monitoring. Background of dementia (mixed type, 2024), chronic heart failure and type 2 diabetes. Carer strain noted; son's availability has recently reduced.`, prov.mdt),
       p("current-diagnosis", "Current diagnosis", "Type 2 diabetes mellitus (2012) · Hypertension (2008) · Chronic heart failure (2019) · Chronic kidney disease stage 3a (2020) · Dementia, mixed type (2024)", prov.gpPatel(), undefined, { editable: false }),

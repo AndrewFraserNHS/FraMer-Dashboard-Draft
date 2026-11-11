@@ -15,6 +15,10 @@ import RecordShell from "./layouts/RecordShell";
 import FrailtySnapshot from "./pages/frailty/Snapshot";
 import FrailtyCga from "./pages/frailty/Cga";
 import FrailtyCarePlan from "./pages/frailty/CarePlan";
+import CgaStart from "./pages/frailty/cgaV2/CgaStart";
+import CgaQuestion from "./pages/frailty/cgaV2/CgaQuestion";
+import CgaCheck from "./pages/frailty/cgaV2/CgaCheck";
+import CgaDone from "./pages/frailty/cgaV2/CgaDone";
 import "nhsuk-frontend/dist/nhsuk/nhsuk-frontend.css";
 import "./index.css";
 
@@ -77,6 +81,10 @@ function RecordRoutes() {
         <Route path="/audit" element={<Audit />} />
         <Route path="/frailty" element={<FrailtyRoute element={<FrailtySnapshot />} />} />
         <Route path="/frailty/cga" element={<FrailtyRoute element={<FrailtyCga />} />} />
+        <Route path="/frailty/cga/v2" element={<FrailtyRoute element={<CgaStart />} />} />
+        <Route path="/frailty/cga/v2/question/:stepId" element={<FrailtyRoute element={<CgaQuestion />} />} />
+        <Route path="/frailty/cga/v2/check" element={<FrailtyRoute element={<CgaCheck />} />} />
+        <Route path="/frailty/cga/v2/done" element={<FrailtyRoute element={<CgaDone />} />} />
         <Route path="/frailty/care-plan" element={<FrailtyRoute element={<FrailtyCarePlan />} />} />
       </Routes>
     </RecordShell>

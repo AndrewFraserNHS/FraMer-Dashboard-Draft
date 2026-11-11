@@ -4,6 +4,9 @@ import { MenuButton } from "../../components/shell/MenuButton";
 import { PatientBar } from "../../components/shell/PatientBar";
 import { RecordFilterBar } from "../../components/shell/RecordFilterBar";
 import { OptionsSidebar, PageOptions, TextSize } from "../../components/shell/OptionsSidebar";
+import { AssessmentProgress } from "../../components/ui/AssessmentProgress";
+import { RadioField } from "../../components/ui/FormField";
+import { SummaryList } from "../../components/ui/SummaryList";
 import { BackLink } from "../../components/ui/BackLink";
 import { Button, ButtonLink } from "../../components/ui/Button";
 import { Callout } from "../../components/ui/Callout";
@@ -152,8 +155,49 @@ const tableRows = [
   { name: "Sertraline", dose: "50mg", started: formatDate("2022-01-01") },
 ];
 
+function QuestionDemo() {
+  const [value, setValue] = useState("");
+  return (
+    <RadioField
+      name="pl-q"
+      legend="Clinical Frailty Scale: is this correct? (on a real page this is the h1)"
+      hint="The record says: 6, Moderately frail"
+      value={value}
+      onChange={setValue}
+      options={[
+        { value: "yes", label: "Yes, this is correct" },
+        { value: "change", label: "No, I want to change it", reveal: <p className="pl-note">A text box or choices appear here.</p> },
+        { value: "remove", label: "This does not apply, remove it" },
+      ]}
+    />
+  );
+}
+
 /** Live examples, keyed by pattern id (src/data/patternNotes.ts). */
 export const demos: Record<string, ReactNode> = {
+  "question-page": <QuestionDemo />,
+  "assessment-progress": (
+          <AssessmentProgress
+        currentId="mental"
+        questionInSection={2}
+        questionOverall={37}
+        totalQuestions={69}
+        sections={[
+          { id: "physical", title: "Physical", done: 32, total: 32, to: "#" },
+          { id: "mental", title: "Mental health", done: 1, total: 6, to: "#" },
+          { id: "social", title: "Social", done: 0, total: 5, to: "#" },
+          { id: "environment", title: "Environment", done: 0, total: 4, to: "#" },
+        ]}
+      />
+  ),
+  "summary-list": (
+          <SummaryList
+        rows={[
+          { key: "a", label: "Clinical Frailty Scale", value: "Confirmed as correct: 6", changeTo: "#" },
+          { key: "b", label: "Falls history", value: <StatusTag tone="orange">Not answered</StatusTag>, changeTo: "#" },
+        ]}
+      />
+  ),
   button: row(
     <>
       <Button>Primary</Button>

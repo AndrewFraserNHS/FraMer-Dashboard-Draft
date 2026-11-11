@@ -1,4 +1,6 @@
 import { usePersistentState } from "../../hooks/usePersistentState";
+import { Link } from "react-router-dom";
+import { Callout } from "../../components/ui/Callout";
 import { ButtonLink } from "../../components/ui/Button";
 import { DataSection } from "../../components/ui/DataSection";
 import { DetailList } from "../../components/ui/DetailList";
@@ -26,6 +28,10 @@ export default function FrailtyCga() {
       systems={frailtyConnectedSystems}
       showSystems={false}
     >
+      <Callout tone="blue" title="Try the step-by-step version" label="Information: ">
+        One question per page, with progress through each section. <Link to="/frailty/cga/v2">Open version 2 of the assessment</Link>.
+      </Callout>
+
       <p className="cga-progress" role="status">
         {totalReviewed} of {totalFields} items reviewed
       </p>

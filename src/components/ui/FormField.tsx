@@ -178,3 +178,126 @@ export function DateField({
     </div>
   );
 }
+
+/** Set when the control's label is the page's one h1, as in the NHS question pages pattern. */
+export type PageHeading = { /** Small text above the question, e.g. "Physical · Question 2 of 9" */ caption?: string };
+
+function HeadingLabel({ caption, children }: { caption?: string; children: ReactNode }) {
+  return (
+    <h1 className="nhsuk-label-wrapper">
+      <span className="nhsuk-label nhsuk-label--l">
+        {caption && <span className="nhsuk-caption-l">{caption}<span className="nhs-visually-hidden">: </span></span>}
+        {children}
+      </span>
+    </h1>
+  );
+}
+
+/** Multi-line text where the label is the page heading (one question per page). */
+export function TextAreaQuestion({ question, caption, hint, error, optional, id, ...input }: Omit<FieldShellProps, "label"> & PageHeading & { question: ReactNode } & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const ids = useIds(id);
+  return (
+    <div className={`nhsuk-form-group${error ? " nhsuk-form-group--error" : ""}`}>
+      <label htmlFor={ids.input}>
+        <HeadingLabel caption={caption}>
+          {question}
+          {optional && <OptionalMark />}
+        </HeadingLabel>
+      </label>
+      <FieldMessages ids={ids} hint={hint} error={error} />
+      <textarea
+        className={`nhsuk-textarea${error ? " nhsuk-textarea--error" : ""}`}
+        rows={6}
+        {...controlProps(ids, { hint, error }, input.required)}
+        {...input}
+      />
+    </div>
+  );
+}
+
+export type RadioOption = {
+  value: string;
+  label: string;
+  hint?: string;
+  /** Content revealed under this option while it is selected (NHS conditional reveal) */
+  reveal?: ReactNode;
+};
+
+type RadioFieldProps = Omit<FieldShellProps, "label"> & {
+  legend: ReactNode;
+  name: string;
+  options: readonly RadioOption[];
+  value: string;
+  onChange: (value: string) => void;
+  /** Makes the legend the page's h1 */
+  asPageHeading?: PageHeading;
+  /** Smaller radios for a nested question */
+  small?: boolean;
+  id?: string;
+  /** Shown between the question and the options, e.g. the value a system holds */
+  before?: ReactNode;
+};
+
+/**
+ * NHS radios: a fieldset whose legend is the question. With asPageHeading the legend is the page h1,
+ * so the question is the first thing a screen reader announces. Options can reveal more content.
+ */
+export function RadioField({ legend, name, hint, error, optional, id, options, value, onChange, asPageHeading, small, before }: RadioFieldProps) {
+  const generated = useId();
+  const base = id ?? generated;
+  const ids: Ids = { input: `${base}-${options[0]?.value}`, hint: `${base}-hint`, error: `${base}-error` };
+  const legendBody = (
+    <>
+      {asPageHeading?.caption && <span className="nhsuk-caption-l">{asPageHeading.caption}<span className="nhs-visually-hidden">: </span></span>}
+      {legend}
+      {optional && <OptionalMark />}
+    </>
+  );
+  return (
+    <div className={`nhsuk-form-group${error ? " nhsuk-form-group--error" : ""}`} id={base}>
+      <fieldset className="nhsuk-fieldset" aria-describedby={describedBy(ids, { hint, error })}>
+        <legend className={`nhsuk-fieldset__legend${asPageHeading ? " nhsuk-fieldset__legend--l" : ""}`}>
+          {asPageHeading ? <h1 className="nhsuk-fieldset__heading">{legendBody}</h1> : legendBody}
+        </legend>
+        <FieldMessages ids={ids} hint={hint} error={error} />
+        {before}
+        <div className={`nhsuk-radios${small ? " nhsuk-radios--small" : ""}`}>
+          {options.map((option) => {
+            const optionId = `${base}-${option.value}`;
+            const selected = value === option.value;
+            return (
+              <div key={option.value}>
+                <div className="nhsuk-radios__item">
+                  <input
+                    className="nhsuk-radios__input"
+                    id={optionId}
+                    name={name}
+                    type="radio"
+                    value={option.value}
+                    checked={selected}
+                    onChange={() => onChange(option.value)}
+                    aria-describedby={option.hint ? `${optionId}-hint` : undefined}
+                    aria-controls={option.reveal ? `${optionId}-reveal` : undefined}
+                  />
+                  <label className="nhsuk-label nhsuk-radios__label" htmlFor={optionId}>
+                    {option.label}
+                  </label>
+                  {option.hint && (
+                    <div id={`${optionId}-hint`} className="nhsuk-hint nhsuk-radios__hint">
+                      {option.hint}
+                    </div>
+                  )}
+                </div>
+                {option.reveal && (
+                  <div id={`${optionId}-reveal`} className="nhsuk-radios__conditional" hidden={!selected}>
+                    {option.reveal}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </fieldset>
+    </div>
+  );
+}

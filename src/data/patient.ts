@@ -24,13 +24,59 @@ export type Risk = {
 };
 
 export const risks: readonly Risk[] = [
-  { id: "gestational-diabetes", level: "high", title: "Gestational diabetes", detail: `Diagnosed ${formatDate("2026-09-05")} · Lab results`, source: "Lab results", banner: `Diagnosed ${formatDate("2026-09-05")}` },
-  { id: "penicillin-allergy", level: "high", title: "Penicillin allergy", detail: "Reaction: rash · GP record", source: "GP record", banner: "Reaction: rash" },
-  { id: "body-mass-index", level: "medium", title: "High body mass index (32)", detail: `Added to record ${formatDate("2026-08-15")} · BadgerNet Maternity`, source: "BadgerNet Maternity", banner: "BMI 32 - requires monitoring" },
-  { id: "mental-health", level: "medium", title: "Depression and anxiety (history)", detail: "Currently managed by Perinatal mental health team", source: "Maternity record", banner: "Currently managed by Perinatal mental health team" },
-  { id: "sertraline", level: "medium", title: "Sertraline in pregnancy", detail: "50mg once daily · GP record", source: "GP record" },
-  { id: "language", level: "medium", title: "Language need", detail: "Urdu interpreter required", source: "Maternity record" },
-  { id: "safeguarding", level: "low", title: "Safeguarding", detail: "3 concerns on record · 1 active", source: "Maternity record" },
+  {
+    id: "gestational-diabetes",
+    level: "high",
+    title: "Gestational diabetes",
+    detail: `Diagnosed ${formatDate("2026-09-05")} · Lab results`,
+    source: "Lab results",
+    banner: `Diagnosed ${formatDate("2026-09-05")}`,
+  },
+  {
+    id: "penicillin-allergy",
+    level: "high",
+    title: "Penicillin allergy",
+    detail: "Reaction: rash · GP record",
+    source: "GP record",
+    banner: "Reaction: rash",
+  },
+  {
+    id: "body-mass-index",
+    level: "medium",
+    title: "High body mass index (32)",
+    detail: `Added to record ${formatDate("2026-08-15")} · BadgerNet Maternity`,
+    source: "BadgerNet Maternity",
+    banner: "BMI 32 - requires monitoring",
+  },
+  {
+    id: "mental-health",
+    level: "medium",
+    title: "Depression and anxiety (history)",
+    detail: "Currently managed by Perinatal mental health team",
+    source: "Maternity record",
+    banner: "Currently managed by Perinatal mental health team",
+  },
+  {
+    id: "sertraline",
+    level: "medium",
+    title: "Sertraline in pregnancy",
+    detail: "50mg once daily · GP record",
+    source: "GP record",
+  },
+  {
+    id: "language",
+    level: "medium",
+    title: "Language need",
+    detail: "Urdu interpreter required",
+    source: "Maternity record",
+  },
+  {
+    id: "safeguarding",
+    level: "medium",
+    title: "Safeguarding",
+    detail: "3 concerns on record · 1 active",
+    source: "Maternity record",
+  },
 ];
 
 export const priorityLabel: Record<Priority, string> = {
@@ -161,11 +207,14 @@ export const documents: readonly ClinicalDocument[] = [
 ];
 
 export const socialContext: ReadonlyArray<readonly [string, string]> = [
-  ["Pregnancy", `Third pregnancy, 1 previous birth · 34 weeks and 1 day · estimated due date ${formatDate("2026-11-15")}`],
+  [
+    "Pregnancy",
+    `Third pregnancy, 1 previous birth · 34 weeks and 1 day · estimated due date ${formatDate("2026-11-15")}`,
+  ],
   ["Language", "Urdu · Interpreter required"],
   ["Living situation", "Lives with partner, Imran Khan"],
   ["Employment", "Retail assistant (part-time)"],
-  ["Safeguarding", "No active concern recorded"],
+  ["Safeguarding", "Domestic abuse risk, ongoing, speak with Leila alone"],
   ["Next of kin", "Imran Khan · 07811 223344"],
   ["Phone", "07980782416"],
   ["Email", "leila.khan@example.com"],

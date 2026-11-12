@@ -59,6 +59,17 @@ const riskAssessmentDetails: Record<
     linkedAction: "Safeguarding review with social worker and care package checks.",
     rationale: "High priority because unresolved safeguarding concerns may lead to harm.",
   },
+  "penicillin-allergy": {
+    recordedRisk: "Confirmed allergy to penicillin",
+    evidence:
+      "Penicillin allergy recorded with prior rash reaction and carried in the shared care record.",
+    scoreTool: "Medication and allergy review",
+    assessmentDate: formatFrailtyDate("2026-01-15"),
+    linkedAction:
+      "Avoid penicillin-based antibiotics and review alternatives when treatment is required.",
+    rationale:
+      "High priority because prescribing decisions must account for allergy to prevent avoidable harm.",
+  },
   polypharmacy: {
     recordedRisk: "Polypharmacy",
     evidence: "5 active medicines with frailty and falls context.",

@@ -168,6 +168,16 @@ export type FrailtyRisk = {
 
 export const frailtyRisks: readonly FrailtyRisk[] = [
   { id: "falls", level: "high", title: "Falls risk", status: "High", detail: "4 falls in the last 3 months", provenance: prov.gpPatel() },
+  {
+    id: "penicillin-allergy",
+    level: "high",
+    title: "Penicillin allergy",
+    status: "Confirmed allergy",
+    detail: "Rash after penicillin exposure",
+    explanation:
+      "Confirmed penicillin allergy recorded in the shared record. Check antibiotic alternatives before prescribing and ensure this remains visible across services.",
+    provenance: prov.gpPatel(),
+  },
   { id: "safeguarding", level: "high", title: "Safeguarding concerns", status: "Self-neglect flagged", provenance: prov.safeguarding },
   { id: "polypharmacy", level: "high", title: "Polypharmacy", status: "5 medications", provenance: prov.gpPharmacist },
   {

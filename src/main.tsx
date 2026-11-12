@@ -33,12 +33,14 @@ const nhsLogoSrc = `${import.meta.env.BASE_URL}assets/images/NHS%2010mm%20-%20RG
 function FrailtyRoute({ element }: { element: React.ReactElement }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [authenticated, setAuthenticated] = useState(() => sessionStorage.getItem("frailty-auth") === "@lpha");
+  const [authenticated, setAuthenticated] = useState(
+    () => sessionStorage.getItem("frailty-auth") === "@lph@",
+  );
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    if (password === "@lpha") {
-      sessionStorage.setItem("frailty-auth", "@lpha");
+    if (password === "@lph@") {
+      sessionStorage.setItem("frailty-auth", "@lph@");
       setAuthenticated(true);
       setError("");
       return;
